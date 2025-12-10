@@ -39,15 +39,15 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 **Objective**: Establish project structure, dependencies, and development environment.
 
-- [ ] [SETUP-001] [P] Initialize project structure with src/, tests/, specs/, history/ directories (plan.md:208-294)
-- [ ] [SETUP-002] [P] Create pyproject.toml with project metadata, dependencies (rich, click, python-dateutil), and dev dependencies (pytest, mypy, pytest-cov)
-- [ ] [SETUP-003] [P] Create .gitignore with Python, IDE, and OS ignores
-- [ ] [SETUP-004] [P] Create README.md with project overview and setup instructions
-- [ ] [SETUP-005] [P] Create .env.example with LOG_LEVEL configuration template
+- [X] [SETUP-001] [P] Initialize project structure with src/, tests/, specs/, history/ directories (plan.md:208-294)
+- [X] [SETUP-002] [P] Create pyproject.toml with project metadata, dependencies (rich, click, python-dateutil), and dev dependencies (pytest, mypy, pytest-cov)
+- [X] [SETUP-003] [P] Create .gitignore with Python, IDE, and OS ignores
+- [X] [SETUP-004] [P] Create README.md with project overview and setup instructions
+- [X] [SETUP-005] [P] Create .env.example with LOG_LEVEL configuration template
 - [ ] [SETUP-006] Install UV package manager and verify installation (plan.md:39)
 - [ ] [SETUP-007] Install project dependencies using `uv pip install -e .`
-- [ ] [SETUP-008] Create GitHub Actions CI workflow (.github/workflows/test.yml) for pytest, mypy, coverage (plan.md:105-121)
-- [ ] [SETUP-009] Create tests/conftest.py with shared pytest fixtures (sample tasks, mock storage)
+- [X] [SETUP-008] Create GitHub Actions CI workflow (.github/workflows/test.yml) for pytest, mypy, coverage (plan.md:105-121)
+- [X] [SETUP-009] Create tests/conftest.py with shared pytest fixtures (sample tasks, mock storage)
 
 **Acceptance**: Project structure matches plan.md structure, all dependencies install cleanly, CI workflow runs successfully.
 

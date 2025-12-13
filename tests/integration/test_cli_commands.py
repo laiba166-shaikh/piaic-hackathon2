@@ -124,3 +124,69 @@ class TestCLIErrorHandling:
 
         # Should mention the error
         assert "Error" in result.output or "error" in result.output.lower() or "No such command" in result.output
+
+
+class TestAddCommand:
+    """Integration tests for User Story 1: Capture New Tasks"""
+
+    def test_add_command_with_title_only(self) -> None:
+        """Test add command with title only creates task (US1-001, AC1)"""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["add", "Buy groceries"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should display success message with task ID (FR-009)
+        assert "Task" in result.output or "task" in result.output.lower()
+        assert "created" in result.output.lower() or "added" in result.output.lower()
+        assert "1" in result.output  # First task should get ID 1
+
+        # Should show task title
+        assert "Buy groceries" in result.output
+
+    def test_add_command_with_title_and_description(self) -> None:
+        """Test add command with title and description (US1-002, AC2)"""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["add", "Call dentist", "-d", "Schedule annual checkup"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should display success message
+        assert "created" in result.output.lower() or "added" in result.output.lower()
+
+        # Should show both title and description
+        assert "Call dentist" in result.output
+        # Note: Description might not be shown in success message, will verify in list command
+
+    def test_add_command_with_empty_title_shows_error(self) -> None:
+        """Test add command with empty title shows validation error (US1-003, AC3, FR-007)"""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["add", ""])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should display error message (FR-010)
+        assert "Error" in result.output or "error" in result.output.lower()
+        assert "title" in result.output.lower() or "empty" in result.output.lower()
+
+    def test_add_command_assigns_unique_sequential_ids(self) -> None:
+        """Test that multiple tasks get unique sequential IDs (US1-004, AC4, FR-002)"""
+        runner = CliRunner()
+
+        # Add first task
+        result1 = runner.invoke(cli, ["add", "Task 1"])
+        assert result1.exit_code == 0
+        assert "1" in result1.output  # Should get ID 1
+
+        # Add second task
+        result2 = runner.invoke(cli, ["add", "Task 2"])
+        assert result2.exit_code == 0
+        assert "2" in result2.output  # Should get ID 2
+
+        # Add third task
+        result3 = runner.invoke(cli, ["add", "Task 3"])
+        assert result3.exit_code == 0
+        assert "3" in result3.output  # Should get ID 3

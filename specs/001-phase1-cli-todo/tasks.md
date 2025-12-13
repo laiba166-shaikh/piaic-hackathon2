@@ -128,42 +128,42 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### RED Phase (Tests First)
 
-- [ ] [US1-001] [RED] Write integration test for `add` command with title only in tests/integration/test_cli_commands.py
+- [X] [US1-001] [RED] Write integration test for `add` command with title only in tests/integration/test_cli_commands.py
   - Test: `todo add "Buy groceries"` creates task with ID 1, incomplete status
   - Verify task appears in storage with auto-generated ID
-- [ ] [US1-002] [RED] Write integration test for `add` command with title and description
+- [X] [US1-002] [RED] Write integration test for `add` command with title and description
   - Test: `todo add "Call dentist" -d "Schedule annual checkup"`
   - Verify both title and description are stored
-- [ ] [US1-003] [RED] Write integration test for `add` command with empty title (FR-007)
+- [X] [US1-003] [RED] Write integration test for `add` command with empty title (FR-007)
   - Test: `todo add ""`
   - Verify ValidationError is raised with clear message
-- [ ] [US1-004] [RED] Write integration test for unique ID assignment (FR-002)
+- [X] [US1-004] [RED] Write integration test for unique ID assignment (FR-002)
   - Test: Add 3 tasks, verify IDs are 1, 2, 3 (sequential)
-- [ ] [US1-005] [RED] Write unit test for TaskService.create_task() in tests/unit/test_services.py
+- [X] [US1-005] [RED] Write unit test for TaskService.create_task() in tests/unit/test_services.py
   - Mock ITaskStorage, verify create() is called with correct Task object
 
 ### GREEN Phase (Implementation)
 
-- [ ] [US1-006] [GREEN] Create TaskService class in src/core/services.py with __init__(storage: ITaskStorage)
-- [ ] [US1-007] [GREEN] Implement TaskService.create_task(title, description=None) method
+- [X] [US1-006] [GREEN] Create TaskService class in src/core/services.py with __init__(storage: ITaskStorage)
+- [X] [US1-007] [GREEN] Implement TaskService.create_task(title, description=None) method
   - Create Task object with title, description
   - Call storage.create(task)
   - Return created task with assigned ID
-- [ ] [US1-008] [GREEN] Create src/cli/commands/basic.py with `add` command using Click
+- [X] [US1-008] [GREEN] Create src/cli/commands/basic.py with `add` command using Click
   - Define @click.command() for `add`
   - Accept title as argument, description as --description/-d option
   - Call TaskService.create_task()
   - Display success message with task ID (FR-009)
-- [ ] [US1-009] [GREEN] Register `add` command in src/cli/main.py
+- [X] [US1-009] [GREEN] Register `add` command in src/cli/main.py
 
 ### REFACTOR Phase
 
-- [ ] [US1-010] [REFACTOR] Add input validation in `add` command (FR-007)
+- [X] [US1-010] [REFACTOR] Add input validation in `add` command (FR-007)
   - Check title is not empty/whitespace
   - Display error message if validation fails (FR-010)
-- [ ] [US1-011] [REFACTOR] Add logging for task creation in src/core/services.py
-- [ ] [US1-012] [REFACTOR] Run all US1 tests, ensure 100% pass rate
-- [ ] [US1-013] [REFACTOR] Run mypy on src/core/services.py and src/cli/commands/basic.py
+- [X] [US1-011] [REFACTOR] Add logging for task creation in src/core/services.py
+- [X] [US1-012] [REFACTOR] Run all US1 tests, ensure 100% pass rate
+- [X] [US1-013] [REFACTOR] Run mypy on src/core/services.py and src/cli/commands/basic.py
 
 **Acceptance**: SC-001 (partial), all US1 acceptance scenarios pass, user can add tasks with title and optional description.
 

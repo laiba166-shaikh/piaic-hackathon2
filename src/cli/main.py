@@ -11,6 +11,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from src.config import APP_NAME, APP_VERSION, APP_DESCRIPTION, get_logger
+from src.cli.commands import basic
 
 logger = get_logger(__name__)
 console = Console()
@@ -91,6 +92,10 @@ def exit() -> None:
     console.print("\n[cyan]Goodbye! All tasks have been cleared from memory.[/cyan]\n")
     logger.info("Todo CLI exiting - user requested exit")
     raise SystemExit(0)
+
+
+# Register commands from basic.py
+cli.add_command(basic.add)
 
 
 def main() -> None:

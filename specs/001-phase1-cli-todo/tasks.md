@@ -79,11 +79,11 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### Custom Exceptions
 
-- [ ] [FOUND-012] [GREEN] [P] Create src/core/exceptions.py with TaskNotFoundError, ValidationError, InvalidIDError
+- [X] [FOUND-012] [GREEN] [P] Create src/core/exceptions.py with TaskNotFoundError, ValidationError, InvalidIDError
 
 ### Storage Abstraction Layer
 
-- [ ] [FOUND-013] [RED] Write contract tests for ITaskStorage interface in tests/contract/test_storage_interface.py
+- [X] [FOUND-013] [RED] Write contract tests for ITaskStorage interface in tests/contract/test_storage_interface.py
   - Test create assigns unique sequential ID (never reused) (contracts/storage.py:25-26)
   - Test create sets created_at and updated_at timestamps (contracts/storage.py:27-28)
   - Test get returns None if not found (contracts/storage.py:29)
@@ -92,15 +92,15 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
   - Test delete does not reuse ID (contracts/storage.py:26)
   - Test delete nonexistent returns False (contracts/storage.py:29)
   - Test update nonexistent raises TaskNotFoundError
-- [ ] [FOUND-014] [GREEN] Create ITaskStorage ABC interface in src/core/storage/base.py (contracts/storage.py:22-141)
-- [ ] [FOUND-015] [RED] Write unit tests for MemoryStorage implementation in tests/unit/test_storage.py
+- [X] [FOUND-014] [GREEN] Create ITaskStorage ABC interface in src/core/storage/base.py (contracts/storage.py:22-141)
+- [X] [FOUND-015] [RED] Write unit tests for MemoryStorage implementation in tests/unit/test_storage.py
   - Test all contract requirements from FOUND-013
   - Test thread-safety for sequential counter (optional for Phase 1)
-- [ ] [FOUND-016] [GREEN] Implement MemoryStorage with dict-based storage in src/core/storage/memory.py (plan.md:344-520)
+- [X] [FOUND-016] [GREEN] Implement MemoryStorage with dict-based storage in src/core/storage/memory.py (plan.md:344-520)
   - Implement _counter for sequential ID generation
   - Implement _tasks dict for in-memory storage
   - Implement create, get, list_all, update, delete methods
-- [ ] [FOUND-017] [REFACTOR] Run contract tests against MemoryStorage, ensure 100% pass rate
+- [X] [FOUND-017] [REFACTOR] Run contract tests against MemoryStorage, ensure 100% pass rate
 
 **Acceptance**: All contract tests pass for MemoryStorage, storage interface is future-proof for Phase 2 DatabaseStorage.
 

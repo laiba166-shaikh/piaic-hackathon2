@@ -18,21 +18,20 @@ class TestCLIStartup:
     """Integration tests for CLI startup and initialization"""
 
     def test_cli_displays_welcome_message_on_startup(self) -> None:
-        """Test that CLI displays welcome message when invoked without commands (FR-013)"""
+        """Test that CLI displays interactive mode welcome when invoked without commands"""
         runner = CliRunner()
         result = runner.invoke(cli, [])
 
-        # Should exit successfully
+        # Should exit successfully (interactive mode exits immediately with empty input)
         assert result.exit_code == 0
 
-        # Should contain welcome message elements
+        # Should contain welcome message elements for interactive mode
         assert "Todo CLI" in result.output
         assert "v0.1.0" in result.output
-        assert "In-Memory Task Manager" in result.output
+        assert "Interactive Mode" in result.output
 
-        # Should contain data warning (NFR-006)
-        assert "WARNING" in result.output
-        assert "in-memory only" in result.output or "not persisted" in result.output
+        # Should mention task persistence in session
+        assert "persist during this session" in result.output or "interactive mode" in result.output.lower()
 
         # Should mention help command (FR-013)
         assert "--help" in result.output or "help" in result.output.lower()

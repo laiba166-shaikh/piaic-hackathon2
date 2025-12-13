@@ -53,8 +53,14 @@ def display_welcome_message() -> None:
 
 @click.group(invoke_without_command=True)
 @click.pass_context
+@click.option(
+    "--interactive",
+    "-i",
+    is_flag=True,
+    help="Start in interactive mode",
+)
 @click.version_option(version=APP_VERSION, prog_name=APP_NAME)
-def cli(ctx: click.Context) -> None:
+def cli(ctx: click.Context, interactive: bool) -> None:
     """
     Phase 1 CLI Todo App - In-Memory Task Manager
 
@@ -72,6 +78,7 @@ def cli(ctx: click.Context) -> None:
 
     \b
     Examples:
+      todo                    # Start interactive mode
       todo add "Buy groceries" --priority high --tags shopping,personal
       todo list
       todo done 1
@@ -80,10 +87,12 @@ def cli(ctx: click.Context) -> None:
     \b
     Note: Data is stored in-memory only and will be lost on exit.
     """
-    # If no command is provided, show welcome message
-    if ctx.invoked_subcommand is None:
-        display_welcome_message()
-        logger.info("Todo CLI started")
+    # If no command is provided or --interactive flag is set, enter interactive mode
+    if ctx.invoked_subcommand is None or interactive:
+        from src.cli.interactive import run_interactive_shell
+
+        run_interactive_shell(ctx.command)
+        logger.info("Todo CLI started in interactive mode")
 
 
 @cli.command()

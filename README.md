@@ -8,6 +8,7 @@ A professional command-line todo application with Basic, Intermediate, and Advan
 - ✅ Add, view, update, and delete tasks
 - ✅ Mark tasks complete/incomplete
 - ✅ Professional table-based visualization with unicode support
+- ✅ Interactive shell mode for persistent session
 
 ### Intermediate Level
 - ✅ Assign priorities (High/Medium/Low) with visual indicators
@@ -55,6 +56,35 @@ todo --help
 
 ### Basic Usage
 
+#### Interactive Mode (Recommended)
+
+Interactive mode keeps tasks in memory during your session, making the in-memory storage practical to use:
+
+```bash
+# Start interactive mode
+todo
+
+# Then execute commands without the "todo" prefix:
+todo> add "Buy groceries"
+Task created successfully! ID: 1
+
+todo> add "Call dentist" -d "Schedule checkup"
+Task created successfully! ID: 2
+
+todo> list
+# Shows all tasks from this session
+
+todo> help
+# See all available commands
+
+todo> exit
+# Exit interactive mode
+```
+
+#### One-Shot Commands
+
+You can also run individual commands (each runs in a separate process):
+
 ```bash
 # Add a task
 todo add "Buy groceries"
@@ -77,6 +107,8 @@ todo filter --status incomplete --priority high
 # Delete task
 todo delete 1
 ```
+
+**Note**: With one-shot commands, each command runs in a separate process, so tasks don't persist between commands in Phase 1 (in-memory storage). Use interactive mode for a better experience.
 
 ## Development
 
@@ -161,7 +193,14 @@ pytest -v
 
 ## Data Persistence
 
-⚠️ **Important**: Phase 1 uses **in-memory storage**. All tasks are lost when you exit the CLI. This is intentional for Phase 1. Database persistence will be added in Phase 2.
+⚠️ **Important**: Phase 1 uses **in-memory storage**.
+
+- **Interactive Mode**: Tasks persist during your session. When you exit, all tasks are lost.
+- **One-Shot Commands**: Each command runs in a separate process, so tasks don't persist between commands.
+
+**Recommendation**: Use interactive mode (`todo` with no arguments) for the best Phase 1 experience.
+
+Database persistence will be added in Phase 2.
 
 ## Contributing
 

@@ -59,21 +59,21 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### Core Models and Enums
 
-- [ ] [FOUND-001] [RED] [P] Write unit tests for Priority enum (HIGH, MEDIUM, LOW) in tests/unit/test_models.py
-- [ ] [FOUND-002] [GREEN] [P] Implement Priority enum in src/core/models.py (data-model.md:35-38)
-- [ ] [FOUND-003] [RED] [P] Write unit tests for Recurrence enum (NONE, DAILY, WEEKLY, MONTHLY) in tests/unit/test_models.py
-- [ ] [FOUND-004] [GREEN] [P] Implement Recurrence enum in src/core/models.py (data-model.md:40-44)
-- [ ] [FOUND-005] [RED] Write unit tests for Task dataclass validation in tests/unit/test_models.py
+- [X] [FOUND-001] [RED] [P] Write unit tests for Priority enum (HIGH, MEDIUM, LOW) in tests/unit/test_models.py
+- [X] [FOUND-002] [GREEN] [P] Implement Priority enum in src/core/models.py (data-model.md:35-38)
+- [X] [FOUND-003] [RED] [P] Write unit tests for Recurrence enum (NONE, DAILY, WEEKLY, MONTHLY) in tests/unit/test_models.py
+- [X] [FOUND-004] [GREEN] [P] Implement Recurrence enum in src/core/models.py (data-model.md:40-44)
+- [X] [FOUND-005] [RED] Write unit tests for Task dataclass validation in tests/unit/test_models.py
   - Test title required, 1-200 chars (FR-001, FR-007)
   - Test description max 500 chars (FR-001 clarified)
   - Test reminder must be positive integer (FR-028)
   - Test default values (completed=False, priority=MEDIUM, recurrence=NONE)
-- [ ] [FOUND-006] [GREEN] Implement Task dataclass with __post_init__ validation in src/core/models.py (data-model.md:47-78)
-- [ ] [FOUND-007] [RED] [P] Write unit tests for Task.is_overdue() method in tests/unit/test_models.py
-- [ ] [FOUND-008] [GREEN] [P] Implement Task.is_overdue() method in src/core/models.py (data-model.md:70-73)
-- [ ] [FOUND-009] [RED] [P] Write unit tests for Task.is_due_today() method in tests/unit/test_models.py
-- [ ] [FOUND-010] [GREEN] [P] Implement Task.is_due_today() method in src/core/models.py (data-model.md:75-78)
-- [ ] [FOUND-011] [REFACTOR] Run mypy on src/core/models.py, fix type hint issues
+- [X] [FOUND-006] [GREEN] Implement Task dataclass with __post_init__ validation in src/core/models.py (data-model.md:47-78)
+- [X] [FOUND-007] [RED] [P] Write unit tests for Task.is_overdue() method in tests/unit/test_models.py
+- [X] [FOUND-008] [GREEN] [P] Implement Task.is_overdue() method in src/core/models.py (data-model.md:70-73)
+- [X] [FOUND-009] [RED] [P] Write unit tests for Task.is_due_today() method in tests/unit/test_models.py
+- [X] [FOUND-010] [GREEN] [P] Implement Task.is_due_today() method in src/core/models.py (data-model.md:75-78)
+- [X] [FOUND-011] [REFACTOR] Run mypy on src/core/models.py, fix type hint issues
 
 **Acceptance**: All Task model tests pass, mypy validation passes, 100% code coverage for models.py.
 

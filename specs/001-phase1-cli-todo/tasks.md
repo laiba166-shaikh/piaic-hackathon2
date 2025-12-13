@@ -106,15 +106,15 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### Configuration and Logging
 
-- [ ] [FOUND-018] [GREEN] [P] Create src/config.py with logging setup, constants (plan.md:139-148)
-- [ ] [FOUND-019] [GREEN] [P] Configure structured logging format: `[TIMESTAMP] [LEVEL] [MODULE] - MESSAGE`
+- [X] [FOUND-018] [GREEN] [P] Create src/config.py with logging setup, constants (plan.md:139-148)
+- [X] [FOUND-019] [GREEN] [P] Configure structured logging format: `[TIMESTAMP] [LEVEL] [MODULE] - MESSAGE`
 
 ### CLI Foundation
 
-- [ ] [FOUND-020] [GREEN] [P] Create src/cli/main.py with Click app entry point (plan.md:242)
-- [ ] [FOUND-021] [GREEN] [P] Create src/cli/commands/__init__.py for command registration
-- [ ] [FOUND-022] [RED] Write integration test for CLI startup message (FR-013) in tests/integration/test_cli_commands.py
-- [ ] [FOUND-023] [GREEN] Implement --help command and welcome message in src/cli/main.py
+- [X] [FOUND-020] [GREEN] [P] Create src/cli/main.py with Click app entry point (plan.md:242)
+- [X] [FOUND-021] [GREEN] [P] Create src/cli/commands/__init__.py for command registration
+- [X] [FOUND-022] [RED] Write integration test for CLI startup message (FR-013) in tests/integration/test_cli_commands.py
+- [X] [FOUND-023] [GREEN] Implement --help command and welcome message in src/cli/main.py
 
 **Acceptance**: CLI starts, displays welcome message, responds to --help, exits cleanly.
 

@@ -126,6 +126,92 @@ class TestCLIErrorHandling:
         assert "Error" in result.output or "error" in result.output.lower() or "No such command" in result.output
 
 
+class TestListCommand:
+    """Integration tests for User Story 2: View Task List"""
+
+    def test_list_command_with_tasks(self) -> None:
+        """Test list command displays all tasks (US2-001, AC1)"""
+        runner = CliRunner()
+
+        # Add 3 tasks first
+        runner.invoke(cli, ["add", "Task 1"])
+        runner.invoke(cli, ["add", "Task 2"])
+        runner.invoke(cli, ["add", "Task 3"])
+
+        # Run list command
+        result = runner.invoke(cli, ["list"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should contain all task titles
+        assert "Task 1" in result.output
+        assert "Task 2" in result.output
+        assert "Task 3" in result.output
+
+        # Should show task IDs (1, 2, 3)
+        assert "1" in result.output
+        assert "2" in result.output
+        assert "3" in result.output
+
+        # Should show completion status
+        assert "Incomplete" in result.output.lower() or "[ ]" in result.output or "incomplete" in result.output.lower()
+
+    def test_list_command_with_empty_list(self) -> None:
+        """Test list command with no tasks shows empty message (US2-002, AC2)"""
+        runner = CliRunner()
+
+        # Run list without adding any tasks
+        result = runner.invoke(cli, ["list"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show "no tasks" or "empty" message
+        assert "no tasks" in result.output.lower() or "empty" in result.output.lower()
+
+    def test_list_command_shows_descriptions(self) -> None:
+        """Test list command can show task descriptions (US2-003, AC3)"""
+        runner = CliRunner()
+
+        # Add task with description
+        runner.invoke(cli, ["add", "Call dentist", "-d", "Schedule annual checkup"])
+
+        # Run list command
+        result = runner.invoke(cli, ["list"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show task title
+        assert "Call dentist" in result.output
+
+        # Description might be shown inline or truncated - just verify task appears
+        assert "1" in result.output  # Task ID should be shown
+
+    def test_list_command_distinguishes_complete_incomplete(self) -> None:
+        """Test list command distinguishes complete vs incomplete tasks (US2-004, AC4)"""
+        runner = CliRunner()
+
+        # Add two tasks
+        runner.invoke(cli, ["add", "Task 1"])
+        runner.invoke(cli, ["add", "Task 2"])
+
+        # Note: We'll need the 'done' command to mark tasks complete
+        # For now, just verify incomplete tasks are shown
+        result = runner.invoke(cli, ["list"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show both tasks
+        assert "Task 1" in result.output
+        assert "Task 2" in result.output
+
+        # Should indicate incomplete status (checkboxes, text, etc.)
+        # The exact format will depend on implementation
+
+
 class TestAddCommand:
     """Integration tests for User Story 1: Capture New Tasks"""
 

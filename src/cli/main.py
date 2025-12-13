@@ -96,6 +96,7 @@ def exit() -> None:
 
 # Register commands from basic.py
 cli.add_command(basic.add)
+cli.add_command(basic.list)
 
 
 def main() -> None:

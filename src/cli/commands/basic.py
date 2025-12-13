@@ -105,3 +105,54 @@ def add(title: str, description: str | None) -> None:
         console.print(f"\n[red]Unexpected error: {e}[/red]\n")
         logger.error(f"Unexpected error in add command: {e}", exc_info=True)
         raise click.ClickException(str(e))
+
+
+@click.command()
+def list() -> None:
+    """
+    List all tasks in your todo list.
+
+    Displays all tasks in a formatted table showing:
+    - Status: [X] for complete, [ ] for incomplete
+    - ID: Unique task identifier
+    - Priority: [!] High, [-] Medium, [v] Low
+    - Title: Task title
+    - Tags: Task categories/labels
+    - Due: Due date (if set)
+
+    Tasks are sorted by creation date (newest first).
+
+    \b
+    Examples:
+        todo list
+
+    \b
+    Returns:
+        Formatted table of all tasks or empty state message
+    """
+    try:
+        # Retrieve all tasks through service layer
+        tasks = _service.list_all()
+
+        if not tasks:
+            # Display empty state message
+            from src.cli.rendering.table import render_empty_message
+
+            message = render_empty_message()
+            console.print(message)
+            logger.info("Displayed empty task list")
+        else:
+            # Display tasks in formatted table
+            from src.cli.rendering.table import render_task_table
+
+            table = render_task_table(tasks)
+            console.print("\n")
+            console.print(table)
+            console.print("\n")
+            logger.info(f"Displayed {len(tasks)} tasks")
+
+    except Exception as e:
+        # Unexpected error
+        console.print(f"\n[red]Unexpected error: {e}[/red]\n")
+        logger.error(f"Unexpected error in list command: {e}", exc_info=True)
+        raise click.ClickException(str(e))

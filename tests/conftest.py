@@ -1,9 +1,28 @@
 """Shared pytest fixtures for all tests"""
 from datetime import datetime, timedelta
 from typing import List
+from collections.abc import Generator
 import pytest
 from src.core.models import Task, Priority, Recurrence
 
+
+@pytest.fixture(autouse=True)
+def reset_storage() -> Generator[None, None, None]:
+    """Reset global storage before each test to ensure test isolation"""
+    # Import here to avoid circular dependency
+    from src.cli.commands import basic
+    from src.core.storage.memory import MemoryStorage
+    from src.core.services import TaskService
+
+    # Reset global storage and service instances
+    basic._storage = MemoryStorage()
+    basic._service = TaskService(basic._storage)
+
+    yield
+
+    # Cleanup after test
+    basic._storage = MemoryStorage()
+    basic._service = TaskService(basic._storage)
 
 @pytest.fixture
 def sample_task() -> Task:

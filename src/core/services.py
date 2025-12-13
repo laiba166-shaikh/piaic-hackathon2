@@ -80,3 +80,19 @@ class TaskService:
 
         logger.info(f"Created task ID {created_task.id}: {created_task.title}")
         return created_task
+
+    def list_all(self) -> list[Task]:
+        """
+        Retrieve all tasks sorted by creation date (newest first).
+
+        Returns:
+            List of all tasks, sorted by created_at descending (newest first)
+
+        Business Rules:
+            - Default sort order: created_at descending (FR-020a)
+            - Storage layer handles the sorting
+            - Returns empty list if no tasks exist
+        """
+        tasks = self._storage.list_all()
+        logger.debug(f"Retrieved {len(tasks)} tasks from storage")
+        return tasks

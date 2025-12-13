@@ -120,3 +120,75 @@ class TestTaskServiceCreateTask:
 
         # Returned task should have the ID assigned by storage
         assert result.id == 42
+
+
+class TestTaskServiceListAll:
+    """Unit tests for TaskService.list_all() method (US2-005)"""
+
+    def test_list_all_returns_all_tasks(self) -> None:
+        """Test list_all returns all tasks from storage"""
+        from src.core.services import TaskService
+
+        # Mock storage with tasks
+        mock_storage = Mock(spec=ITaskStorage)
+        tasks = [
+            Task(title="Task 1", id=1, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="Task 2", id=2, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="Task 3", id=3, created_at=datetime.now(), updated_at=datetime.now()),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        # Create service and call list_all
+        service = TaskService(mock_storage)
+        result = service.list_all()
+
+        # Verify storage.list_all was called
+        assert mock_storage.list_all.called
+
+        # Verify correct tasks returned
+        assert result == tasks
+        assert len(result) == 3
+
+    def test_list_all_returns_empty_list_when_no_tasks(self) -> None:
+        """Test list_all returns empty list when storage has no tasks"""
+        from src.core.services import TaskService
+
+        # Mock storage with no tasks
+        mock_storage = Mock(spec=ITaskStorage)
+        mock_storage.list_all.return_value = []
+
+        # Create service and call list_all
+        service = TaskService(mock_storage)
+        result = service.list_all()
+
+        # Verify empty list returned
+        assert result == []
+        assert len(result) == 0
+
+    def test_list_all_returns_tasks_sorted_by_created_at_descending(self) -> None:
+        """Test list_all returns tasks sorted by created_at descending (newest first)"""
+        from src.core.services import TaskService
+        import time
+
+        # Mock storage with tasks in specific order
+        mock_storage = Mock(spec=ITaskStorage)
+
+        # Create tasks with different timestamps
+        now = datetime.now()
+        task1 = Task(title="Old task", id=1, created_at=now, updated_at=now)
+        time.sleep(0.001)
+        task2 = Task(title="Middle task", id=2, created_at=datetime.now(), updated_at=datetime.now())
+        time.sleep(0.001)
+        task3 = Task(title="New task", id=3, created_at=datetime.now(), updated_at=datetime.now())
+
+        # Storage returns tasks sorted (newest first per FR-020a)
+        mock_storage.list_all.return_value = [task3, task2, task1]
+
+        # Create service and call list_all
+        service = TaskService(mock_storage)
+        result = service.list_all()
+
+        # Verify tasks are in correct order (newest first)
+        assert result[0].title == "New task"
+        assert result[1].title == "Middle task"
+        assert result[2].title == "Old task"

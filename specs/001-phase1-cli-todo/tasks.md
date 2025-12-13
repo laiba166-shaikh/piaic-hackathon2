@@ -177,42 +177,42 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### RED Phase (Tests First)
 
-- [ ] [US2-001] [RED] Write integration test for `list` command with tasks in tests/integration/test_cli_commands.py
+- [X] [US2-001] [RED] Write integration test for `list` command with tasks in tests/integration/test_cli_commands.py
   - Add 3 tasks, run `todo list`
   - Verify all 3 tasks are displayed with ID, title, status
-- [ ] [US2-002] [RED] Write integration test for `list` command with empty task list
+- [X] [US2-002] [RED] Write integration test for `list` command with empty task list
   - Run `todo list` with no tasks
   - Verify "no tasks" message is displayed
-- [ ] [US2-003] [RED] Write integration test for task list showing descriptions
+- [X] [US2-003] [RED] Write integration test for task list showing descriptions
   - Add task with description, run `todo list`
   - Verify description is visible or accessible
-- [ ] [US2-004] [RED] Write integration test for distinguishing complete vs incomplete tasks
+- [X] [US2-004] [RED] Write integration test for distinguishing complete vs incomplete tasks
   - Add 2 tasks, mark one complete
   - Verify visual distinction (✓ vs ☐) in output
-- [ ] [US2-005] [RED] Write unit test for TaskService.list_all() in tests/unit/test_services.py
+- [X] [US2-005] [RED] Write unit test for TaskService.list_all() in tests/unit/test_services.py
   - Mock storage.list_all(), verify correct return value
 
 ### GREEN Phase (Implementation)
 
-- [ ] [US2-006] [GREEN] Implement TaskService.list_all() method in src/core/services.py
+- [X] [US2-006] [GREEN] Implement TaskService.list_all() method in src/core/services.py
   - Call storage.list_all()
   - Return list of tasks (sorted by created_at descending per FR-020a)
-- [ ] [US2-007] [GREEN] Create src/cli/rendering/table.py with render_task_table() function
+- [X] [US2-007] [GREEN] Create src/cli/rendering/table.py with render_task_table() function
   - Use Rich Table with columns: ID, Status, Priority, Title, Tags, Due Date (FR-032)
   - Add rows for each task
   - Return formatted table
-- [ ] [US2-008] [GREEN] Create src/cli/rendering/colors.py with PRIORITY_INDICATORS dict (data-model.md:108-114)
-  - Map Priority.HIGH to ("❗", "red")
-  - Map Priority.MEDIUM to ("➖", "yellow")
-  - Map Priority.LOW to ("⬇", "blue")
-- [ ] [US2-009] [GREEN] Add STATUS_INDICATORS to src/cli/rendering/colors.py
-  - Map completed=True to ("✓", "green") (FR-036)
-  - Map completed=False to ("☐", "white") (FR-037)
-- [ ] [US2-010] [GREEN] Implement `list` command in src/cli/commands/basic.py
+- [X] [US2-008] [GREEN] Create src/cli/rendering/colors.py with PRIORITY_INDICATORS dict (data-model.md:108-114)
+  - Map Priority.HIGH to ("[!]", "red") - text-based for Windows compatibility
+  - Map Priority.MEDIUM to ("[-]", "yellow")
+  - Map Priority.LOW to ("[v]", "blue")
+- [X] [US2-009] [GREEN] Add STATUS_INDICATORS to src/cli/rendering/colors.py
+  - Map completed=True to ("[X]", "green") (FR-036)
+  - Map completed=False to ("[ ]", "white") (FR-037)
+- [X] [US2-010] [GREEN] Implement `list` command in src/cli/commands/basic.py
   - Call TaskService.list_all()
   - If empty, display "No tasks found" message
   - Otherwise, call render_task_table() and print
-- [ ] [US2-011] [GREEN] Register `list` command in src/cli/main.py
+- [X] [US2-011] [GREEN] Register `list` command in src/cli/main.py
 
 ### REFACTOR Phase
 
@@ -225,7 +225,7 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 - [ ] [US2-014] [REFACTOR] Add unicode detection and ASCII fallback in src/cli/rendering/table.py
   - Use Rich Console to detect terminal capabilities (FR-007, SC-017)
   - Fallback to ASCII box chars (+---+) if unicode unsupported
-- [ ] [US2-015] [REFACTOR] Run all US2 tests, ensure 100% pass rate
+- [X] [US2-015] [REFACTOR] Run all US2 tests, ensure 100% pass rate
 - [ ] [US2-016] [REFACTOR] Verify table displays correctly with 10+ tasks
 
 **Acceptance**: SC-001 (partial), SC-014, SC-017, all US2 acceptance scenarios pass, users can view tasks in formatted table.

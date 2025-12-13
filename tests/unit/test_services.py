@@ -192,3 +192,116 @@ class TestTaskServiceListAll:
         assert result[0].title == "New task"
         assert result[1].title == "Middle task"
         assert result[2].title == "Old task"
+
+
+class TestTaskServiceMarkComplete:
+    """Unit tests for TaskService.mark_complete() method (US3-006)"""
+
+    def test_mark_complete_updates_task_status(self) -> None:
+        """Test mark_complete sets task.completed to True"""
+        from src.core.services import TaskService
+
+        # Mock storage with a task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Task to complete", id=1, created_at=datetime.now(), updated_at=datetime.now(), completed=False)
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and mark task complete
+        service = TaskService(mock_storage)
+        result = service.mark_complete(1)
+
+        # Verify storage.get was called with correct ID
+        mock_storage.get.assert_called_once_with(1)
+
+        # Verify storage.update was called
+        assert mock_storage.update.called
+
+        # Verify the updated task has completed=True
+        update_call_args = mock_storage.update.call_args[0][0]
+        assert update_call_args.completed is True
+        assert update_call_args.id == 1
+
+        # Verify method returns the updated task
+        assert result.completed is True
+
+    def test_mark_complete_raises_error_for_nonexistent_task(self) -> None:
+        """Test mark_complete raises TaskNotFoundError for invalid ID"""
+        from src.core.services import TaskService
+        from src.core.exceptions import TaskNotFoundError
+
+        # Mock storage that returns None (task not found)
+        mock_storage = Mock(spec=ITaskStorage)
+        mock_storage.get.return_value = None
+
+        # Create service and try to mark nonexistent task complete
+        service = TaskService(mock_storage)
+
+        # Should raise TaskNotFoundError
+        with pytest.raises(TaskNotFoundError):
+            service.mark_complete(999)
+
+    def test_mark_complete_is_idempotent(self) -> None:
+        """Test marking already completed task as complete again works"""
+        from src.core.services import TaskService
+
+        # Mock storage with already completed task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Already complete", id=1, created_at=datetime.now(), updated_at=datetime.now(), completed=True)
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and mark already complete task as complete
+        service = TaskService(mock_storage)
+        result = service.mark_complete(1)
+
+        # Should succeed and task should still be completed
+        assert result.completed is True
+
+
+class TestTaskServiceMarkIncomplete:
+    """Unit tests for TaskService.mark_incomplete() method (US3-007)"""
+
+    def test_mark_incomplete_updates_task_status(self) -> None:
+        """Test mark_incomplete sets task.completed to False"""
+        from src.core.services import TaskService
+
+        # Mock storage with a completed task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Completed task", id=1, created_at=datetime.now(), updated_at=datetime.now(), completed=True)
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and mark task incomplete
+        service = TaskService(mock_storage)
+        result = service.mark_incomplete(1)
+
+        # Verify storage.get was called with correct ID
+        mock_storage.get.assert_called_once_with(1)
+
+        # Verify storage.update was called
+        assert mock_storage.update.called
+
+        # Verify the updated task has completed=False
+        update_call_args = mock_storage.update.call_args[0][0]
+        assert update_call_args.completed is False
+        assert update_call_args.id == 1
+
+        # Verify method returns the updated task
+        assert result.completed is False
+
+    def test_mark_incomplete_raises_error_for_nonexistent_task(self) -> None:
+        """Test mark_incomplete raises TaskNotFoundError for invalid ID"""
+        from src.core.services import TaskService
+        from src.core.exceptions import TaskNotFoundError
+
+        # Mock storage that returns None (task not found)
+        mock_storage = Mock(spec=ITaskStorage)
+        mock_storage.get.return_value = None
+
+        # Create service and try to mark nonexistent task incomplete
+        service = TaskService(mock_storage)
+
+        # Should raise TaskNotFoundError
+        with pytest.raises(TaskNotFoundError):
+            service.mark_incomplete(999)

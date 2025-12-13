@@ -96,3 +96,73 @@ class TaskService:
         tasks = self._storage.list_all()
         logger.debug(f"Retrieved {len(tasks)} tasks from storage")
         return tasks
+
+    def mark_complete(self, task_id: int) -> Task:
+        """
+        Mark a task as complete.
+
+        Args:
+            task_id: The ID of the task to mark complete
+
+        Returns:
+            Updated task with completed=True
+
+        Raises:
+            TaskNotFoundError: If task with given ID doesn't exist
+
+        Business Rules:
+            - Sets task.completed to True
+            - Updates task.updated_at timestamp
+            - Idempotent - marking already completed task succeeds
+        """
+        from src.core.exceptions import TaskNotFoundError
+
+        # Retrieve task from storage
+        task = self._storage.get(task_id)
+        if task is None:
+            logger.warning(f"Attempted to mark nonexistent task {task_id} as complete")
+            raise TaskNotFoundError(task_id)
+
+        # Update task status
+        task.completed = True
+
+        # Persist changes
+        self._storage.update(task)
+
+        logger.info(f"Marked task ID {task_id} as complete")
+        return task
+
+    def mark_incomplete(self, task_id: int) -> Task:
+        """
+        Mark a task as incomplete.
+
+        Args:
+            task_id: The ID of the task to mark incomplete
+
+        Returns:
+            Updated task with completed=False
+
+        Raises:
+            TaskNotFoundError: If task with given ID doesn't exist
+
+        Business Rules:
+            - Sets task.completed to False
+            - Updates task.updated_at timestamp
+            - Idempotent - marking already incomplete task succeeds
+        """
+        from src.core.exceptions import TaskNotFoundError
+
+        # Retrieve task from storage
+        task = self._storage.get(task_id)
+        if task is None:
+            logger.warning(f"Attempted to mark nonexistent task {task_id} as incomplete")
+            raise TaskNotFoundError(task_id)
+
+        # Update task status
+        task.completed = False
+
+        # Persist changes
+        self._storage.update(task)
+
+        logger.info(f"Marked task ID {task_id} as incomplete")
+        return task

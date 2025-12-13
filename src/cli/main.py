@@ -91,7 +91,8 @@ def cli(ctx: click.Context, interactive: bool) -> None:
     if ctx.invoked_subcommand is None or interactive:
         from src.cli.interactive import run_interactive_shell
 
-        run_interactive_shell(ctx.command)
+        # Get the Click group (cli function is decorated with @click.group)
+        run_interactive_shell(cli)
         logger.info("Todo CLI started in interactive mode")
 
 
@@ -106,6 +107,8 @@ def exit() -> None:
 # Register commands from basic.py
 cli.add_command(basic.add)
 cli.add_command(basic.list)
+cli.add_command(basic.done)
+cli.add_command(basic.undone)
 
 
 def main() -> None:

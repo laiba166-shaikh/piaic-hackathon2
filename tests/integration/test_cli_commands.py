@@ -211,6 +211,99 @@ class TestListCommand:
         # The exact format will depend on implementation
 
 
+class TestDoneCommand:
+    """Integration tests for User Story 3: Mark Tasks Complete"""
+
+    def test_done_command_marks_task_complete(self) -> None:
+        """Test done command marks task as complete (US3-001, AC1)"""
+        runner = CliRunner()
+
+        # Add a task
+        add_result = runner.invoke(cli, ["add", "Complete this task"])
+        assert add_result.exit_code == 0
+
+        # Mark task as done
+        done_result = runner.invoke(cli, ["done", "1"])
+
+        # Should exit successfully
+        assert done_result.exit_code == 0
+
+        # Should show success message
+        assert "completed" in done_result.output.lower() or "done" in done_result.output.lower()
+
+        # Verify task is marked complete by listing
+        list_result = runner.invoke(cli, ["list"])
+        assert list_result.exit_code == 0
+
+        # Should show completed status (checkmark, strikethrough, etc.)
+        assert "[X]" in list_result.output or "complete" in list_result.output.lower()
+
+    def test_undone_command_marks_task_incomplete(self) -> None:
+        """Test undone command marks task as incomplete (US3-002, AC2)"""
+        runner = CliRunner()
+
+        # Add a task and mark it done
+        runner.invoke(cli, ["add", "Task to undo"])
+        runner.invoke(cli, ["done", "1"])
+
+        # Mark task as undone
+        undone_result = runner.invoke(cli, ["undone", "1"])
+
+        # Should exit successfully
+        assert undone_result.exit_code == 0
+
+        # Should show success message
+        assert "incomplete" in undone_result.output.lower() or "undone" in undone_result.output.lower()
+
+        # Verify task is marked incomplete by listing
+        list_result = runner.invoke(cli, ["list"])
+        assert list_result.exit_code == 0
+
+        # Should show incomplete status
+        assert "[ ]" in list_result.output or "incomplete" in list_result.output.lower()
+
+    def test_done_command_with_invalid_id(self) -> None:
+        """Test done command with invalid ID shows error (US3-003, AC3)"""
+        runner = CliRunner()
+
+        # Try to mark non-existent task as done
+        result = runner.invoke(cli, ["done", "999"])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should show error message
+        assert "not found" in result.output.lower() or "error" in result.output.lower()
+
+    def test_done_command_with_non_numeric_id(self) -> None:
+        """Test done command with non-numeric ID shows error (US3-004, AC4)"""
+        runner = CliRunner()
+
+        # Try to mark task with invalid ID format
+        result = runner.invoke(cli, ["done", "abc"])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should show error message
+        assert "invalid" in result.output.lower() or "error" in result.output.lower()
+
+    def test_done_already_completed_task(self) -> None:
+        """Test marking already completed task as done is idempotent (US3-005, AC5)"""
+        runner = CliRunner()
+
+        # Add a task and mark it done twice
+        runner.invoke(cli, ["add", "Task to complete"])
+        runner.invoke(cli, ["done", "1"])
+        result = runner.invoke(cli, ["done", "1"])
+
+        # Should still succeed (idempotent)
+        assert result.exit_code == 0
+
+        # Should show success or already complete message
+        assert "completed" in result.output.lower() or "already" in result.output.lower()
+
+
 class TestAddCommand:
     """Integration tests for User Story 1: Capture New Tasks"""
 

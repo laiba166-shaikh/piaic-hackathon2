@@ -108,6 +108,138 @@ def add(title: str, description: str | None) -> None:
 
 
 @click.command()
+@click.argument("task_id", type=int)
+def done(task_id: int) -> None:
+    """
+    Mark a task as complete.
+
+    Marks the task with the given ID as completed. Completed tasks are
+    visually distinguished in the task list.
+
+    \\b
+    Examples:
+        todo done 1
+        todo done 5
+
+    \\b
+    Arguments:
+        TASK_ID: The ID of the task to mark as complete (positive integer)
+    """
+    try:
+        # Mark task as complete through service layer
+        task = _service.mark_complete(task_id)
+
+        # Display success message (FR-009)
+        success_text = Text()
+        success_text.append("Task marked as completed!\n\n", style="bold green")
+        success_text.append("ID: ", style="cyan")
+        success_text.append(f"{task.id}\n", style="bold white")
+        success_text.append("Title: ", style="cyan")
+        success_text.append(f"{task.title}\n", style="white")
+        success_text.append("\nStatus: ", style="cyan")
+        success_text.append("Completed", style="green")
+
+        panel = Panel(
+            success_text,
+            title="[bold green]Task Complete[/bold green]",
+            border_style="green",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.info(f"User marked task ID {task.id} as complete")
+
+    except ValueError as e:
+        # Input validation error
+        error_text = Text()
+        error_text.append("Invalid input\\n\\n", style="bold red")
+        error_text.append(str(e), style="white")
+
+        panel = Panel(
+            error_text,
+            title="[bold red]Error[/bold red]",
+            border_style="red",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.warning(f"Validation error in done command: {e}")
+        raise click.ClickException(str(e))
+
+    except Exception as e:
+        # Unexpected error (includes TaskNotFoundError)
+        console.print(f"\\n[red]Error: {e}[/red]\\n")
+        logger.error(f"Error in done command: {e}", exc_info=True)
+        raise click.ClickException(str(e))
+
+
+@click.command()
+@click.argument("task_id", type=int)
+def undone(task_id: int) -> None:
+    """
+    Mark a task as incomplete.
+
+    Marks the task with the given ID as not completed. Use this to reopen
+    a task that was previously marked as complete.
+
+    \\b
+    Examples:
+        todo undone 1
+        todo undone 5
+
+    \\b
+    Arguments:
+        TASK_ID: The ID of the task to mark as incomplete (positive integer)
+    """
+    try:
+        # Mark task as incomplete through service layer
+        task = _service.mark_incomplete(task_id)
+
+        # Display success message (FR-009)
+        success_text = Text()
+        success_text.append("Task marked as incomplete!\n\n", style="bold yellow")
+        success_text.append("ID: ", style="cyan")
+        success_text.append(f"{task.id}\n", style="bold white")
+        success_text.append("Title: ", style="cyan")
+        success_text.append(f"{task.title}\n", style="white")
+        success_text.append("\nStatus: ", style="cyan")
+        success_text.append("Incomplete", style="yellow")
+
+        panel = Panel(
+            success_text,
+            title="[bold yellow]Task Reopened[/bold yellow]",
+            border_style="yellow",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.info(f"User marked task ID {task.id} as incomplete")
+
+    except ValueError as e:
+        # Input validation error
+        error_text = Text()
+        error_text.append("Invalid input\\n\\n", style="bold red")
+        error_text.append(str(e), style="white")
+
+        panel = Panel(
+            error_text,
+            title="[bold red]Error[/bold red]",
+            border_style="red",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.warning(f"Validation error in undone command: {e}")
+        raise click.ClickException(str(e))
+
+    except Exception as e:
+        # Unexpected error (includes TaskNotFoundError)
+        console.print(f"\\n[red]Error: {e}[/red]\\n")
+        logger.error(f"Error in undone command: {e}", exc_info=True)
+        raise click.ClickException(str(e))
+
+
+@click.command()
 def list() -> None:
     """
     List all tasks in your todo list.

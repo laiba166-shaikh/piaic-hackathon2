@@ -12,7 +12,7 @@ Phase 2+: Enhanced with persistence, advanced features
 """
 from datetime import datetime
 from typing import Optional, List
-from src.core.models import Task, Priority
+from src.core.models import Task, Priority, Recurrence
 from src.core.storage.base import ITaskStorage
 from src.config import get_logger
 
@@ -46,6 +46,7 @@ class TaskService:
         description: Optional[str] = None,
         priority: Optional[Priority] = None,
         tags: Optional[List[str]] = None,
+        recurrence: Optional[Recurrence] = None,
     ) -> Task:
         """
         Create a new task with validation.
@@ -55,6 +56,7 @@ class TaskService:
             description: Optional task description (max 500 chars)
             priority: Task priority (HIGH, MEDIUM, LOW), defaults to MEDIUM
             tags: List of tags/categories for the task
+            recurrence: Recurrence pattern (NONE, DAILY, WEEKLY, MONTHLY), defaults to NONE
 
         Returns:
             Created task with assigned ID and timestamps
@@ -69,6 +71,7 @@ class TaskService:
             - Tasks start as incomplete (completed=False)
             - Default priority is MEDIUM
             - Tags default to empty list
+            - Default recurrence is NONE
         """
         # Validate title is not empty or whitespace-only
         if not title or not title.strip():
@@ -81,6 +84,7 @@ class TaskService:
             description=description,
             priority=priority if priority is not None else Priority.MEDIUM,
             tags=tags if tags is not None else [],
+            recurrence=recurrence if recurrence is not None else Recurrence.NONE,
         )
 
         # Persist to storage (storage assigns ID and timestamps)
@@ -125,6 +129,7 @@ class TaskService:
             - Sets task.completed to True
             - Updates task.updated_at timestamp
             - Idempotent - marking already completed task succeeds
+            - For recurring tasks: creates a new task instance with next due date
         """
         from src.core.exceptions import TaskNotFoundError
 
@@ -141,6 +146,28 @@ class TaskService:
         self._storage.update(task)
 
         logger.info(f"Marked task ID {task_id} as complete")
+
+        # Handle recurring tasks: create next instance
+        if task.recurrence != Recurrence.NONE and task.due_date:
+            from src.core.recurring import calculate_next_occurrence
+
+            next_due = calculate_next_occurrence(task.due_date, task.recurrence)
+
+            # Create new task with same properties but new due date
+            new_task = Task(
+                title=task.title,
+                description=task.description,
+                priority=task.priority,
+                tags=task.tags.copy() if task.tags else [],
+                due_date=next_due,
+                recurrence=task.recurrence,
+            )
+            created_task = self._storage.create(new_task)
+            logger.info(
+                f"Created recurring task ID {created_task.id} from completed task {task_id} "
+                f"(next due: {next_due})"
+            )
+
         return task
 
     def mark_incomplete(self, task_id: int) -> Task:
@@ -185,9 +212,10 @@ class TaskService:
         description: Optional[str] = None,
         priority: Optional[Priority] = None,
         tags: Optional[List[str]] = None,
+        recurrence: Optional[Recurrence] = None,
     ) -> Task:
         """
-        Update task title, description, priority, and/or tags.
+        Update task title, description, priority, tags, and/or recurrence.
 
         Args:
             task_id: The ID of the task to update
@@ -195,31 +223,38 @@ class TaskService:
             description: New description (optional)
             priority: New priority level (optional)
             tags: New tags list (optional)
+            recurrence: New recurrence pattern (optional, only for incomplete tasks)
 
         Returns:
             Updated task
 
         Raises:
             TaskNotFoundError: If task with given ID doesn't exist
-            ValueError: If no updates provided or title is empty
+            ValueError: If no updates provided, title is empty, or recurrence update on completed task
 
         Business Rules:
             - At least one field must be provided for update
             - Title cannot be empty or whitespace-only
+            - Recurrence can only be updated for incomplete tasks
             - Updates task.updated_at timestamp
         """
         from src.core.exceptions import TaskNotFoundError
 
         # Validate at least one field is being updated
-        if all(field is None for field in [title, description, priority, tags]):
+        if all(field is None for field in [title, description, priority, tags, recurrence]):
             logger.warning("Attempted to update task with no changes")
-            raise ValueError("At least one field (title, description, priority, or tags) must be provided")
+            raise ValueError("At least one field (title, description, priority, tags, or recurrence) must be provided")
 
         # Retrieve task from storage
         task = self._storage.get(task_id)
         if task is None:
             logger.warning(f"Attempted to update nonexistent task {task_id}")
             raise TaskNotFoundError(task_id)
+
+        # Validate recurrence update is only for incomplete tasks
+        if recurrence is not None and task.completed:
+            logger.warning(f"Attempted to update recurrence for completed task {task_id}")
+            raise ValueError("Cannot update recurrence for completed task")
 
         # Update title if provided
         if title is not None:
@@ -240,6 +275,10 @@ class TaskService:
         # Update tags if provided
         if tags is not None:
             task.tags = tags
+
+        # Update recurrence if provided
+        if recurrence is not None:
+            task.recurrence = recurrence
 
         # Persist changes
         self._storage.update(task)

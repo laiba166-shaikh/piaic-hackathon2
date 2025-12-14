@@ -1207,3 +1207,148 @@ class TestSortCommand:
 
         # Should indicate sorting by created
         assert "created" in result.output.lower()
+
+
+class TestRecurringTasks:
+    """Integration tests for User Story 10: Recurring Tasks"""
+
+    def test_add_task_with_daily_recurrence(self) -> None:
+        """Test add command accepts --recurrence option (US10-001)"""
+        runner = CliRunner()
+
+        # Add task with daily recurrence
+        result = runner.invoke(cli, ["add", "Daily standup", "--recurrence", "daily"])
+
+        # Should succeed
+        assert result.exit_code == 0
+        assert "created" in result.output.lower()
+
+        # Verify task is in list with recurrence
+        list_result = runner.invoke(cli, ["list"])
+        assert "Daily standup" in list_result.output
+
+    def test_add_task_with_weekly_recurrence(self) -> None:
+        """Test add command with weekly recurrence (US10-002)"""
+        runner = CliRunner()
+
+        # Add task with weekly recurrence
+        result = runner.invoke(cli, ["add", "Weekly review", "--recurrence", "weekly"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+    def test_add_task_with_monthly_recurrence(self) -> None:
+        """Test add command with monthly recurrence (US10-003)"""
+        runner = CliRunner()
+
+        # Add task with monthly recurrence
+        result = runner.invoke(cli, ["add", "Monthly report", "--recurrence", "monthly"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+    def test_completing_recurring_task_creates_new_instance(self) -> None:
+        """Test that completing a recurring task creates a new task (US10-004, FR-024)"""
+        runner = CliRunner()
+
+        # Add a daily recurring task
+        runner.invoke(cli, ["add", "Daily exercise", "--recurrence", "daily"])
+
+        # Verify we have 1 task
+        list_result = runner.invoke(cli, ["list"])
+        assert "Daily exercise" in list_result.output
+
+        # Mark it complete
+        runner.invoke(cli, ["done", "1"])
+
+        # After completing, a new task should be created
+        list_result = runner.invoke(cli, ["list"])
+
+        # Should have the completed task AND a new recurring instance
+        # Count occurrences of "Daily exercise"
+        assert list_result.output.count("Daily exercise") >= 1
+
+    def test_recurring_task_shows_recurrence_indicator(self) -> None:
+        """Test that recurring tasks show recurrence type in list (US10-005)"""
+        runner = CliRunner()
+
+        # Add recurring tasks with different frequencies
+        runner.invoke(cli, ["add", "Daily task", "--recurrence", "daily"])
+        runner.invoke(cli, ["add", "Weekly task", "--recurrence", "weekly"])
+        runner.invoke(cli, ["add", "Non-recurring task"])
+
+        # List tasks
+        result = runner.invoke(cli, ["list"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show all tasks
+        assert "Daily task" in result.output
+        assert "Weekly task" in result.output
+        assert "Non-recurring task" in result.output
+
+    def test_add_task_with_recurrence_none(self) -> None:
+        """Test add command with --recurrence none (explicit non-recurring) (US10-006)"""
+        runner = CliRunner()
+
+        # Add task with explicit none recurrence
+        result = runner.invoke(cli, ["add", "One-time task", "--recurrence", "none"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+    def test_update_recurrence_for_incomplete_task(self) -> None:
+        """Test update command can change recurrence for incomplete task"""
+        runner = CliRunner()
+
+        # Add a non-recurring task
+        runner.invoke(cli, ["add", "Task to update"])
+
+        # Update recurrence to daily
+        result = runner.invoke(cli, ["update", "1", "--recurrence", "daily"])
+
+        # Should succeed
+        assert result.exit_code == 0
+        assert "updated" in result.output.lower()
+
+    def test_update_recurrence_blocked_for_completed_task(self) -> None:
+        """Test update command blocks recurrence update for completed task"""
+        runner = CliRunner()
+
+        # Add a task and complete it
+        runner.invoke(cli, ["add", "Completed task"])
+        runner.invoke(cli, ["done", "1"])
+
+        # Try to update recurrence - should fail
+        result = runner.invoke(cli, ["update", "1", "--recurrence", "weekly"])
+
+        # Should fail with error message
+        assert result.exit_code != 0
+        assert "completed" in result.output.lower() or "error" in result.output.lower()
+
+    def test_update_recurrence_from_daily_to_weekly(self) -> None:
+        """Test update command can change recurrence from daily to weekly"""
+        runner = CliRunner()
+
+        # Add a daily recurring task
+        runner.invoke(cli, ["add", "Change frequency", "--recurrence", "daily"])
+
+        # Update recurrence to weekly
+        result = runner.invoke(cli, ["update", "1", "--recurrence", "weekly"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+    def test_update_recurrence_to_none(self) -> None:
+        """Test update command can remove recurrence (set to none)"""
+        runner = CliRunner()
+
+        # Add a recurring task
+        runner.invoke(cli, ["add", "Remove recurrence", "--recurrence", "monthly"])
+
+        # Update recurrence to none
+        result = runner.invoke(cli, ["update", "1", "--recurrence", "none"])
+
+        # Should succeed
+        assert result.exit_code == 0

@@ -45,7 +45,14 @@ _service = TaskService(_storage)
     default=None,
     help="Comma-separated tags (e.g., 'work,urgent' or 'work,high priority')",
 )
-def add(title: str, description: str | None, priority: str | None, tags: str | None) -> None:
+@click.option(
+    "-r",
+    "--recurrence",
+    type=click.Choice(["none", "daily", "weekly", "monthly"], case_sensitive=False),
+    default="none",
+    help="Recurrence pattern (none, daily, weekly, monthly). Default: none",
+)
+def add(title: str, description: str | None, priority: str | None, tags: str | None, recurrence: str) -> None:
     """
     Add a new task to your todo list.
 
@@ -59,6 +66,8 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         todo add "Submit report" --description "Q4 financial summary"
         todo add "Complete proposal" -p high --tags "work,urgent"
         todo add "Meeting" --tags "work,high priority"
+        todo add "Daily standup" --recurrence daily
+        todo add "Weekly review" -r weekly
 
     \b
     Arguments:
@@ -69,16 +78,26 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         -d, --description TEXT: Optional task description (max 500 characters)
         -p, --priority [high|medium|low]: Task priority level (defaults to medium)
         --tags TEXT: Comma-separated tags for categorization
+        -r, --recurrence [none|daily|weekly|monthly]: Task recurrence pattern
     """
     try:
         # Parse priority
-        from src.core.models import Priority
+        from src.core.models import Priority, Recurrence
 
         priority_enum = None
         if priority:
             # Convert string to Priority enum
             priority_map = {"high": Priority.HIGH, "medium": Priority.MEDIUM, "low": Priority.LOW}
             priority_enum = priority_map[priority.lower()]
+
+        # Parse recurrence
+        recurrence_map = {
+            "none": Recurrence.NONE,
+            "daily": Recurrence.DAILY,
+            "weekly": Recurrence.WEEKLY,
+            "monthly": Recurrence.MONTHLY,
+        }
+        recurrence_enum = recurrence_map[recurrence.lower()]
 
         # Parse tags
         from src.core.validators import parse_tags
@@ -87,7 +106,7 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
 
         # Create task through service layer
         task = _service.create_task(
-            title=title, description=description, priority=priority_enum, tags=tags_list
+            title=title, description=description, priority=priority_enum, tags=tags_list, recurrence=recurrence_enum
         )
 
         # Display success message with task details (FR-009)
@@ -108,6 +127,10 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         if task.tags:
             success_text.append("Tags: ", style="cyan")
             success_text.append(f"{', '.join(task.tags)}\n", style="white")
+
+        if task.recurrence != Recurrence.NONE:
+            success_text.append("Recurrence: ", style="cyan")
+            success_text.append(f"{task.recurrence.value}\n", style="white")
 
         success_text.append("\nStatus: ", style="cyan")
         success_text.append("Incomplete", style="yellow")
@@ -304,14 +327,22 @@ def undone(task_id: int) -> None:
     default=None,
     help="Comma-separated tags (e.g., 'work,urgent')",
 )
+@click.option(
+    "-r",
+    "--recurrence",
+    type=click.Choice(["none", "daily", "weekly", "monthly"], case_sensitive=False),
+    default=None,
+    help="Recurrence pattern (none, daily, weekly, monthly). Only for incomplete tasks.",
+)
 def update(
-    task_id: int, title: str | None, description: str | None, priority: str | None, tags: str | None
+    task_id: int, title: str | None, description: str | None, priority: str | None, tags: str | None, recurrence: str | None
 ) -> None:
     """
-    Update a task's title, description, priority, and/or tags.
+    Update a task's title, description, priority, tags, and/or recurrence.
 
     Updates the task with the given ID. You can update any combination of
-    title, description, priority, or tags. At least one update must be provided.
+    title, description, priority, tags, or recurrence. At least one update must be provided.
+    Note: Recurrence can only be updated for incomplete tasks.
 
     \\b
     Examples:
@@ -320,6 +351,8 @@ def update(
         todo update 1 --title "Buy milk and eggs" -d "From organic store"
         todo update 1 -p high --tags "work,urgent"
         todo update 2 --tags "personal,shopping"
+        todo update 1 --recurrence daily
+        todo update 1 -r weekly
 
     \\b
     Arguments:
@@ -331,15 +364,27 @@ def update(
         --description, -d TEXT: New task description
         -p, --priority [high|medium|low]: Task priority level
         --tags TEXT: Comma-separated tags for categorization
+        -r, --recurrence [none|daily|weekly|monthly]: Recurrence pattern (incomplete tasks only)
     """
     try:
         # Parse priority
-        from src.core.models import Priority
+        from src.core.models import Priority, Recurrence
 
         priority_enum = None
         if priority:
             priority_map = {"high": Priority.HIGH, "medium": Priority.MEDIUM, "low": Priority.LOW}
             priority_enum = priority_map[priority.lower()]
+
+        # Parse recurrence
+        recurrence_enum = None
+        if recurrence:
+            recurrence_map = {
+                "none": Recurrence.NONE,
+                "daily": Recurrence.DAILY,
+                "weekly": Recurrence.WEEKLY,
+                "monthly": Recurrence.MONTHLY,
+            }
+            recurrence_enum = recurrence_map[recurrence.lower()]
 
         # Parse tags
         from src.core.validators import parse_tags
@@ -348,7 +393,7 @@ def update(
 
         # Update task through service layer
         task = _service.update_task(
-            task_id, title=title, description=description, priority=priority_enum, tags=tags_list
+            task_id, title=title, description=description, priority=priority_enum, tags=tags_list, recurrence=recurrence_enum
         )
 
         # Display success message (FR-009)
@@ -369,6 +414,10 @@ def update(
         if task.tags:
             success_text.append("Tags: ", style="cyan")
             success_text.append(f"{', '.join(task.tags)}\n", style="white")
+
+        if task.recurrence != Recurrence.NONE:
+            success_text.append("Recurrence: ", style="cyan")
+            success_text.append(f"{task.recurrence.value}\n", style="white")
 
         panel = Panel(
             success_text,

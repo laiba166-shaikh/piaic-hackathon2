@@ -2,7 +2,7 @@
 from datetime import datetime
 import pytest
 from unittest.mock import Mock, MagicMock
-from src.core.models import Task, Priority
+from src.core.models import Task, Priority, Recurrence
 from src.core.storage.base import ITaskStorage
 from src.core.exceptions import ValidationError
 
@@ -425,6 +425,108 @@ class TestTaskServiceUpdateTask:
         # Should raise ValueError
         with pytest.raises(ValueError):
             service.update_task(1)
+
+    def test_update_task_recurrence_for_incomplete_task(self) -> None:
+        """Test update_task can update recurrence for incomplete task"""
+        from src.core.services import TaskService
+
+        # Mock storage with an incomplete task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(
+            title="Task",
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            completed=False,
+            recurrence=Recurrence.NONE,
+        )
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and update recurrence
+        service = TaskService(mock_storage)
+        result = service.update_task(1, recurrence=Recurrence.DAILY)
+
+        # Verify storage.update was called
+        assert mock_storage.update.called
+
+        # Verify the updated task has new recurrence
+        update_call_args = mock_storage.update.call_args[0][0]
+        assert update_call_args.recurrence == Recurrence.DAILY
+
+        # Verify method returns the updated task with new recurrence
+        assert result.recurrence == Recurrence.DAILY
+
+    def test_update_task_recurrence_blocked_for_completed_task(self) -> None:
+        """Test update_task raises ValueError when updating recurrence for completed task"""
+        from src.core.services import TaskService
+
+        # Mock storage with a completed task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(
+            title="Task",
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            completed=True,
+            recurrence=Recurrence.NONE,
+        )
+        mock_storage.get.return_value = task
+
+        # Create service and try to update recurrence
+        service = TaskService(mock_storage)
+
+        # Should raise ValueError
+        with pytest.raises(ValueError, match="Cannot update recurrence for completed task"):
+            service.update_task(1, recurrence=Recurrence.WEEKLY)
+
+    def test_update_task_recurrence_from_daily_to_weekly(self) -> None:
+        """Test update_task can change recurrence from daily to weekly"""
+        from src.core.services import TaskService
+
+        # Mock storage with a daily recurring task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(
+            title="Daily task",
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            completed=False,
+            recurrence=Recurrence.DAILY,
+        )
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and update recurrence to weekly
+        service = TaskService(mock_storage)
+        result = service.update_task(1, recurrence=Recurrence.WEEKLY)
+
+        # Verify recurrence changed
+        assert result.recurrence == Recurrence.WEEKLY
+
+    def test_update_task_recurrence_to_none(self) -> None:
+        """Test update_task can remove recurrence (set to NONE)"""
+        from src.core.services import TaskService
+
+        # Mock storage with a recurring task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(
+            title="Recurring task",
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            completed=False,
+            recurrence=Recurrence.MONTHLY,
+        )
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and remove recurrence
+        service = TaskService(mock_storage)
+        result = service.update_task(1, recurrence=Recurrence.NONE)
+
+        # Verify recurrence is now NONE
+        assert result.recurrence == Recurrence.NONE
 
 
 class TestTaskServiceDeleteTask:

@@ -52,7 +52,12 @@ _service = TaskService(_storage)
     default="none",
     help="Recurrence pattern (none, daily, weekly, monthly). Default: none",
 )
-def add(title: str, description: str | None, priority: str | None, tags: str | None, recurrence: str) -> None:
+@click.option(
+    "--due",
+    default=None,
+    help="Due date (YYYY-MM-DD or YYYY-MM-DD HH:MM)",
+)
+def add(title: str, description: str | None, priority: str | None, tags: str | None, recurrence: str, due: str | None) -> None:
     """
     Add a new task to your todo list.
 
@@ -68,6 +73,8 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         todo add "Meeting" --tags "work,high priority"
         todo add "Daily standup" --recurrence daily
         todo add "Weekly review" -r weekly
+        todo add "Submit report" --due "2025-12-31"
+        todo add "Meeting" --due "2025-12-31 14:30"
 
     \b
     Arguments:
@@ -79,6 +86,7 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         -p, --priority [high|medium|low]: Task priority level (defaults to medium)
         --tags TEXT: Comma-separated tags for categorization
         -r, --recurrence [none|daily|weekly|monthly]: Task recurrence pattern
+        --due TEXT: Due date (YYYY-MM-DD or YYYY-MM-DD HH:MM)
     """
     try:
         # Parse priority
@@ -100,13 +108,18 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         recurrence_enum = recurrence_map[recurrence.lower()]
 
         # Parse tags
-        from src.core.validators import parse_tags
+        from src.core.validators import parse_tags, parse_due_date
 
         tags_list = parse_tags(tags) if tags else []
 
+        # Parse due date
+        due_date = None
+        if due:
+            due_date = parse_due_date(due)
+
         # Create task through service layer
         task = _service.create_task(
-            title=title, description=description, priority=priority_enum, tags=tags_list, recurrence=recurrence_enum
+            title=title, description=description, priority=priority_enum, tags=tags_list, recurrence=recurrence_enum, due_date=due_date
         )
 
         # Display success message with task details (FR-009)
@@ -131,6 +144,10 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         if task.recurrence != Recurrence.NONE:
             success_text.append("Recurrence: ", style="cyan")
             success_text.append(f"{task.recurrence.value}\n", style="white")
+
+        if task.due_date:
+            success_text.append("Due: ", style="cyan")
+            success_text.append(f"{task.due_date.strftime('%Y-%m-%d %H:%M')}\n", style="white")
 
         success_text.append("\nStatus: ", style="cyan")
         success_text.append("Incomplete", style="yellow")
@@ -334,14 +351,19 @@ def undone(task_id: int) -> None:
     default=None,
     help="Recurrence pattern (none, daily, weekly, monthly). Only for incomplete tasks.",
 )
+@click.option(
+    "--due",
+    default=None,
+    help="Due date (YYYY-MM-DD or YYYY-MM-DD HH:MM)",
+)
 def update(
-    task_id: int, title: str | None, description: str | None, priority: str | None, tags: str | None, recurrence: str | None
+    task_id: int, title: str | None, description: str | None, priority: str | None, tags: str | None, recurrence: str | None, due: str | None
 ) -> None:
     """
-    Update a task's title, description, priority, tags, and/or recurrence.
+    Update a task's title, description, priority, tags, recurrence, and/or due date.
 
     Updates the task with the given ID. You can update any combination of
-    title, description, priority, tags, or recurrence. At least one update must be provided.
+    title, description, priority, tags, recurrence, or due date. At least one update must be provided.
     Note: Recurrence can only be updated for incomplete tasks.
 
     \\b
@@ -353,6 +375,7 @@ def update(
         todo update 2 --tags "personal,shopping"
         todo update 1 --recurrence daily
         todo update 1 -r weekly
+        todo update 1 --due "2025-12-31"
 
     \\b
     Arguments:
@@ -365,6 +388,7 @@ def update(
         -p, --priority [high|medium|low]: Task priority level
         --tags TEXT: Comma-separated tags for categorization
         -r, --recurrence [none|daily|weekly|monthly]: Recurrence pattern (incomplete tasks only)
+        --due TEXT: Due date (YYYY-MM-DD or YYYY-MM-DD HH:MM)
     """
     try:
         # Parse priority
@@ -387,13 +411,18 @@ def update(
             recurrence_enum = recurrence_map[recurrence.lower()]
 
         # Parse tags
-        from src.core.validators import parse_tags
+        from src.core.validators import parse_tags, parse_due_date
 
         tags_list = parse_tags(tags) if tags else None
 
+        # Parse due date
+        due_date = None
+        if due:
+            due_date = parse_due_date(due)
+
         # Update task through service layer
         task = _service.update_task(
-            task_id, title=title, description=description, priority=priority_enum, tags=tags_list, recurrence=recurrence_enum
+            task_id, title=title, description=description, priority=priority_enum, tags=tags_list, recurrence=recurrence_enum, due_date=due_date
         )
 
         # Display success message (FR-009)
@@ -418,6 +447,10 @@ def update(
         if task.recurrence != Recurrence.NONE:
             success_text.append("Recurrence: ", style="cyan")
             success_text.append(f"{task.recurrence.value}\n", style="white")
+
+        if task.due_date:
+            success_text.append("Due: ", style="cyan")
+            success_text.append(f"{task.due_date.strftime('%Y-%m-%d %H:%M')}\n", style="white")
 
         panel = Panel(
             success_text,

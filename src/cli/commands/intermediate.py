@@ -130,9 +130,15 @@ def search(query: str) -> None:
     default=None,
     help="Filter by tag (tasks must have this tag)",
 )
-def filter(priority: str | None, status: str | None, tag: str | None) -> None:
+@click.option(
+    "--overdue",
+    is_flag=True,
+    default=False,
+    help="Filter to show only overdue tasks",
+)
+def filter(priority: str | None, status: str | None, tag: str | None, overdue: bool) -> None:
     """
-    Filter tasks by priority, status, or tags.
+    Filter tasks by priority, status, tags, or overdue status.
 
     Filters all tasks based on the provided criteria. Multiple filters can be
     combined (AND logic). At least one filter must be provided.
@@ -144,12 +150,15 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
         todo filter --tag work
         todo filter --priority high --status incomplete
         todo filter --tag urgent --priority high
+        todo filter --overdue
+        todo filter --overdue --priority high
 
     \\b
     Options:
         -p, --priority [high|medium|low]: Filter by priority level
         -s, --status [completed|incomplete|all]: Filter by completion status
         -t, --tag TEXT: Filter by tag (case-sensitive)
+        --overdue: Show only overdue tasks
 
     \\b
     Returns:
@@ -173,8 +182,11 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
                 completed_filter = False
             # "all" means no filter on completion status
 
+        # Convert overdue flag to filter value
+        overdue_filter = True if overdue else None
+
         # Validate at least one filter is provided
-        if all(f is None for f in [priority_enum, completed_filter, tag]):
+        if all(f is None for f in [priority_enum, completed_filter, tag, overdue_filter]):
             error_text = Text()
             error_text.append("No filter criteria provided\\n\\n", style="bold red")
             error_text.append(
@@ -182,7 +194,8 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
             )
             error_text.append("  --priority [high|medium|low]\\n", style="cyan")
             error_text.append("  --status [completed|incomplete|all]\\n", style="cyan")
-            error_text.append("  --tag TAG_NAME", style="cyan")
+            error_text.append("  --tag TAG_NAME\\n", style="cyan")
+            error_text.append("  --overdue", style="cyan")
 
             panel = Panel(
                 error_text,
@@ -197,7 +210,7 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
 
         # Filter tasks through service layer
         matching_tasks = _service.filter_tasks(
-            priority=priority_enum, completed=completed_filter, tag=tag
+            priority=priority_enum, completed=completed_filter, tag=tag, overdue=overdue_filter
         )
 
         if not matching_tasks:
@@ -213,6 +226,8 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
                 message_text.append(f"  • Status: {status}\\n", style="white")
             if tag:
                 message_text.append(f"  • Tag: {tag}\\n", style="white")
+            if overdue:
+                message_text.append("  • Overdue: yes\\n", style="white")
 
             message_text.append("\\nTry different criteria or check your task list with ", style="white")
             message_text.append("todo list", style="cyan")
@@ -232,7 +247,7 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
             # Add filter header
             header_text = Text()
             header_text.append("Filtered tasks", style="cyan")
-            if priority or status or tag:
+            if priority or status or tag or overdue:
                 header_text.append(" (", style="dim")
                 filters = []
                 if priority:
@@ -241,6 +256,8 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
                     filters.append(f"status={status}")
                 if tag:
                     filters.append(f"tag={tag}")
+                if overdue:
+                    filters.append("overdue")
                 header_text.append(", ".join(filters), style="dim")
                 header_text.append(")", style="dim")
             header_text.append(f" - {len(matching_tasks)} found", style="dim")

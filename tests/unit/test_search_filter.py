@@ -466,3 +466,149 @@ class TestSortTasks:
 
         with pytest.raises(ValueError, match="Invalid sort field"):
             service.sort_tasks(by="invalid_field")
+
+
+class TestFilterOverdueTasks:
+    """Unit tests for filtering overdue tasks"""
+
+    def test_filter_tasks_by_overdue_true(self) -> None:
+        """Test filter_tasks can filter to only overdue tasks"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        now = datetime.now()
+        tasks = [
+            Task(
+                title="Overdue task",
+                due_date=now - timedelta(days=1),
+                completed=False,
+                id=1,
+                created_at=now,
+                updated_at=now,
+            ),
+            Task(
+                title="Future task",
+                due_date=now + timedelta(days=1),
+                completed=False,
+                id=2,
+                created_at=now,
+                updated_at=now,
+            ),
+            Task(
+                title="No due date",
+                due_date=None,
+                completed=False,
+                id=3,
+                created_at=now,
+                updated_at=now,
+            ),
+            Task(
+                title="Completed overdue",
+                due_date=now - timedelta(days=2),
+                completed=True,
+                id=4,
+                created_at=now,
+                updated_at=now,
+            ),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Filter by overdue=True
+        results = service.filter_tasks(overdue=True)
+
+        # Should find only incomplete overdue task
+        assert len(results) == 1
+        assert results[0].title == "Overdue task"
+
+    def test_filter_tasks_by_overdue_false(self) -> None:
+        """Test filter_tasks can filter to only non-overdue tasks"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        now = datetime.now()
+        tasks = [
+            Task(
+                title="Overdue task",
+                due_date=now - timedelta(days=1),
+                completed=False,
+                id=1,
+                created_at=now,
+                updated_at=now,
+            ),
+            Task(
+                title="Future task",
+                due_date=now + timedelta(days=1),
+                completed=False,
+                id=2,
+                created_at=now,
+                updated_at=now,
+            ),
+            Task(
+                title="No due date",
+                due_date=None,
+                completed=False,
+                id=3,
+                created_at=now,
+                updated_at=now,
+            ),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Filter by overdue=False (not overdue)
+        results = service.filter_tasks(overdue=False)
+
+        # Should find tasks that are not overdue
+        assert len(results) == 2
+        titles = [r.title for r in results]
+        assert "Future task" in titles
+        assert "No due date" in titles
+
+    def test_filter_tasks_overdue_combined_with_priority(self) -> None:
+        """Test filter_tasks combines overdue with priority filter"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        now = datetime.now()
+        tasks = [
+            Task(
+                title="High overdue",
+                due_date=now - timedelta(days=1),
+                priority=Priority.HIGH,
+                completed=False,
+                id=1,
+                created_at=now,
+                updated_at=now,
+            ),
+            Task(
+                title="Low overdue",
+                due_date=now - timedelta(days=1),
+                priority=Priority.LOW,
+                completed=False,
+                id=2,
+                created_at=now,
+                updated_at=now,
+            ),
+            Task(
+                title="High future",
+                due_date=now + timedelta(days=1),
+                priority=Priority.HIGH,
+                completed=False,
+                id=3,
+                created_at=now,
+                updated_at=now,
+            ),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Filter by overdue=True AND priority=HIGH
+        results = service.filter_tasks(overdue=True, priority=Priority.HIGH)
+
+        # Should find only high priority overdue task
+        assert len(results) == 1
+        assert results[0].title == "High overdue"

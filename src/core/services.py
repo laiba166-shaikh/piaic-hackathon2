@@ -13,6 +13,7 @@ Phase 2+: Enhanced with persistence, advanced features
 from datetime import datetime
 from typing import Optional, List
 from src.core.models import Task, Priority, Recurrence
+from src.core.validators import parse_due_date
 from src.core.storage.base import ITaskStorage
 from src.config import get_logger
 
@@ -47,6 +48,7 @@ class TaskService:
         priority: Optional[Priority] = None,
         tags: Optional[List[str]] = None,
         recurrence: Optional[Recurrence] = None,
+        due_date: Optional[datetime] = None,
     ) -> Task:
         """
         Create a new task with validation.
@@ -57,6 +59,7 @@ class TaskService:
             priority: Task priority (HIGH, MEDIUM, LOW), defaults to MEDIUM
             tags: List of tags/categories for the task
             recurrence: Recurrence pattern (NONE, DAILY, WEEKLY, MONTHLY), defaults to NONE
+            due_date: Optional due date for the task
 
         Returns:
             Created task with assigned ID and timestamps
@@ -85,6 +88,7 @@ class TaskService:
             priority=priority if priority is not None else Priority.MEDIUM,
             tags=tags if tags is not None else [],
             recurrence=recurrence if recurrence is not None else Recurrence.NONE,
+            due_date=due_date,
         )
 
         # Persist to storage (storage assigns ID and timestamps)
@@ -213,9 +217,10 @@ class TaskService:
         priority: Optional[Priority] = None,
         tags: Optional[List[str]] = None,
         recurrence: Optional[Recurrence] = None,
+        due_date: Optional[datetime] = None,
     ) -> Task:
         """
-        Update task title, description, priority, tags, and/or recurrence.
+        Update task title, description, priority, tags, recurrence, and/or due_date.
 
         Args:
             task_id: The ID of the task to update
@@ -224,6 +229,7 @@ class TaskService:
             priority: New priority level (optional)
             tags: New tags list (optional)
             recurrence: New recurrence pattern (optional, only for incomplete tasks)
+            due_date: New due date (optional)
 
         Returns:
             Updated task
@@ -241,9 +247,9 @@ class TaskService:
         from src.core.exceptions import TaskNotFoundError
 
         # Validate at least one field is being updated
-        if all(field is None for field in [title, description, priority, tags, recurrence]):
+        if all(field is None for field in [title, description, priority, tags, recurrence, due_date]):
             logger.warning("Attempted to update task with no changes")
-            raise ValueError("At least one field (title, description, priority, tags, or recurrence) must be provided")
+            raise ValueError("At least one field (title, description, priority, tags, recurrence, or due_date) must be provided")
 
         # Retrieve task from storage
         task = self._storage.get(task_id)
@@ -279,6 +285,10 @@ class TaskService:
         # Update recurrence if provided
         if recurrence is not None:
             task.recurrence = recurrence
+
+        # Update due_date if provided
+        if due_date is not None:
+            task.due_date = due_date
 
         # Persist changes
         self._storage.update(task)
@@ -361,14 +371,16 @@ class TaskService:
         priority: Optional[Priority] = None,
         completed: Optional[bool] = None,
         tag: Optional[str] = None,
+        overdue: Optional[bool] = None,
     ) -> List[Task]:
         """
-        Filter tasks by criteria (priority, status, tags).
+        Filter tasks by criteria (priority, status, tags, overdue).
 
         Args:
             priority: Filter by priority level (HIGH, MEDIUM, LOW)
             completed: Filter by completion status (True/False)
             tag: Filter by tag (tasks must have this tag)
+            overdue: Filter by overdue status (True for overdue tasks, False for not overdue)
 
         Returns:
             List of tasks matching ALL provided filter criteria (AND logic)
@@ -381,9 +393,10 @@ class TaskService:
             - Multiple criteria are combined with AND logic
             - Returns empty list if no matches found
             - Tag matching is case-sensitive exact match
+            - Overdue: task.is_overdue() for True, not task.is_overdue() for False
         """
         # Validate at least one filter criterion is provided
-        if all(criterion is None for criterion in [priority, completed, tag]):
+        if all(criterion is None for criterion in [priority, completed, tag, overdue]):
             logger.warning("Attempted to filter with no criteria")
             raise ValueError("at least one filter criterion must be provided")
 
@@ -405,11 +418,18 @@ class TaskService:
             if tag is not None and tag not in task.tags:
                 continue
 
+            # Check overdue filter
+            if overdue is not None:
+                if overdue and not task.is_overdue():
+                    continue
+                if not overdue and task.is_overdue():
+                    continue
+
             # Task passed all filters
             filtered_tasks.append(task)
 
         logger.info(
-            f"Filter (priority={priority}, completed={completed}, tag={tag}) "
+            f"Filter (priority={priority}, completed={completed}, tag={tag}, overdue={overdue}) "
             f"returned {len(filtered_tasks)} results"
         )
         return filtered_tasks

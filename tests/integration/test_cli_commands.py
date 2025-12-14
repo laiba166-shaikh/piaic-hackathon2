@@ -1352,3 +1352,121 @@ class TestRecurringTasks:
 
         # Should succeed
         assert result.exit_code == 0
+
+
+class TestDueDates:
+    """Integration tests for User Story 11: Due Dates"""
+
+    def test_add_task_with_due_date(self) -> None:
+        """Test add command accepts --due option (US11-001)"""
+        runner = CliRunner()
+
+        # Add task with due date
+        result = runner.invoke(cli, ["add", "Submit report", "--due", "2025-12-31"])
+
+        # Should succeed
+        assert result.exit_code == 0
+        assert "created" in result.output.lower()
+
+    def test_add_task_with_due_date_and_time(self) -> None:
+        """Test add command accepts --due with time"""
+        runner = CliRunner()
+
+        # Add task with due date and time
+        result = runner.invoke(cli, ["add", "Meeting", "--due", "2025-12-31 14:30"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+    def test_update_task_due_date(self) -> None:
+        """Test update command can change due date"""
+        runner = CliRunner()
+
+        # Add a task
+        runner.invoke(cli, ["add", "Task to update"])
+
+        # Update with due date
+        result = runner.invoke(cli, ["update", "1", "--due", "2025-12-25"])
+
+        # Should succeed
+        assert result.exit_code == 0
+        assert "updated" in result.output.lower()
+
+    def test_task_list_shows_due_date(self) -> None:
+        """Test list command shows due date column"""
+        runner = CliRunner()
+
+        # Add task with due date
+        runner.invoke(cli, ["add", "Due task", "--due", "2025-12-31"])
+
+        # List tasks
+        result = runner.invoke(cli, ["list"])
+
+        # Should show due date
+        assert result.exit_code == 0
+        assert "2025-12-31" in result.output
+
+    def test_add_task_with_invalid_due_date_format(self) -> None:
+        """Test add command rejects invalid due date format"""
+        runner = CliRunner()
+
+        # Add task with invalid date format
+        result = runner.invoke(cli, ["add", "Bad date", "--due", "not-a-date"])
+
+        # Should fail with error
+        assert result.exit_code != 0
+
+
+class TestOverdueFilter:
+    """Integration tests for overdue task filtering"""
+
+    def test_filter_overdue_tasks(self) -> None:
+        """Test filter command with --overdue flag"""
+        runner = CliRunner()
+
+        # Add a task with past due date (will be overdue)
+        runner.invoke(cli, ["add", "Overdue task", "--due", "2020-01-01"])
+        # Add a task with future due date
+        runner.invoke(cli, ["add", "Future task", "--due", "2030-12-31"])
+        # Add a task without due date
+        runner.invoke(cli, ["add", "No due date task"])
+
+        # Filter overdue tasks
+        result = runner.invoke(cli, ["filter", "--overdue"])
+
+        # Should show only overdue task
+        assert result.exit_code == 0
+        assert "Overdue task" in result.output
+        assert "Future task" not in result.output
+        assert "No due date task" not in result.output
+
+    def test_filter_overdue_combined_with_priority(self) -> None:
+        """Test filter command combines --overdue with --priority"""
+        runner = CliRunner()
+
+        # Add overdue high priority task
+        runner.invoke(cli, ["add", "High overdue", "--due", "2020-01-01", "-p", "high"])
+        # Add overdue low priority task
+        runner.invoke(cli, ["add", "Low overdue", "--due", "2020-01-01", "-p", "low"])
+
+        # Filter overdue + high priority
+        result = runner.invoke(cli, ["filter", "--overdue", "--priority", "high"])
+
+        # Should show only high priority overdue task
+        assert result.exit_code == 0
+        assert "High overdue" in result.output
+        assert "Low overdue" not in result.output
+
+    def test_filter_overdue_no_results(self) -> None:
+        """Test filter --overdue with no overdue tasks"""
+        runner = CliRunner()
+
+        # Add only future tasks
+        runner.invoke(cli, ["add", "Future task", "--due", "2030-12-31"])
+
+        # Filter overdue tasks
+        result = runner.invoke(cli, ["filter", "--overdue"])
+
+        # Should show no results message
+        assert result.exit_code == 0
+        assert "no tasks" in result.output.lower() or "No tasks" in result.output

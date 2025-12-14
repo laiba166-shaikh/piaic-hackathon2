@@ -240,6 +240,92 @@ def undone(task_id: int) -> None:
 
 
 @click.command()
+@click.argument("task_id", type=int)
+@click.option(
+    "--title",
+    "-t",
+    default=None,
+    help="New task title",
+)
+@click.option(
+    "--description",
+    "-d",
+    default=None,
+    help="New task description",
+)
+def update(task_id: int, title: str | None, description: str | None) -> None:
+    """
+    Update a task's title and/or description.
+
+    Updates the task with the given ID. You can update the title, description,
+    or both. At least one update must be provided.
+
+    \\b
+    Examples:
+        todo update 1 --title "New title"
+        todo update 1 -d "New description"
+        todo update 1 --title "Buy milk and eggs" -d "From organic store"
+
+    \\b
+    Arguments:
+        TASK_ID: The ID of the task to update (positive integer)
+
+    \\b
+    Options:
+        --title, -t TEXT: New task title
+        --description, -d TEXT: New task description
+    """
+    try:
+        # Update task through service layer
+        task = _service.update_task(task_id, title=title, description=description)
+
+        # Display success message (FR-009)
+        success_text = Text()
+        success_text.append("Task updated successfully!\n\n", style="bold green")
+        success_text.append("ID: ", style="cyan")
+        success_text.append(f"{task.id}\n", style="bold white")
+        success_text.append("Title: ", style="cyan")
+        success_text.append(f"{task.title}\n", style="white")
+
+        if task.description:
+            success_text.append("Description: ", style="cyan")
+            success_text.append(f"{task.description}\n", style="white")
+
+        panel = Panel(
+            success_text,
+            title="[bold green]Task Updated[/bold green]",
+            border_style="green",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.info(f"User updated task ID {task.id}")
+
+    except ValueError as e:
+        # Input validation error
+        error_text = Text()
+        error_text.append("Invalid input\n\n", style="bold red")
+        error_text.append(str(e), style="white")
+
+        panel = Panel(
+            error_text,
+            title="[bold red]Error[/bold red]",
+            border_style="red",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.warning(f"Validation error in update command: {e}")
+        raise click.ClickException(str(e))
+
+    except Exception as e:
+        # Unexpected error (includes TaskNotFoundError)
+        console.print(f"\n[red]Error: {e}[/red]\n")
+        logger.error(f"Error in update command: {e}", exc_info=True)
+        raise click.ClickException(str(e))
+
+
+@click.command()
 def list() -> None:
     """
     List all tasks in your todo list.

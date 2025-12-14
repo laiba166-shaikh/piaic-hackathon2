@@ -240,50 +240,50 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### RED Phase (Tests First)
 
-- [ ] [US3-001] [RED] Write integration test for `done` command in tests/integration/test_cli_commands.py
+- [X] [US3-001] [RED] Write integration test for `done` command in tests/integration/test_cli_commands.py
   - Add task, run `todo done 1`
   - Verify task status changes to completed=True
-- [ ] [US3-002] [RED] Write integration test for marking task incomplete (`undone` command)
+- [X] [US3-002] [RED] Write integration test for marking task incomplete (`undone` command)
   - Mark task complete, then run `todo undone 1`
   - Verify status changes back to completed=False
-- [ ] [US3-003] [RED] Write integration test for `done` with invalid ID
+- [X] [US3-003] [RED] Write integration test for `done` with invalid ID
   - Run `todo done 999`
   - Verify error message is displayed (FR-010)
-- [ ] [US3-004] [RED] Write integration test for `done` affecting only target task
+- [X] [US3-004] [RED] Write integration test for `done` affecting only target task
   - Add 5 tasks, mark task 3 complete
   - Verify tasks 1, 2, 4, 5 remain incomplete
-- [ ] [US3-005] [RED] Write unit test for TaskService.mark_complete(task_id) in tests/unit/test_services.py
+- [X] [US3-005] [RED] Write unit test for TaskService.mark_complete(task_id) in tests/unit/test_services.py
   - Mock storage, verify update() is called
   - Test raises TaskNotFoundError if ID not found
 
 ### GREEN Phase (Implementation)
 
-- [ ] [US3-006] [GREEN] Implement TaskService.mark_complete(task_id: int) in src/core/services.py
+- [X] [US3-006] [GREEN] Implement TaskService.mark_complete(task_id: int) in src/core/services.py
   - Call storage.get(task_id)
   - If None, raise TaskNotFoundError
   - Set task.completed = True
   - Call storage.update(task)
   - Return updated task
-- [ ] [US3-007] [GREEN] Implement TaskService.mark_incomplete(task_id: int) in src/core/services.py
+- [X] [US3-007] [GREEN] Implement TaskService.mark_incomplete(task_id: int) in src/core/services.py
   - Similar to mark_complete, but set completed = False
-- [ ] [US3-008] [GREEN] Implement `done` command in src/cli/commands/basic.py
+- [X] [US3-008] [GREEN] Implement `done` command in src/cli/commands/basic.py
   - Accept task_id as argument
   - Call TaskService.mark_complete(task_id)
   - Display success message (FR-009)
   - Handle TaskNotFoundError, display error (FR-010)
-- [ ] [US3-009] [GREEN] Implement `undone` command in src/cli/commands/basic.py
+- [X] [US3-009] [GREEN] Implement `undone` command in src/cli/commands/basic.py
   - Accept task_id as argument
   - Call TaskService.mark_incomplete(task_id)
   - Display success message
-- [ ] [US3-010] [GREEN] Register `done` and `undone` commands in src/cli/main.py
+- [X] [US3-010] [GREEN] Register `done` and `undone` commands in src/cli/main.py
 
 ### REFACTOR Phase
 
-- [ ] [US3-011] [REFACTOR] Add visual distinction test in tests/integration/test_table_rendering.py
+- [X] [US3-011] [REFACTOR] Add visual distinction test in tests/integration/test_table_rendering.py
   - Verify completed tasks show ✓ (green) (FR-036, SC-015)
   - Verify incomplete tasks show ☐ (FR-037)
-- [ ] [US3-012] [REFACTOR] Update render_task_table() to use STATUS_INDICATORS
-- [ ] [US3-013] [REFACTOR] Run all US3 tests, ensure 100% pass rate
+- [X] [US3-012] [REFACTOR] Update render_task_table() to use STATUS_INDICATORS
+- [X] [US3-013] [REFACTOR] Run all US3 tests, ensure 100% pass rate
 
 **Acceptance**: SC-001 (partial), SC-015, all US3 acceptance scenarios pass, users can mark tasks complete/incomplete.
 
@@ -297,41 +297,41 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### RED Phase (Tests First)
 
-- [ ] [US4-001] [RED] Write integration test for `update` command with title in tests/integration/test_cli_commands.py
+- [X] [US4-001] [RED] Write integration test for `update` command with title in tests/integration/test_cli_commands.py
   - Add task "Buy milk", update to "Buy milk and eggs"
   - Verify title changes
-- [ ] [US4-002] [RED] Write integration test for `update` command adding description
+- [X] [US4-002] [RED] Write integration test for `update` command adding description
   - Add task without description, update with -d "From the organic store"
   - Verify description is added
-- [ ] [US4-003] [RED] Write integration test for `update` with invalid task ID
+- [X] [US4-003] [RED] Write integration test for `update` with invalid task ID
   - Run `todo update 999 --title "New title"`
   - Verify error message is displayed
-- [ ] [US4-004] [RED] Write integration test for `update` with empty title
+- [X] [US4-004] [RED] Write integration test for `update` with empty title
   - Run `todo update 1 --title ""`
   - Verify error message, task remains unchanged
-- [ ] [US4-005] [RED] Write unit test for TaskService.update_task() in tests/unit/test_services.py
+- [X] [US4-005] [RED] Write unit test for TaskService.update_task() in tests/unit/test_services.py
 
 ### GREEN Phase (Implementation)
 
-- [ ] [US4-006] [GREEN] Implement TaskService.update_task(task_id, title=None, description=None, **kwargs) in src/core/services.py
+- [X] [US4-006] [GREEN] Implement TaskService.update_task(task_id, title=None, description=None, **kwargs) in src/core/services.py
   - Get task by ID (raise TaskNotFoundError if not found)
   - Update provided fields
   - Validate title if provided (not empty)
   - Call storage.update(task)
   - Return updated task
-- [ ] [US4-007] [GREEN] Implement `update` command in src/cli/commands/basic.py
+- [X] [US4-007] [GREEN] Implement `update` command in src/cli/commands/basic.py
   - Accept task_id as argument
   - Accept --title, --description options
   - Call TaskService.update_task()
   - Display success message
   - Handle errors (FR-010)
-- [ ] [US4-008] [GREEN] Register `update` command in src/cli/main.py
+- [X] [US4-008] [GREEN] Register `update` command in src/cli/main.py
 
 ### REFACTOR Phase
 
-- [ ] [US4-009] [REFACTOR] Add validation for title length (1-200 chars) in TaskService.update_task()
-- [ ] [US4-010] [REFACTOR] Add validation for description length (max 500 chars)
-- [ ] [US4-011] [REFACTOR] Run all US4 tests, ensure 100% pass rate
+- [X] [US4-009] [REFACTOR] Add validation for title length (1-200 chars) in TaskService.update_task()
+- [X] [US4-010] [REFACTOR] Add validation for description length (max 500 chars)
+- [X] [US4-011] [REFACTOR] Run all US4 tests, ensure 100% pass rate
 
 **Acceptance**: SC-001 (partial), all US4 acceptance scenarios pass, users can update task titles and descriptions.
 

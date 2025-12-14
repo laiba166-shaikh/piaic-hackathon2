@@ -304,6 +304,112 @@ class TestDoneCommand:
         assert "completed" in result.output.lower() or "already" in result.output.lower()
 
 
+class TestUpdateCommand:
+    """Integration tests for User Story 4: Update Task Details"""
+
+    def test_update_command_changes_title(self) -> None:
+        """Test update command changes task title (US4-001, AC1)"""
+        runner = CliRunner()
+
+        # Add a task
+        runner.invoke(cli, ["add", "Buy milk"])
+
+        # Update the title
+        result = runner.invoke(cli, ["update", "1", "--title", "Buy milk and eggs"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "updated" in result.output.lower()
+
+        # Verify title changed by listing
+        list_result = runner.invoke(cli, ["list"])
+        assert "Buy milk and eggs" in list_result.output
+        assert "Buy milk" not in list_result.output or "Buy milk and eggs" in list_result.output
+
+    def test_update_command_adds_description(self) -> None:
+        """Test update command adds description to task (US4-002, AC2)"""
+        runner = CliRunner()
+
+        # Add a task without description
+        runner.invoke(cli, ["add", "Buy groceries"])
+
+        # Update with description
+        result = runner.invoke(cli, ["update", "1", "-d", "From the organic store"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "updated" in result.output.lower()
+
+    def test_update_command_updates_description(self) -> None:
+        """Test update command updates existing description (US4-003, AC3)"""
+        runner = CliRunner()
+
+        # Add a task with description
+        runner.invoke(cli, ["add", "Call dentist", "-d", "Annual checkup"])
+
+        # Update the description
+        result = runner.invoke(cli, ["update", "1", "-d", "Schedule cleaning appointment"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "updated" in result.output.lower()
+
+    def test_update_command_with_invalid_id(self) -> None:
+        """Test update command with invalid ID shows error (US4-004, AC4)"""
+        runner = CliRunner()
+
+        # Try to update non-existent task
+        result = runner.invoke(cli, ["update", "999", "--title", "New title"])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should show error message
+        assert "not found" in result.output.lower() or "error" in result.output.lower()
+
+    def test_update_command_with_empty_title(self) -> None:
+        """Test update command with empty title shows error (US4-005, AC5)"""
+        runner = CliRunner()
+
+        # Add a task
+        runner.invoke(cli, ["add", "Original title"])
+
+        # Try to update with empty title
+        result = runner.invoke(cli, ["update", "1", "--title", ""])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should show error message
+        assert "empty" in result.output.lower() or "invalid" in result.output.lower() or "error" in result.output.lower()
+
+    def test_update_command_with_both_title_and_description(self) -> None:
+        """Test update command can update both title and description (US4-006, AC6)"""
+        runner = CliRunner()
+
+        # Add a task
+        runner.invoke(cli, ["add", "Old title", "-d", "Old description"])
+
+        # Update both title and description
+        result = runner.invoke(cli, ["update", "1", "--title", "New title", "-d", "New description"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "updated" in result.output.lower()
+
+        # Verify changes by listing
+        list_result = runner.invoke(cli, ["list"])
+        assert "New title" in list_result.output
+
+
 class TestAddCommand:
     """Integration tests for User Story 1: Capture New Tasks"""
 

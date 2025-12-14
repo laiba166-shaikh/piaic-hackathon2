@@ -305,3 +305,123 @@ class TestTaskServiceMarkIncomplete:
         # Should raise TaskNotFoundError
         with pytest.raises(TaskNotFoundError):
             service.mark_incomplete(999)
+
+
+class TestTaskServiceUpdateTask:
+    """Unit tests for TaskService.update_task() method (US4-007)"""
+
+    def test_update_task_updates_title(self) -> None:
+        """Test update_task updates task title"""
+        from src.core.services import TaskService
+
+        # Mock storage with a task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Old title", id=1, created_at=datetime.now(), updated_at=datetime.now())
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and update task
+        service = TaskService(mock_storage)
+        result = service.update_task(1, title="New title")
+
+        # Verify storage.get was called
+        mock_storage.get.assert_called_once_with(1)
+
+        # Verify storage.update was called
+        assert mock_storage.update.called
+
+        # Verify the updated task has new title
+        update_call_args = mock_storage.update.call_args[0][0]
+        assert update_call_args.title == "New title"
+        assert update_call_args.id == 1
+
+        # Verify method returns the updated task
+        assert result.title == "New title"
+
+    def test_update_task_updates_description(self) -> None:
+        """Test update_task updates task description"""
+        from src.core.services import TaskService
+
+        # Mock storage with a task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Task", id=1, created_at=datetime.now(), updated_at=datetime.now(), description="Old desc")
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and update description
+        service = TaskService(mock_storage)
+        result = service.update_task(1, description="New desc")
+
+        # Verify the updated task has new description
+        update_call_args = mock_storage.update.call_args[0][0]
+        assert update_call_args.description == "New desc"
+
+        # Verify method returns the updated task
+        assert result.description == "New desc"
+
+    def test_update_task_updates_both_title_and_description(self) -> None:
+        """Test update_task can update both title and description"""
+        from src.core.services import TaskService
+
+        # Mock storage with a task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Old", id=1, created_at=datetime.now(), updated_at=datetime.now(), description="Old desc")
+        mock_storage.get.return_value = task
+        mock_storage.update.return_value = True
+
+        # Create service and update both
+        service = TaskService(mock_storage)
+        result = service.update_task(1, title="New", description="New desc")
+
+        # Verify both updated
+        update_call_args = mock_storage.update.call_args[0][0]
+        assert update_call_args.title == "New"
+        assert update_call_args.description == "New desc"
+
+    def test_update_task_raises_error_for_nonexistent_task(self) -> None:
+        """Test update_task raises TaskNotFoundError for invalid ID"""
+        from src.core.services import TaskService
+        from src.core.exceptions import TaskNotFoundError
+
+        # Mock storage that returns None
+        mock_storage = Mock(spec=ITaskStorage)
+        mock_storage.get.return_value = None
+
+        # Create service and try to update nonexistent task
+        service = TaskService(mock_storage)
+
+        # Should raise TaskNotFoundError
+        with pytest.raises(TaskNotFoundError):
+            service.update_task(999, title="New title")
+
+    def test_update_task_raises_error_for_empty_title(self) -> None:
+        """Test update_task raises ValueError for empty title"""
+        from src.core.services import TaskService
+
+        # Mock storage with a task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Original", id=1, created_at=datetime.now(), updated_at=datetime.now())
+        mock_storage.get.return_value = task
+
+        # Create service and try to update with empty title
+        service = TaskService(mock_storage)
+
+        # Should raise ValueError
+        with pytest.raises(ValueError):
+            service.update_task(1, title="")
+
+    def test_update_task_with_no_changes_provided(self) -> None:
+        """Test update_task raises ValueError when no updates provided"""
+        from src.core.services import TaskService
+
+        # Mock storage with a task
+        mock_storage = Mock(spec=ITaskStorage)
+        task = Task(title="Task", id=1, created_at=datetime.now(), updated_at=datetime.now())
+        mock_storage.get.return_value = task
+
+        # Create service and try to update with nothing
+        service = TaskService(mock_storage)
+
+        # Should raise ValueError
+        with pytest.raises(ValueError):
+            service.update_task(1)

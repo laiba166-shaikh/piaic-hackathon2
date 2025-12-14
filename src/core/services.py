@@ -166,3 +166,60 @@ class TaskService:
 
         logger.info(f"Marked task ID {task_id} as incomplete")
         return task
+
+    def update_task(
+        self,
+        task_id: int,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> Task:
+        """
+        Update task title and/or description.
+
+        Args:
+            task_id: The ID of the task to update
+            title: New title (optional)
+            description: New description (optional)
+
+        Returns:
+            Updated task
+
+        Raises:
+            TaskNotFoundError: If task with given ID doesn't exist
+            ValueError: If no updates provided or title is empty
+
+        Business Rules:
+            - At least one of title or description must be provided
+            - Title cannot be empty or whitespace-only
+            - Updates task.updated_at timestamp
+        """
+        from src.core.exceptions import TaskNotFoundError
+
+        # Validate at least one field is being updated
+        if title is None and description is None:
+            logger.warning("Attempted to update task with no changes")
+            raise ValueError("At least one of title or description must be provided")
+
+        # Retrieve task from storage
+        task = self._storage.get(task_id)
+        if task is None:
+            logger.warning(f"Attempted to update nonexistent task {task_id}")
+            raise TaskNotFoundError(task_id)
+
+        # Update title if provided
+        if title is not None:
+            # Validate title is not empty
+            if not title or not title.strip():
+                logger.warning(f"Attempted to update task {task_id} with empty title")
+                raise ValueError("Title cannot be empty")
+            task.title = title
+
+        # Update description if provided
+        if description is not None:
+            task.description = description
+
+        # Persist changes
+        self._storage.update(task)
+
+        logger.info(f"Updated task ID {task_id}")
+        return task

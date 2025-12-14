@@ -270,3 +270,106 @@ class TaskService:
             logger.warning(f"Attempted to delete nonexistent task {task_id}")
 
         return deleted
+
+    def search_tasks(self, query: str) -> List[Task]:
+        """
+        Search for tasks by keyword in title or description.
+
+        Args:
+            query: Search keyword (case-insensitive)
+
+        Returns:
+            List of tasks matching the search query
+
+        Raises:
+            ValueError: If query is empty or whitespace-only
+
+        Business Rules:
+            - Case-insensitive substring matching (FR-017)
+            - Searches both title and description fields
+            - Returns empty list if no matches found
+            - Query cannot be empty or whitespace-only
+        """
+        # Validate query is not empty
+        if not query or not query.strip():
+            logger.warning("Attempted to search with empty query")
+            raise ValueError("Search query cannot be empty")
+
+        # Get all tasks from storage
+        all_tasks = self._storage.list_all()
+
+        # Normalize query for case-insensitive matching
+        normalized_query = query.lower()
+
+        # Filter tasks by keyword in title or description
+        matching_tasks = []
+        for task in all_tasks:
+            # Check title
+            if normalized_query in task.title.lower():
+                matching_tasks.append(task)
+                continue
+
+            # Check description if present
+            if task.description and normalized_query in task.description.lower():
+                matching_tasks.append(task)
+
+        logger.info(f"Search for '{query}' returned {len(matching_tasks)} results")
+        return matching_tasks
+
+    def filter_tasks(
+        self,
+        priority: Optional[Priority] = None,
+        completed: Optional[bool] = None,
+        tag: Optional[str] = None,
+    ) -> List[Task]:
+        """
+        Filter tasks by criteria (priority, status, tags).
+
+        Args:
+            priority: Filter by priority level (HIGH, MEDIUM, LOW)
+            completed: Filter by completion status (True/False)
+            tag: Filter by tag (tasks must have this tag)
+
+        Returns:
+            List of tasks matching ALL provided filter criteria (AND logic)
+
+        Raises:
+            ValueError: If no filter criteria provided
+
+        Business Rules:
+            - At least one filter criterion must be provided (FR-019)
+            - Multiple criteria are combined with AND logic
+            - Returns empty list if no matches found
+            - Tag matching is case-sensitive exact match
+        """
+        # Validate at least one filter criterion is provided
+        if all(criterion is None for criterion in [priority, completed, tag]):
+            logger.warning("Attempted to filter with no criteria")
+            raise ValueError("at least one filter criterion must be provided")
+
+        # Get all tasks from storage
+        all_tasks = self._storage.list_all()
+
+        # Apply filters (AND logic)
+        filtered_tasks = []
+        for task in all_tasks:
+            # Check priority filter
+            if priority is not None and task.priority != priority:
+                continue
+
+            # Check completed status filter
+            if completed is not None and task.completed != completed:
+                continue
+
+            # Check tag filter
+            if tag is not None and tag not in task.tags:
+                continue
+
+            # Task passed all filters
+            filtered_tasks.append(task)
+
+        logger.info(
+            f"Filter (priority={priority}, completed={completed}, tag={tag}) "
+            f"returned {len(filtered_tasks)} results"
+        )
+        return filtered_tasks

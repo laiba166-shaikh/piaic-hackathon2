@@ -800,3 +800,246 @@ class TestAddCommand:
 
         # Tags should be parsed correctly (will verify in GREEN phase)
         assert result.exit_code == 0
+
+
+class TestSearchCommand:
+    """Integration tests for User Story 7: Search Tasks"""
+
+    def test_search_command_finds_matching_tasks(self) -> None:
+        """Test search command finds tasks by keyword in title (US7-001)"""
+        runner = CliRunner()
+
+        # Add 10 tasks with varied titles
+        runner.invoke(cli, ["add", "Team meeting"])
+        runner.invoke(cli, ["add", "Client meeting"])
+        runner.invoke(cli, ["add", "Project review"])
+        runner.invoke(cli, ["add", "Code review"])
+        runner.invoke(cli, ["add", "Meeting notes"])
+        runner.invoke(cli, ["add", "Budget planning"])
+        runner.invoke(cli, ["add", "Sprint meeting"])
+        runner.invoke(cli, ["add", "Design review"])
+        runner.invoke(cli, ["add", "Quarterly meeting"])
+        runner.invoke(cli, ["add", "Status update"])
+
+        # Search for "meeting"
+        result = runner.invoke(cli, ["search", "meeting"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show matching tasks
+        assert "Team meeting" in result.output
+        assert "Client meeting" in result.output
+        assert "Meeting notes" in result.output
+        assert "Sprint meeting" in result.output
+        assert "Quarterly meeting" in result.output
+
+        # Should NOT show non-matching tasks
+        assert "Project review" not in result.output
+        assert "Budget planning" not in result.output
+
+    def test_search_command_matches_description(self) -> None:
+        """Test search matches keyword in description (US7-002, FR-017)"""
+        runner = CliRunner()
+
+        # Add tasks with keyword in description
+        runner.invoke(cli, ["add", "Task A", "-d", "Discuss meeting agenda"])
+        runner.invoke(cli, ["add", "Task B", "-d", "Review code"])
+        runner.invoke(cli, ["add", "Task C", "-d", "Plan next meeting"])
+
+        # Search for "meeting"
+        result = runner.invoke(cli, ["search", "meeting"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should find tasks with keyword in description
+        assert "Task A" in result.output
+        assert "Task C" in result.output
+
+        # Should NOT show task without keyword
+        assert "Task B" not in result.output
+
+    def test_search_command_no_results(self) -> None:
+        """Test search shows message when no results found (US7-003)"""
+        runner = CliRunner()
+
+        # Add some tasks
+        runner.invoke(cli, ["add", "Task 1"])
+        runner.invoke(cli, ["add", "Task 2"])
+
+        # Search for non-existent keyword
+        result = runner.invoke(cli, ["search", "nonexistent"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show "no results" message
+        assert "no" in result.output.lower() and ("result" in result.output.lower() or "found" in result.output.lower())
+
+    def test_search_command_case_insensitive(self) -> None:
+        """Test search is case-insensitive (FR-017)"""
+        runner = CliRunner()
+
+        # Add tasks with mixed case
+        runner.invoke(cli, ["add", "MEETING with CEO"])
+        runner.invoke(cli, ["add", "meeting with team"])
+        runner.invoke(cli, ["add", "Meeting with client"])
+
+        # Search with lowercase
+        result = runner.invoke(cli, ["search", "meeting"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should find all tasks regardless of case
+        assert "MEETING with CEO" in result.output or "meeting with CEO" in result.output.lower()
+        assert "meeting with team" in result.output
+        assert "Meeting with client" in result.output or "meeting with client" in result.output.lower()
+
+    def test_search_command_with_empty_query(self) -> None:
+        """Test search with empty query shows error (US7-004, FR-017)"""
+        runner = CliRunner()
+
+        # Try to search with empty string
+        result = runner.invoke(cli, ["search", ""])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should show error message
+        assert "error" in result.output.lower() or "empty" in result.output.lower()
+
+
+class TestFilterCommand:
+    """Integration tests for User Story 8: Filter Tasks"""
+
+    def test_filter_by_priority_high(self) -> None:
+        """Test filter command filters by high priority (US8-001, FR-019)"""
+        runner = CliRunner()
+
+        # Add tasks with different priorities
+        runner.invoke(cli, ["add", "Urgent task", "-p", "high"])
+        runner.invoke(cli, ["add", "Normal task", "-p", "medium"])
+        runner.invoke(cli, ["add", "Low priority task", "-p", "low"])
+        runner.invoke(cli, ["add", "Another urgent task", "-p", "high"])
+
+        # Filter by high priority
+        result = runner.invoke(cli, ["filter", "--priority", "high"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show only high priority tasks
+        assert "Urgent task" in result.output
+        assert "Another urgent task" in result.output
+        assert "Normal task" not in result.output
+        assert "Low priority task" not in result.output
+
+    def test_filter_by_status_completed(self) -> None:
+        """Test filter command filters by completed status (US8-002, FR-019)"""
+        runner = CliRunner()
+
+        # Add tasks and mark some complete
+        runner.invoke(cli, ["add", "Task 1"])
+        runner.invoke(cli, ["add", "Task 2"])
+        runner.invoke(cli, ["add", "Task 3"])
+        runner.invoke(cli, ["done", "1"])
+        runner.invoke(cli, ["done", "3"])
+
+        # Filter by completed status
+        result = runner.invoke(cli, ["filter", "--status", "completed"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show only completed tasks
+        assert "Task 1" in result.output
+        assert "Task 3" in result.output
+        assert "Task 2" not in result.output
+
+    def test_filter_by_status_incomplete(self) -> None:
+        """Test filter command filters by incomplete status (US8-003, FR-019)"""
+        runner = CliRunner()
+
+        # Add tasks and mark some complete
+        runner.invoke(cli, ["add", "Task A"])
+        runner.invoke(cli, ["add", "Task B"])
+        runner.invoke(cli, ["add", "Task C"])
+        runner.invoke(cli, ["done", "2"])
+
+        # Filter by incomplete status
+        result = runner.invoke(cli, ["filter", "--status", "incomplete"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show only incomplete tasks
+        assert "Task A" in result.output
+        assert "Task C" in result.output
+        assert "Task B" not in result.output
+
+    def test_filter_by_tag(self) -> None:
+        """Test filter command filters by tag (US8-004, FR-019)"""
+        runner = CliRunner()
+
+        # Add tasks with different tags
+        runner.invoke(cli, ["add", "Work task", "--tags", "work,urgent"])
+        runner.invoke(cli, ["add", "Personal task", "--tags", "personal,shopping"])
+        runner.invoke(cli, ["add", "Another work task", "--tags", "work"])
+        runner.invoke(cli, ["add", "Untagged task"])
+
+        # Filter by "work" tag
+        result = runner.invoke(cli, ["filter", "--tag", "work"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show only tasks with "work" tag
+        assert "Work task" in result.output
+        assert "Another work task" in result.output
+        assert "Personal task" not in result.output
+        assert "Untagged task" not in result.output
+
+    def test_filter_combined_priority_and_status(self) -> None:
+        """Test filter with combined criteria (priority + status) (US8-005, FR-019)"""
+        runner = CliRunner()
+
+        # Add tasks with various combinations
+        runner.invoke(cli, ["add", "High incomplete", "-p", "high"])
+        runner.invoke(cli, ["add", "High complete", "-p", "high"])
+        runner.invoke(cli, ["add", "Low incomplete", "-p", "low"])
+        runner.invoke(cli, ["add", "Low complete", "-p", "low"])
+
+        # Mark some complete
+        runner.invoke(cli, ["done", "2"])
+        runner.invoke(cli, ["done", "4"])
+
+        # Filter by high priority AND incomplete status
+        result = runner.invoke(cli, ["filter", "--priority", "high", "--status", "incomplete"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show only high priority incomplete tasks
+        assert "High incomplete" in result.output
+        assert "High complete" not in result.output
+        assert "Low incomplete" not in result.output
+        assert "Low complete" not in result.output
+
+    def test_filter_no_results(self) -> None:
+        """Test filter shows friendly message when no results (US8-006, FR-020)"""
+        runner = CliRunner()
+
+        # Add some tasks
+        runner.invoke(cli, ["add", "Task 1", "-p", "low"])
+        runner.invoke(cli, ["add", "Task 2", "-p", "medium"])
+
+        # Filter for high priority (should find none)
+        result = runner.invoke(cli, ["filter", "--priority", "high"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show friendly "no results" message
+        assert "no" in result.output.lower() and ("task" in result.output.lower() or "result" in result.output.lower())

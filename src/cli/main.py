@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from src.config import APP_NAME, APP_VERSION, APP_DESCRIPTION, get_logger
-from src.cli.commands import basic
+from src.cli.commands import basic, intermediate
 
 logger = get_logger(__name__)
 console = Console()
@@ -111,6 +111,10 @@ cli.add_command(basic.done)
 cli.add_command(basic.undone)
 cli.add_command(basic.update)
 cli.add_command(basic.delete)
+
+# Register commands from intermediate.py
+cli.add_command(intermediate.search)
+cli.add_command(intermediate.filter)
 
 
 def main() -> None:

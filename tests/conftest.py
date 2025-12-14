@@ -18,11 +18,25 @@ def reset_storage() -> Generator[None, None, None]:
     basic._storage = MemoryStorage()
     basic._service = TaskService(basic._storage)
 
+    # Also reset intermediate module if it exists (for search/filter commands)
+    try:
+        from src.cli.commands import intermediate
+        intermediate._service = TaskService(basic._storage)
+    except (ImportError, AttributeError):
+        pass  # Module doesn't exist yet or doesn't have _service
+
     yield
 
     # Cleanup after test
     basic._storage = MemoryStorage()
     basic._service = TaskService(basic._storage)
+
+    # Also cleanup intermediate module if it exists
+    try:
+        from src.cli.commands import intermediate
+        intermediate._service = TaskService(basic._storage)
+    except (ImportError, AttributeError):
+        pass
 
 @pytest.fixture
 def sample_task() -> Task:

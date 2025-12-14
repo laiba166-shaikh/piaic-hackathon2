@@ -279,3 +279,110 @@ def filter(priority: str | None, status: str | None, tag: str | None) -> None:
         console.print(f"\\n[red]Unexpected error: {e}[/red]\\n")
         logger.error(f"Unexpected error in filter command: {e}", exc_info=True)
         raise click.ClickException(str(e))
+
+
+@click.command()
+@click.option(
+    "-b",
+    "--by",
+    type=click.Choice(["priority", "title", "created", "due_date"], case_sensitive=False),
+    default="created",
+    help="Field to sort by (priority, title, created, due_date). Default: created",
+)
+@click.option(
+    "-o",
+    "--order",
+    type=click.Choice(["asc", "desc"], case_sensitive=False),
+    default="desc",
+    help="Sort order: asc (ascending) or desc (descending). Default: desc",
+)
+def sort(by: str, order: str) -> None:
+    """
+    Sort tasks by priority, title, created date, or due date.
+
+    Displays all tasks sorted by the specified field. Default order is descending
+    (highest priority first, newest first, Z-A for title).
+
+    \\b
+    Examples:
+        todo sort --by priority              # High -> Medium -> Low
+        todo sort --by priority --order asc  # Low -> Medium -> High
+        todo sort --by title                 # Z-A (descending)
+        todo sort --by title --order asc     # A-Z (ascending)
+        todo sort --by created               # Newest first
+        todo sort --by created --order asc   # Oldest first
+
+    \\b
+    Sort Fields:
+        priority: HIGH -> MEDIUM -> LOW (desc) or LOW -> MEDIUM -> HIGH (asc)
+        title: Alphabetical order (case-insensitive)
+        created: By creation timestamp
+        due_date: By due date (tasks without due date appear last)
+
+    \\b
+    Returns:
+        Formatted table of sorted tasks or message if no tasks exist
+    """
+    try:
+        # Determine ascending flag from order option
+        ascending = order.lower() == "asc"
+
+        # Sort tasks through service layer
+        sorted_tasks = _service.sort_tasks(by=by.lower(), ascending=ascending)
+
+        if not sorted_tasks:
+            # Display no tasks message
+            message_text = Text()
+            message_text.append("No tasks to sort.\\n\\n", style="bold yellow")
+            message_text.append("Add some tasks first with ", style="white")
+            message_text.append("todo add \"Your task\"", style="cyan")
+
+            panel = Panel(
+                message_text,
+                title="[bold yellow]No Tasks[/bold yellow]",
+                border_style="yellow",
+                padding=(1, 2),
+            )
+            console.print(panel)
+            logger.info("Sort command invoked with no tasks")
+        else:
+            # Display sorted tasks in formatted table
+            from src.cli.rendering.table import render_task_table
+
+            # Add sort header
+            header_text = Text()
+            header_text.append("Tasks sorted by ", style="cyan")
+            header_text.append(by, style="bold white")
+            header_text.append(f" ({order})", style="dim")
+            header_text.append(f" - {len(sorted_tasks)} tasks", style="dim")
+
+            console.print("\\n")
+            console.print(header_text)
+
+            table = render_task_table(sorted_tasks)
+            console.print(table)
+            console.print("\\n")
+            logger.info(f"Displayed {len(sorted_tasks)} tasks sorted by {by} ({order})")
+
+    except ValueError as e:
+        # Invalid sort field error
+        error_text = Text()
+        error_text.append("Invalid sort option\\n\\n", style="bold red")
+        error_text.append(str(e), style="white")
+
+        panel = Panel(
+            error_text,
+            title="[bold red]Error[/bold red]",
+            border_style="red",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.warning(f"Validation error in sort command: {e}")
+        raise click.ClickException(str(e))
+
+    except Exception as e:
+        # Unexpected error
+        console.print(f"\\n[red]Unexpected error: {e}[/red]\\n")
+        logger.error(f"Unexpected error in sort command: {e}", exc_info=True)
+        raise click.ClickException(str(e))

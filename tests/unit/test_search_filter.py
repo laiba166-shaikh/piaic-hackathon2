@@ -1,6 +1,6 @@
 """Unit tests for search and filter functionality"""
 import pytest
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import Mock
 from src.core.models import Task, Priority
 from src.core.storage.base import ITaskStorage
@@ -327,3 +327,142 @@ class TestFilterTasks:
         # Should raise ValueError when no criteria provided
         with pytest.raises(ValueError, match="at least one filter"):
             service.filter_tasks()
+
+
+class TestSortTasks:
+    """Unit tests for TaskService.sort_tasks() method (US9-007)"""
+
+    def test_sort_tasks_by_priority_descending(self) -> None:
+        """Test sort_tasks sorts by priority high -> medium -> low"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        tasks = [
+            Task(title="Low task", priority=Priority.LOW, id=1, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="High task", priority=Priority.HIGH, id=2, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="Medium task", priority=Priority.MEDIUM, id=3, created_at=datetime.now(), updated_at=datetime.now()),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Sort by priority descending (high -> medium -> low)
+        results = service.sort_tasks(by="priority", ascending=False)
+
+        assert len(results) == 3
+        assert results[0].priority == Priority.HIGH
+        assert results[1].priority == Priority.MEDIUM
+        assert results[2].priority == Priority.LOW
+
+    def test_sort_tasks_by_priority_ascending(self) -> None:
+        """Test sort_tasks sorts by priority low -> medium -> high when ascending"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        tasks = [
+            Task(title="High task", priority=Priority.HIGH, id=1, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="Low task", priority=Priority.LOW, id=2, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="Medium task", priority=Priority.MEDIUM, id=3, created_at=datetime.now(), updated_at=datetime.now()),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Sort by priority ascending (low -> medium -> high)
+        results = service.sort_tasks(by="priority", ascending=True)
+
+        assert len(results) == 3
+        assert results[0].priority == Priority.LOW
+        assert results[1].priority == Priority.MEDIUM
+        assert results[2].priority == Priority.HIGH
+
+    def test_sort_tasks_by_title_alphabetically(self) -> None:
+        """Test sort_tasks sorts by title A-Z"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        tasks = [
+            Task(title="Zebra", id=1, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="Apple", id=2, created_at=datetime.now(), updated_at=datetime.now()),
+            Task(title="Mango", id=3, created_at=datetime.now(), updated_at=datetime.now()),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Sort by title ascending (A-Z)
+        results = service.sort_tasks(by="title", ascending=True)
+
+        assert len(results) == 3
+        assert results[0].title == "Apple"
+        assert results[1].title == "Mango"
+        assert results[2].title == "Zebra"
+
+    def test_sort_tasks_by_created_date(self) -> None:
+        """Test sort_tasks sorts by created_at newest first"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        now = datetime.now()
+        tasks = [
+            Task(title="First", id=1, created_at=now - timedelta(hours=2), updated_at=now),
+            Task(title="Third", id=2, created_at=now, updated_at=now),
+            Task(title="Second", id=3, created_at=now - timedelta(hours=1), updated_at=now),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Sort by created descending (newest first)
+        results = service.sort_tasks(by="created", ascending=False)
+
+        assert len(results) == 3
+        assert results[0].title == "Third"
+        assert results[1].title == "Second"
+        assert results[2].title == "First"
+
+    def test_sort_tasks_by_created_date_ascending(self) -> None:
+        """Test sort_tasks sorts by created_at oldest first when ascending"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        now = datetime.now()
+        tasks = [
+            Task(title="Third", id=1, created_at=now, updated_at=now),
+            Task(title="First", id=2, created_at=now - timedelta(hours=2), updated_at=now),
+            Task(title="Second", id=3, created_at=now - timedelta(hours=1), updated_at=now),
+        ]
+        mock_storage.list_all.return_value = tasks
+
+        service = TaskService(mock_storage)
+
+        # Sort by created ascending (oldest first)
+        results = service.sort_tasks(by="created", ascending=True)
+
+        assert len(results) == 3
+        assert results[0].title == "First"
+        assert results[1].title == "Second"
+        assert results[2].title == "Third"
+
+    def test_sort_tasks_returns_empty_list_when_no_tasks(self) -> None:
+        """Test sort_tasks returns empty list when no tasks exist"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        mock_storage.list_all.return_value = []
+
+        service = TaskService(mock_storage)
+
+        results = service.sort_tasks(by="priority")
+
+        assert results == []
+
+    def test_sort_tasks_raises_error_for_invalid_field(self) -> None:
+        """Test sort_tasks raises ValueError for invalid sort field"""
+        from src.core.services import TaskService
+
+        mock_storage = Mock(spec=ITaskStorage)
+        service = TaskService(mock_storage)
+
+        with pytest.raises(ValueError, match="Invalid sort field"):
+            service.sort_tasks(by="invalid_field")

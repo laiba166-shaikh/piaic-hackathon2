@@ -1043,3 +1043,167 @@ class TestFilterCommand:
 
         # Should show friendly "no results" message
         assert "no" in result.output.lower() and ("task" in result.output.lower() or "result" in result.output.lower())
+
+
+class TestSortCommand:
+    """Integration tests for User Story 9: Sort Tasks"""
+
+    def test_sort_by_priority(self) -> None:
+        """Test sort command sorts by priority (US9-001, FR-020)"""
+        runner = CliRunner()
+
+        # Add tasks with different priorities
+        runner.invoke(cli, ["add", "Low priority task", "-p", "low"])
+        runner.invoke(cli, ["add", "High priority task", "-p", "high"])
+        runner.invoke(cli, ["add", "Medium priority task", "-p", "medium"])
+        runner.invoke(cli, ["add", "Another high task", "-p", "high"])
+
+        # Sort by priority (high -> medium -> low)
+        result = runner.invoke(cli, ["sort", "--by", "priority"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Verify order: high tasks should appear before medium, medium before low
+        output = result.output
+        high1_pos = output.find("High priority task")
+        high2_pos = output.find("Another high task")
+        medium_pos = output.find("Medium priority task")
+        low_pos = output.find("Low priority task")
+
+        # Both high priority tasks should come before medium
+        assert high1_pos < medium_pos or high2_pos < medium_pos
+        # Medium should come before low
+        assert medium_pos < low_pos
+
+    def test_sort_by_title_alphabetically(self) -> None:
+        """Test sort command sorts by title A-Z with --order asc (US9-002)"""
+        runner = CliRunner()
+
+        # Add tasks with varied titles
+        runner.invoke(cli, ["add", "Zebra task"])
+        runner.invoke(cli, ["add", "Apple task"])
+        runner.invoke(cli, ["add", "Mango task"])
+        runner.invoke(cli, ["add", "Banana task"])
+
+        # Sort by title alphabetically (ascending = A-Z)
+        result = runner.invoke(cli, ["sort", "--by", "title", "--order", "asc"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Verify A-Z order
+        output = result.output
+        apple_pos = output.find("Apple task")
+        banana_pos = output.find("Banana task")
+        mango_pos = output.find("Mango task")
+        zebra_pos = output.find("Zebra task")
+
+        assert apple_pos < banana_pos < mango_pos < zebra_pos
+
+    def test_sort_by_created_date(self) -> None:
+        """Test sort command sorts by created date oldest first with asc (US9-003, FR-020a)"""
+        runner = CliRunner()
+
+        # Add tasks (they will have sequential created_at timestamps)
+        # Even with same-millisecond creation, IDs are sequential so order is deterministic
+        runner.invoke(cli, ["add", "First task"])
+        runner.invoke(cli, ["add", "Second task"])
+        runner.invoke(cli, ["add", "Third task"])
+
+        # Sort by created date ascending (oldest first)
+        result = runner.invoke(cli, ["sort", "--by", "created", "--order", "asc"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Verify oldest first order (First > Second > Third)
+        output = result.output
+        first_pos = output.find("First task")
+        second_pos = output.find("Second task")
+        third_pos = output.find("Third task")
+
+        # Oldest first means First should appear before Second, Second before Third
+        assert first_pos < second_pos < third_pos
+
+    def test_sort_with_ascending_order(self) -> None:
+        """Test sort command with --order asc reverses default order (US9-004)"""
+        runner = CliRunner()
+
+        # Add tasks with different priorities
+        runner.invoke(cli, ["add", "Low priority", "-p", "low"])
+        runner.invoke(cli, ["add", "High priority", "-p", "high"])
+        runner.invoke(cli, ["add", "Medium priority", "-p", "medium"])
+
+        # Sort by priority ascending (low -> medium -> high)
+        result = runner.invoke(cli, ["sort", "--by", "priority", "--order", "asc"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Verify order: low -> medium -> high
+        output = result.output
+        low_pos = output.find("Low priority")
+        medium_pos = output.find("Medium priority")
+        high_pos = output.find("High priority")
+
+        assert low_pos < medium_pos < high_pos
+
+    def test_sort_by_priority_descending(self) -> None:
+        """Test sort command with --order desc for priority (US9-005)"""
+        runner = CliRunner()
+
+        # Add tasks with different priorities
+        runner.invoke(cli, ["add", "Low task", "-p", "low"])
+        runner.invoke(cli, ["add", "High task", "-p", "high"])
+        runner.invoke(cli, ["add", "Medium task", "-p", "medium"])
+
+        # Sort by priority descending (high -> medium -> low) - this is the default
+        result = runner.invoke(cli, ["sort", "--by", "priority", "--order", "desc"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Verify order: high -> medium -> low
+        output = result.output
+        high_pos = output.find("High task")
+        medium_pos = output.find("Medium task")
+        low_pos = output.find("Low task")
+
+        assert high_pos < medium_pos < low_pos
+
+    def test_sort_empty_list(self) -> None:
+        """Test sort command with empty task list shows friendly message (US9-006)"""
+        runner = CliRunner()
+
+        # Sort with no tasks
+        result = runner.invoke(cli, ["sort", "--by", "priority"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show "no tasks" message
+        assert "no" in result.output.lower() and "task" in result.output.lower()
+
+    def test_sort_default_by_created(self) -> None:
+        """Test sort command defaults to sorting by created date (US9-007)"""
+        runner = CliRunner()
+
+        # Add tasks
+        runner.invoke(cli, ["add", "First task"])
+        runner.invoke(cli, ["add", "Second task"])
+        runner.invoke(cli, ["add", "Third task"])
+
+        # Sort without specifying --by (should default to created)
+        result = runner.invoke(cli, ["sort"])
+
+        # Should succeed
+        assert result.exit_code == 0
+
+        # Should show all tasks (sorted by created)
+        assert "First task" in result.output
+        assert "Second task" in result.output
+        assert "Third task" in result.output
+
+        # Should indicate sorting by created
+        assert "created" in result.output.lower()

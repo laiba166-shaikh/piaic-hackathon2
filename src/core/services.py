@@ -10,6 +10,7 @@ This service provides the core business logic for task operations:
 Phase 1: Basic CRUD operations for in-memory storage
 Phase 2+: Enhanced with persistence, advanced features
 """
+from datetime import datetime
 from typing import Optional, List
 from src.core.models import Task, Priority
 from src.core.storage.base import ITaskStorage
@@ -373,3 +374,84 @@ class TaskService:
             f"returned {len(filtered_tasks)} results"
         )
         return filtered_tasks
+
+    def sort_tasks(self, by: str, ascending: bool = True) -> List[Task]:
+        """
+        Sort tasks by specified field.
+
+        Args:
+            by: Field to sort by ('priority', 'title', 'created', 'due_date')
+            ascending: Sort order (True for ascending, False for descending)
+
+        Returns:
+            List of tasks sorted by specified field
+
+        Raises:
+            ValueError: If invalid sort field provided
+
+        Business Rules:
+            - Priority order: HIGH (1) > MEDIUM (2) > LOW (3)
+            - For priority descending: HIGH first, LOW last
+            - For priority ascending: LOW first, HIGH last
+            - Title: alphabetical (case-insensitive)
+            - Created/due_date: chronological order
+            - Tasks without due_date appear at end when sorting by due_date
+        """
+        # Validate sort field
+        valid_fields = ["priority", "title", "created", "due_date"]
+        if by not in valid_fields:
+            logger.warning(f"Invalid sort field: {by}")
+            raise ValueError(f"Invalid sort field: {by}. Must be one of {valid_fields}")
+
+        # Get all tasks from storage
+        all_tasks = self._storage.list_all()
+
+        if not all_tasks:
+            return []
+
+        # Define sort key functions
+        # Priority values: HIGH=1, MEDIUM=2, LOW=3 for natural ordering
+        priority_order = {Priority.HIGH: 1, Priority.MEDIUM: 2, Priority.LOW: 3}
+
+        if by == "priority":
+            # Sort by priority
+            # ascending=True: LOW (3) -> MEDIUM (2) -> HIGH (1) needs reverse=False on priority_order
+            # ascending=False (desc): HIGH (1) -> MEDIUM (2) -> LOW (3) needs reverse=False on priority_order
+            # Since HIGH=1 is smallest, default sorted() puts HIGH first
+            # For descending (HIGH first), we don't reverse
+            # For ascending (LOW first), we reverse
+            sorted_tasks = sorted(
+                all_tasks,
+                key=lambda t: priority_order[t.priority],
+                reverse=ascending,  # reverse=True when ascending (to get LOW first)
+            )
+        elif by == "title":
+            # Sort alphabetically (case-insensitive)
+            # ascending=True: A-Z (default sorted)
+            # ascending=False (desc): Z-A (reversed)
+            sorted_tasks = sorted(
+                all_tasks,
+                key=lambda t: t.title.lower(),
+                reverse=not ascending,
+            )
+        elif by == "created":
+            # Sort by created_at timestamp
+            # ascending=True: oldest first (default sorted)
+            # ascending=False (desc): newest first (reversed)
+            sorted_tasks = sorted(
+                all_tasks,
+                key=lambda t: t.created_at,
+                reverse=not ascending,
+            )
+        elif by == "due_date":
+            # Sort by due_date, tasks without due_date at end
+            # Use max datetime for None values
+            max_date = datetime.max
+            sorted_tasks = sorted(
+                all_tasks,
+                key=lambda t: t.due_date if t.due_date else max_date,
+                reverse=not ascending,
+            )
+
+        logger.info(f"Sorted {len(sorted_tasks)} tasks by {by} (ascending={ascending})")
+        return sorted_tasks

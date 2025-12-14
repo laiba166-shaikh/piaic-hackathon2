@@ -115,6 +115,7 @@ cli.add_command(basic.delete)
 # Register commands from intermediate.py
 cli.add_command(intermediate.search)
 cli.add_command(intermediate.filter)
+cli.add_command(intermediate.sort)
 
 
 def main() -> None:

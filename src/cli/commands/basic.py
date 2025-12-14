@@ -374,3 +374,71 @@ def list() -> None:
         console.print(f"\n[red]Unexpected error: {e}[/red]\n")
         logger.error(f"Unexpected error in list command: {e}", exc_info=True)
         raise click.ClickException(str(e))
+
+
+@click.command()
+@click.argument("task_id", type=int)
+def delete(task_id: int) -> None:
+    """
+    Delete a task from your todo list.
+
+    Permanently removes the task with the given ID from your list.
+    This action cannot be undone.
+
+    \\b
+    Examples:
+        todo delete 1
+        todo delete 5
+
+    \\b
+    Arguments:
+        TASK_ID: The ID of the task to delete (positive integer)
+    """
+    try:
+        # Delete task through service layer
+        deleted = _service.delete_task(task_id)
+
+        if not deleted:
+            # Task not found
+            error_text = Text()
+            error_text.append("Task not found\n\n", style="bold red")
+            error_text.append(f"No task exists with ID {task_id}.", style="white")
+
+            panel = Panel(
+                error_text,
+                title="[bold red]Error[/bold red]",
+                border_style="red",
+                padding=(1, 2),
+            )
+            console.print(panel)
+
+            logger.warning(f"User attempted to delete nonexistent task ID {task_id}")
+            raise click.ClickException(f"Task with ID {task_id} not found")
+
+        # Display success message
+        success_text = Text()
+        success_text.append("Task deleted successfully!\n\n", style="bold green")
+        success_text.append("ID: ", style="cyan")
+        success_text.append(f"{task_id}\n", style="bold white")
+        success_text.append("\n", style="white")
+        success_text.append("The task has been permanently removed from your list.", style="white")
+
+        panel = Panel(
+            success_text,
+            title="[bold green]Task Deleted[/bold green]",
+            border_style="green",
+            padding=(1, 2),
+        )
+        console.print(panel)
+
+        logger.info(f"User deleted task ID {task_id}")
+
+    except click.ClickException:
+        # Re-raise ClickException (already logged above)
+        raise
+
+    except Exception as e:
+        # Unexpected error
+        console.print(f"\n[red]Error: {e}[/red]\n")
+        logger.error(f"Error in delete command: {e}", exc_info=True)
+        raise click.ClickException(str(e))

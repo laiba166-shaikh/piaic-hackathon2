@@ -425,3 +425,44 @@ class TestTaskServiceUpdateTask:
         # Should raise ValueError
         with pytest.raises(ValueError):
             service.update_task(1)
+
+
+class TestTaskServiceDeleteTask:
+    """Unit tests for TaskService.delete_task() method (US5-005)"""
+
+    def test_delete_task_removes_task(self) -> None:
+        """Test delete_task removes task from storage"""
+        from src.core.services import TaskService
+
+        # Mock storage
+        mock_storage = Mock(spec=ITaskStorage)
+        mock_storage.delete.return_value = True
+
+        # Create service and delete task
+        service = TaskService(mock_storage)
+        result = service.delete_task(1)
+
+        # Verify storage.delete was called
+        # with correct ID
+        mock_storage.delete.assert_called_once_with(1)
+
+        # Verify method returns True
+        assert result is True
+
+    def test_delete_task_returns_false_for_nonexistent_task(self) -> None:
+        """Test delete_task returns False if task doesn't exist"""
+        from src.core.services import TaskService
+
+        # Mock storage that returns False (task not found)
+        mock_storage = Mock(spec=ITaskStorage)
+        mock_storage.delete.return_value = False
+
+        # Create service and try to delete nonexistent task
+        service = TaskService(mock_storage)
+        result = service.delete_task(999)
+
+        # Verify storage.delete was called
+        mock_storage.delete.assert_called_once_with(999)
+
+        # Verify method returns False
+        assert result is False

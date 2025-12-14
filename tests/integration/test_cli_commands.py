@@ -410,6 +410,148 @@ class TestUpdateCommand:
         assert "New title" in list_result.output
 
 
+class TestDeleteCommand:
+    """Integration tests for User Story 5: Delete Unwanted Tasks"""
+
+    def test_delete_command_removes_task(self) -> None:
+        """Test delete command removes task from list (US5-001, AC1)"""
+        runner = CliRunner()
+
+        # Add a task
+        runner.invoke(cli, ["add", "Task to delete"])
+
+        # Delete the task
+        result = runner.invoke(cli, ["delete", "1"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "deleted" in result.output.lower() or "removed" in result.output.lower()
+
+        # Verify task is removed by listing
+        list_result = runner.invoke(cli, ["list"])
+        assert "Task to delete" not in list_result.output
+        assert "no tasks" in list_result.output.lower() or "empty" in list_result.output.lower()
+
+    def test_delete_command_with_invalid_id(self) -> None:
+        """Test delete command with invalid ID shows error (US5-002, AC2)"""
+        runner = CliRunner()
+
+        # Try to delete non-existent task
+        result = runner.invoke(cli, ["delete", "999"])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should show error message
+        assert "not found" in result.output.lower() or "error" in result.output.lower()
+
+    def test_delete_command_affects_only_target_task(self) -> None:
+        """Test delete command only removes target task (US5-003, AC3)"""
+        runner = CliRunner()
+
+        # Add 3 tasks
+        runner.invoke(cli, ["add", "Task 1"])
+        runner.invoke(cli, ["add", "Task 2"])
+        runner.invoke(cli, ["add", "Task 3"])
+
+        # Delete task 2
+        result = runner.invoke(cli, ["delete", "2"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Verify tasks 1 and 3 remain
+        list_result = runner.invoke(cli, ["list"])
+        assert "Task 1" in list_result.output
+        assert "Task 2" not in list_result.output
+        assert "Task 3" in list_result.output
+
+    def test_delete_all_tasks_shows_empty_message(self) -> None:
+        """Test deleting all tasks shows empty list message (US5-004, AC4)"""
+        runner = CliRunner()
+
+        # Add 2 tasks
+        runner.invoke(cli, ["add", "Task A"])
+        runner.invoke(cli, ["add", "Task B"])
+
+        # Delete both tasks
+        runner.invoke(cli, ["delete", "1"])
+        runner.invoke(cli, ["delete", "2"])
+
+        # List tasks
+        result = runner.invoke(cli, ["list"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show "no tasks" message
+        assert "no tasks" in result.output.lower() or "empty" in result.output.lower()
+
+    def test_delete_command_with_non_numeric_id(self) -> None:
+        """Test delete command with non-numeric ID shows error"""
+        runner = CliRunner()
+
+        # Try to delete with invalid ID format
+        result = runner.invoke(cli, ["delete", "abc"])
+
+        # Should exit with error
+        assert result.exit_code != 0
+
+        # Should show error message
+        assert "invalid" in result.output.lower() or "error" in result.output.lower()
+
+    def test_deleted_id_is_never_reused(self) -> None:
+        """Test that IDs are never reused after deletion (US5-010, FR-002)"""
+        runner = CliRunner()
+
+        # Add 3 tasks (should get IDs 1, 2, 3)
+        runner.invoke(cli, ["add", "Task 1"])
+        runner.invoke(cli, ["add", "Task 2"])
+        runner.invoke(cli, ["add", "Task 3"])
+
+        # Delete task 2
+        result = runner.invoke(cli, ["delete", "2"])
+        assert result.exit_code == 0
+
+        # Add a new task - should get ID 4, NOT reuse ID 2
+        runner.invoke(cli, ["add", "Task 4"])
+
+        # List all tasks
+        list_result = runner.invoke(cli, ["list"])
+
+        # Should show tasks with IDs 1, 3, 4 (not 2)
+        assert "Task 1" in list_result.output
+        assert "Task 3" in list_result.output
+        assert "Task 4" in list_result.output
+
+        # Verify ID 2 is NOT in the output (deleted and not reused)
+        assert "Task 2" not in list_result.output
+
+        # The output should contain ID 4 (new task) but not show ID 2 being reused
+        # Parse the output to find the ID column values
+        lines = list_result.output.split("\n")
+
+        # Find lines that contain task data (have both a task title and an ID number)
+        # These lines will have the pattern: "│  [ ]   │    N │"
+        task_data_lines = [
+            line
+            for line in lines
+            if ("│" in line and any(f"Task {i}" in line for i in [1, 3, 4]))
+        ]
+
+        # Verify we have exactly 3 tasks (1, 3, 4)
+        assert len(task_data_lines) == 3
+
+        # Verify the newest task (Task 4) has ID 4, not ID 2
+        task4_line = [line for line in task_data_lines if "Task 4" in line][0]
+
+        # The line should contain "│    4 │" indicating ID 4
+        # Use a simple check: the number 4 should appear in the ID column
+        assert "│    4 │" in task4_line or "│   4 │" in task4_line
+
+
 class TestAddCommand:
     """Integration tests for User Story 1: Capture New Tasks"""
 

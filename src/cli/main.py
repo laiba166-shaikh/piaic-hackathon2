@@ -110,6 +110,7 @@ cli.add_command(basic.list)
 cli.add_command(basic.done)
 cli.add_command(basic.undone)
 cli.add_command(basic.update)
+cli.add_command(basic.delete)
 
 
 def main() -> None:

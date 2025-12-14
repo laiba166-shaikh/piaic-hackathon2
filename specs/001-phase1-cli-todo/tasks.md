@@ -345,39 +345,39 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### RED Phase (Tests First)
 
-- [ ] [US5-001] [RED] Write integration test for `delete` command in tests/integration/test_cli_commands.py
+- [X] [US5-001] [RED] Write integration test for `delete` command in tests/integration/test_cli_commands.py
   - Add task, run `todo delete 1`
   - Verify task is removed from list
-- [ ] [US5-002] [RED] Write integration test for `delete` with invalid ID
+- [X] [US5-002] [RED] Write integration test for `delete` with invalid ID
   - Run `todo delete 999`
   - Verify error message is displayed
-- [ ] [US5-003] [RED] Write integration test for `delete` affecting only target task
+- [X] [US5-003] [RED] Write integration test for `delete` affecting only target task
   - Add 3 tasks, delete task 2
   - Verify tasks 1 and 3 remain
-- [ ] [US5-004] [RED] Write integration test for empty list after deleting all tasks
+- [X] [US5-004] [RED] Write integration test for empty list after deleting all tasks
   - Add and delete all tasks
   - Verify "no tasks" message when listing
-- [ ] [US5-005] [RED] Write unit test for TaskService.delete_task(task_id) in tests/unit/test_services.py
+- [X] [US5-005] [RED] Write unit test for TaskService.delete_task(task_id) in tests/unit/test_services.py
 
 ### GREEN Phase (Implementation)
 
-- [ ] [US5-006] [GREEN] Implement TaskService.delete_task(task_id: int) in src/core/services.py
+- [X] [US5-006] [GREEN] Implement TaskService.delete_task(task_id: int) in src/core/services.py
   - Call storage.delete(task_id)
   - Return True if deleted, False if not found
-- [ ] [US5-007] [GREEN] Implement `delete` command in src/cli/commands/basic.py
+- [X] [US5-007] [GREEN] Implement `delete` command in src/cli/commands/basic.py
   - Accept task_id as argument
   - Call TaskService.delete_task(task_id)
   - Display success message if deleted
   - Display error if task not found
-- [ ] [US5-008] [GREEN] Register `delete` command in src/cli/main.py
+- [X] [US5-008] [GREEN] Register `delete` command in src/cli/main.py
 
 ### REFACTOR Phase
 
 - [ ] [US5-009] [REFACTOR] Add confirmation prompt to `delete` command (optional UX improvement)
   - Use Click.confirm() to ask "Are you sure?"
-- [ ] [US5-010] [REFACTOR] Verify ID is never reused after deletion (FR-002, clarification)
+- [X] [US5-010] [REFACTOR] Verify ID is never reused after deletion (FR-002, clarification)
   - Add test: delete task 3, next created task gets ID 4 (not 3)
-- [ ] [US5-011] [REFACTOR] Run all US5 tests, ensure 100% pass rate
+- [X] [US5-011] [REFACTOR] Run all US5 tests, ensure 100% pass rate
 
 **Acceptance**: SC-001 (complete - all basic operations work), all US5 acceptance scenarios pass, users can delete tasks.
 

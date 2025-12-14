@@ -223,3 +223,28 @@ class TaskService:
 
         logger.info(f"Updated task ID {task_id}")
         return task
+
+    def delete_task(self, task_id: int) -> bool:
+        """
+        Delete a task by ID.
+
+        Args:
+            task_id: The ID of the task to delete
+
+        Returns:
+            True if task was deleted, False if task didn't exist
+
+        Business Rules:
+            - Returns False if task doesn't exist (no error raised)
+            - Permanently removes task from storage
+            - Cannot be undone
+        """
+        # Attempt to delete task from storage
+        deleted = self._storage.delete(task_id)
+
+        if deleted:
+            logger.info(f"Deleted task ID {task_id}")
+        else:
+            logger.warning(f"Attempted to delete nonexistent task {task_id}")
+
+        return deleted

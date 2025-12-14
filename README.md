@@ -202,9 +202,68 @@ pytest -v
 
 Database persistence will be added in Phase 2.
 
-## Contributing
+## Command Reference
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+### Task Management
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `add` | Create a new task | `todo add "Buy milk" -p high --tags "shopping"` |
+| `list` | View all tasks | `todo list` |
+| `done` | Mark task complete | `todo done 1` |
+| `undone` | Mark task incomplete | `todo undone 1` |
+| `update` | Modify task details | `todo update 1 --title "New title" -p low` |
+| `delete` | Remove a task | `todo delete 1` |
+
+### Search, Filter & Sort
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `search` | Find tasks by keyword | `todo search "meeting"` |
+| `filter` | Filter by criteria | `todo filter --priority high --status incomplete` |
+| `sort` | Sort tasks | `todo sort --by priority --order desc` |
+
+### Add Command Options
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `-d, --description` | Task description | `-d "Call about appointment"` |
+| `-p, --priority` | Priority level (high/medium/low) | `-p high` |
+| `--tags` | Comma-separated tags | `--tags "work,urgent"` |
+| `--due` | Due date (YYYY-MM-DD or YYYY-MM-DD HH:MM) | `--due "2025-12-31 14:00"` |
+| `-r, --recurrence` | Recurrence pattern (daily/weekly/monthly) | `-r weekly` |
+
+### Filter Command Options
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `-p, --priority` | Filter by priority | `--priority high` |
+| `-s, --status` | Filter by status (completed/incomplete/all) | `--status incomplete` |
+| `-t, --tag` | Filter by tag | `--tag work` |
+| `--overdue` | Show only overdue tasks | `--overdue` |
+
+### Sort Command Options
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `-b, --by` | Sort field (priority/title/created/due_date) | `--by priority` |
+| `-o, --order` | Sort order (asc/desc) | `--order asc` |
+
+## Visual Indicators
+
+### Priority Icons
+- **HIGH**: `[!]` (red) - Urgent tasks
+- **MEDIUM**: `[-]` (yellow) - Normal priority
+- **LOW**: `[v]` (blue) - Low priority
+
+### Status Icons
+- `[X]` - Completed task
+- `[ ]` - Incomplete task
+
+### Due Date Indicators
+- **OVERDUE** (red) - Past due date
+- **DUE TODAY** (yellow) - Due today
+- Normal date display - Future dates
 
 ## License
 

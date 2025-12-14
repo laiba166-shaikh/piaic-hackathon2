@@ -845,20 +845,22 @@ Setup → Foundational → [US1, US2, US3, US4, US5] → [US6, US7, US8, US9] �
 
 ### Documentation
 
-- [ ] [POLISH-013] Update README.md with complete installation and usage guide
-  - Copy content from quickstart.md
-  - Add architecture overview
-  - Add development setup instructions
-- [ ] [POLISH-014] Create CONTRIBUTING.md with development guidelines
-  - TDD workflow (red-green-refactor)
-  - Code style (type hints, docstrings)
-  - Testing requirements (>90% coverage)
-- [ ] [POLISH-015] Implement --help for all commands (NFR-008)
-  - Add examples to help text
-  - Add command descriptions
-- [ ] [POLISH-016] Add docstrings to all public functions and classes
-  - Follow Google/NumPy docstring format
-  - Include parameter types and return types
+- [x] [POLISH-013] Update README.md with complete installation and usage guide
+  - **COMPLETED**: Added comprehensive command reference tables
+  - Added visual indicators documentation
+  - Added filter/sort command options tables
+  - Architecture overview already present
+- [~] [POLISH-014] Create CONTRIBUTING.md with development guidelines
+  - **SKIPPED**: Individual project, not applicable
+- [x] [POLISH-015] Implement --help for all commands (NFR-008)
+  - **COMPLETED**: All commands have examples and descriptions
+  - Fixed `\b` formatting in docstrings for proper Click help rendering
+  - Verified: add, list, done, undone, update, delete, search, filter, sort
+- [x] [POLISH-016] Add docstrings to all public functions and classes
+  - **COMPLETED**: All public modules have comprehensive docstrings
+  - models.py, validators.py, exceptions.py, services.py
+  - storage/base.py, storage/memory.py
+  - recurring.py, rendering/table.py, rendering/colors.py
 
 ### CI/CD and Deployment
 

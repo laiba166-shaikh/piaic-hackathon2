@@ -195,12 +195,12 @@ def done(task_id: int) -> None:
     Marks the task with the given ID as completed. Completed tasks are
     visually distinguished in the task list.
 
-    \\b
+    \b
     Examples:
         todo done 1
         todo done 5
 
-    \\b
+    \b
     Arguments:
         TASK_ID: The ID of the task to mark as complete (positive integer)
     """
@@ -261,12 +261,12 @@ def undone(task_id: int) -> None:
     Marks the task with the given ID as not completed. Use this to reopen
     a task that was previously marked as complete.
 
-    \\b
+    \b
     Examples:
         todo undone 1
         todo undone 5
 
-    \\b
+    \b
     Arguments:
         TASK_ID: The ID of the task to mark as incomplete (positive integer)
     """
@@ -366,7 +366,7 @@ def update(
     title, description, priority, tags, recurrence, or due date. At least one update must be provided.
     Note: Recurrence can only be updated for incomplete tasks.
 
-    \\b
+    \b
     Examples:
         todo update 1 --title "New title"
         todo update 1 -d "New description"
@@ -377,11 +377,11 @@ def update(
         todo update 1 -r weekly
         todo update 1 --due "2025-12-31"
 
-    \\b
+    \b
     Arguments:
         TASK_ID: The ID of the task to update (positive integer)
 
-    \\b
+    \b
     Options:
         --title, -t TEXT: New task title
         --description, -d TEXT: New task description
@@ -546,12 +546,12 @@ def delete(task_id: int) -> None:
     Permanently removes the task with the given ID from your list.
     This action cannot be undone.
 
-    \\b
+    \b
     Examples:
         todo delete 1
         todo delete 5
 
-    \\b
+    \b
     Arguments:
         TASK_ID: The ID of the task to delete (positive integer)
     """

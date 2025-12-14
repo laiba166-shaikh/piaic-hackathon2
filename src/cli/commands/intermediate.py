@@ -32,17 +32,17 @@ def search(query: str) -> None:
     Searches all tasks for the given QUERY keyword (case-insensitive).
     Matches tasks where the keyword appears in either the title or description.
 
-    \\b
+    \b
     Examples:
         todo search meeting
         todo search "project review"
         todo search urgent
 
-    \\b
+    \b
     Arguments:
         QUERY: Search keyword (case-insensitive, matches substring)
 
-    \\b
+    \b
     Returns:
         Formatted table of matching tasks or message if no results found
     """
@@ -143,7 +143,7 @@ def filter(priority: str | None, status: str | None, tag: str | None, overdue: b
     Filters all tasks based on the provided criteria. Multiple filters can be
     combined (AND logic). At least one filter must be provided.
 
-    \\b
+    \b
     Examples:
         todo filter --priority high
         todo filter --status completed
@@ -153,14 +153,14 @@ def filter(priority: str | None, status: str | None, tag: str | None, overdue: b
         todo filter --overdue
         todo filter --overdue --priority high
 
-    \\b
+    \b
     Options:
         -p, --priority [high|medium|low]: Filter by priority level
         -s, --status [completed|incomplete|all]: Filter by completion status
         -t, --tag TEXT: Filter by tag (case-sensitive)
         --overdue: Show only overdue tasks
 
-    \\b
+    \b
     Returns:
         Formatted table of matching tasks or message if no results found
     """
@@ -320,7 +320,7 @@ def sort(by: str, order: str) -> None:
     Displays all tasks sorted by the specified field. Default order is descending
     (highest priority first, newest first, Z-A for title).
 
-    \\b
+    \b
     Examples:
         todo sort --by priority              # High -> Medium -> Low
         todo sort --by priority --order asc  # Low -> Medium -> High
@@ -329,14 +329,14 @@ def sort(by: str, order: str) -> None:
         todo sort --by created               # Newest first
         todo sort --by created --order asc   # Oldest first
 
-    \\b
+    \b
     Sort Fields:
         priority: HIGH -> MEDIUM -> LOW (desc) or LOW -> MEDIUM -> HIGH (asc)
         title: Alphabetical order (case-insensitive)
         created: By creation timestamp
         due_date: By due date (tasks without due date appear last)
 
-    \\b
+    \b
     Returns:
         Formatted table of sorted tasks or message if no tasks exist
     """

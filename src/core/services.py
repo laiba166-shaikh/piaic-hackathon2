@@ -10,8 +10,8 @@ This service provides the core business logic for task operations:
 Phase 1: Basic CRUD operations for in-memory storage
 Phase 2+: Enhanced with persistence, advanced features
 """
-from typing import Optional
-from src.core.models import Task
+from typing import Optional, List
+from src.core.models import Task, Priority
 from src.core.storage.base import ITaskStorage
 from src.config import get_logger
 
@@ -43,6 +43,8 @@ class TaskService:
         self,
         title: str,
         description: Optional[str] = None,
+        priority: Optional[Priority] = None,
+        tags: Optional[List[str]] = None,
     ) -> Task:
         """
         Create a new task with validation.
@@ -50,6 +52,8 @@ class TaskService:
         Args:
             title: Task title (required, 1-200 chars)
             description: Optional task description (max 500 chars)
+            priority: Task priority (HIGH, MEDIUM, LOW), defaults to MEDIUM
+            tags: List of tags/categories for the task
 
         Returns:
             Created task with assigned ID and timestamps
@@ -63,6 +67,7 @@ class TaskService:
             - Description max 500 characters (enforced by Task model)
             - Tasks start as incomplete (completed=False)
             - Default priority is MEDIUM
+            - Tags default to empty list
         """
         # Validate title is not empty or whitespace-only
         if not title or not title.strip():
@@ -73,12 +78,17 @@ class TaskService:
         task = Task(
             title=title,
             description=description,
+            priority=priority if priority is not None else Priority.MEDIUM,
+            tags=tags if tags is not None else [],
         )
 
         # Persist to storage (storage assigns ID and timestamps)
         created_task = self._storage.create(task)
 
-        logger.info(f"Created task ID {created_task.id}: {created_task.title}")
+        logger.info(
+            f"Created task ID {created_task.id}: {created_task.title} "
+            f"(priority={created_task.priority.value}, tags={created_task.tags})"
+        )
         return created_task
 
     def list_all(self) -> list[Task]:
@@ -172,14 +182,18 @@ class TaskService:
         task_id: int,
         title: Optional[str] = None,
         description: Optional[str] = None,
+        priority: Optional[Priority] = None,
+        tags: Optional[List[str]] = None,
     ) -> Task:
         """
-        Update task title and/or description.
+        Update task title, description, priority, and/or tags.
 
         Args:
             task_id: The ID of the task to update
             title: New title (optional)
             description: New description (optional)
+            priority: New priority level (optional)
+            tags: New tags list (optional)
 
         Returns:
             Updated task
@@ -189,16 +203,16 @@ class TaskService:
             ValueError: If no updates provided or title is empty
 
         Business Rules:
-            - At least one of title or description must be provided
+            - At least one field must be provided for update
             - Title cannot be empty or whitespace-only
             - Updates task.updated_at timestamp
         """
         from src.core.exceptions import TaskNotFoundError
 
         # Validate at least one field is being updated
-        if title is None and description is None:
+        if all(field is None for field in [title, description, priority, tags]):
             logger.warning("Attempted to update task with no changes")
-            raise ValueError("At least one of title or description must be provided")
+            raise ValueError("At least one field (title, description, priority, or tags) must be provided")
 
         # Retrieve task from storage
         task = self._storage.get(task_id)
@@ -217,6 +231,14 @@ class TaskService:
         # Update description if provided
         if description is not None:
             task.description = description
+
+        # Update priority if provided
+        if priority is not None:
+            task.priority = priority
+
+        # Update tags if provided
+        if tags is not None:
+            task.tags = tags
 
         # Persist changes
         self._storage.update(task)

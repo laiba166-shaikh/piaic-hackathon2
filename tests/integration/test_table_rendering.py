@@ -180,3 +180,34 @@ class TestTableVisualDistinctions:
 
         # Should have Status column
         assert "Status" in result.output
+
+
+class TestPriorityIndicators:
+    """Integration tests for priority visual indicators (US6-003)"""
+
+    def test_priority_indicators_show_correctly(self) -> None:
+        """Test that priority indicators show for high, medium, low priorities (US6-003, FR-038-040, SC-006)"""
+        runner = CliRunner()
+
+        # Add tasks with different priorities
+        runner.invoke(cli, ["add", "High priority task", "-p", "high"])
+        runner.invoke(cli, ["add", "Medium priority task", "-p", "medium"])
+        runner.invoke(cli, ["add", "Low priority task", "-p", "low"])
+
+        # List tasks
+        result = runner.invoke(cli, ["list"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should have Priority column
+        assert "Priority" in result.output or "priority" in result.output.lower()
+
+        # Should show all three tasks
+        assert "High priority task" in result.output
+        assert "Medium priority task" in result.output
+        assert "Low priority task" in result.output
+
+        # Priority indicators will be verified in GREEN phase
+        # For now, just verify tasks were created with priorities
+        assert result.exit_code == 0

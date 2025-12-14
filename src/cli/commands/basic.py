@@ -33,11 +33,23 @@ _service = TaskService(_storage)
     default=None,
     help="Optional task description",
 )
-def add(title: str, description: str | None) -> None:
+@click.option(
+    "-p",
+    "--priority",
+    type=click.Choice(["high", "medium", "low"], case_sensitive=False),
+    default=None,
+    help="Task priority (high, medium, low)",
+)
+@click.option(
+    "--tags",
+    default=None,
+    help="Comma-separated tags (e.g., 'work,urgent' or 'work,high priority')",
+)
+def add(title: str, description: str | None, priority: str | None, tags: str | None) -> None:
     """
     Add a new task to your todo list.
 
-    Creates a task with the given TITLE and optional description.
+    Creates a task with the given TITLE and optional description, priority, and tags.
     The task will be assigned a unique ID and marked as incomplete.
 
     \b
@@ -45,6 +57,8 @@ def add(title: str, description: str | None) -> None:
         todo add "Buy groceries"
         todo add "Call dentist" -d "Schedule annual checkup"
         todo add "Submit report" --description "Q4 financial summary"
+        todo add "Complete proposal" -p high --tags "work,urgent"
+        todo add "Meeting" --tags "work,high priority"
 
     \b
     Arguments:
@@ -53,10 +67,28 @@ def add(title: str, description: str | None) -> None:
     \b
     Options:
         -d, --description TEXT: Optional task description (max 500 characters)
+        -p, --priority [high|medium|low]: Task priority level (defaults to medium)
+        --tags TEXT: Comma-separated tags for categorization
     """
     try:
+        # Parse priority
+        from src.core.models import Priority
+
+        priority_enum = None
+        if priority:
+            # Convert string to Priority enum
+            priority_map = {"high": Priority.HIGH, "medium": Priority.MEDIUM, "low": Priority.LOW}
+            priority_enum = priority_map[priority.lower()]
+
+        # Parse tags
+        from src.core.validators import parse_tags
+
+        tags_list = parse_tags(tags) if tags else []
+
         # Create task through service layer
-        task = _service.create_task(title=title, description=description)
+        task = _service.create_task(
+            title=title, description=description, priority=priority_enum, tags=tags_list
+        )
 
         # Display success message with task details (FR-009)
         success_text = Text()
@@ -69,6 +101,13 @@ def add(title: str, description: str | None) -> None:
         if task.description:
             success_text.append("Description: ", style="cyan")
             success_text.append(f"{task.description}\n", style="white")
+
+        success_text.append("Priority: ", style="cyan")
+        success_text.append(f"{task.priority.value}\n", style="white")
+
+        if task.tags:
+            success_text.append("Tags: ", style="cyan")
+            success_text.append(f"{', '.join(task.tags)}\n", style="white")
 
         success_text.append("\nStatus: ", style="cyan")
         success_text.append("Incomplete", style="yellow")
@@ -253,18 +292,34 @@ def undone(task_id: int) -> None:
     default=None,
     help="New task description",
 )
-def update(task_id: int, title: str | None, description: str | None) -> None:
+@click.option(
+    "-p",
+    "--priority",
+    type=click.Choice(["high", "medium", "low"], case_sensitive=False),
+    default=None,
+    help="Task priority (high, medium, low)",
+)
+@click.option(
+    "--tags",
+    default=None,
+    help="Comma-separated tags (e.g., 'work,urgent')",
+)
+def update(
+    task_id: int, title: str | None, description: str | None, priority: str | None, tags: str | None
+) -> None:
     """
-    Update a task's title and/or description.
+    Update a task's title, description, priority, and/or tags.
 
-    Updates the task with the given ID. You can update the title, description,
-    or both. At least one update must be provided.
+    Updates the task with the given ID. You can update any combination of
+    title, description, priority, or tags. At least one update must be provided.
 
     \\b
     Examples:
         todo update 1 --title "New title"
         todo update 1 -d "New description"
         todo update 1 --title "Buy milk and eggs" -d "From organic store"
+        todo update 1 -p high --tags "work,urgent"
+        todo update 2 --tags "personal,shopping"
 
     \\b
     Arguments:
@@ -274,10 +329,27 @@ def update(task_id: int, title: str | None, description: str | None) -> None:
     Options:
         --title, -t TEXT: New task title
         --description, -d TEXT: New task description
+        -p, --priority [high|medium|low]: Task priority level
+        --tags TEXT: Comma-separated tags for categorization
     """
     try:
+        # Parse priority
+        from src.core.models import Priority
+
+        priority_enum = None
+        if priority:
+            priority_map = {"high": Priority.HIGH, "medium": Priority.MEDIUM, "low": Priority.LOW}
+            priority_enum = priority_map[priority.lower()]
+
+        # Parse tags
+        from src.core.validators import parse_tags
+
+        tags_list = parse_tags(tags) if tags else None
+
         # Update task through service layer
-        task = _service.update_task(task_id, title=title, description=description)
+        task = _service.update_task(
+            task_id, title=title, description=description, priority=priority_enum, tags=tags_list
+        )
 
         # Display success message (FR-009)
         success_text = Text()
@@ -290,6 +362,13 @@ def update(task_id: int, title: str | None, description: str | None) -> None:
         if task.description:
             success_text.append("Description: ", style="cyan")
             success_text.append(f"{task.description}\n", style="white")
+
+        success_text.append("Priority: ", style="cyan")
+        success_text.append(f"{task.priority.value}\n", style="white")
+
+        if task.tags:
+            success_text.append("Tags: ", style="cyan")
+            success_text.append(f"{', '.join(task.tags)}\n", style="white")
 
         panel = Panel(
             success_text,

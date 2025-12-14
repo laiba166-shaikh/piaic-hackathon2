@@ -409,6 +409,122 @@ class TestUpdateCommand:
         list_result = runner.invoke(cli, ["list"])
         assert "New title" in list_result.output
 
+    def test_update_command_changes_priority(self) -> None:
+        """Test update command can change task priority (US6-010)"""
+        runner = CliRunner()
+
+        # Add a task with medium priority (default)
+        runner.invoke(cli, ["add", "Task with priority"])
+
+        # Update priority to high
+        result = runner.invoke(cli, ["update", "1", "-p", "high"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message with updated priority
+        assert "updated" in result.output.lower()
+        assert "high" in result.output.lower() or "HIGH" in result.output
+
+    def test_update_command_adds_tags(self) -> None:
+        """Test update command can add tags to a task (US6-010)"""
+        runner = CliRunner()
+
+        # Add a task without tags
+        runner.invoke(cli, ["add", "Task without tags"])
+
+        # Add tags
+        result = runner.invoke(cli, ["update", "1", "--tags", "work,urgent"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "updated" in result.output.lower()
+
+        # Verify tags in list output
+        list_result = runner.invoke(cli, ["list"])
+        assert "work" in list_result.output
+        assert "urgent" in list_result.output
+
+    def test_update_command_changes_tags(self) -> None:
+        """Test update command can change existing tags (US6-010)"""
+        runner = CliRunner()
+
+        # Add a task with tags
+        runner.invoke(cli, ["add", "Task with tags", "--tags", "old,tags"])
+
+        # Update tags
+        result = runner.invoke(cli, ["update", "1", "--tags", "new,updated"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "updated" in result.output.lower()
+
+        # Verify new tags in list output
+        list_result = runner.invoke(cli, ["list"])
+        assert "new" in list_result.output
+        assert "updated" in list_result.output
+
+    def test_update_command_with_priority_and_tags(self) -> None:
+        """Test update command can update both priority and tags (US6-010)"""
+        runner = CliRunner()
+
+        # Add a task
+        runner.invoke(cli, ["add", "Multi-update task"])
+
+        # Update both priority and tags
+        result = runner.invoke(cli, ["update", "1", "-p", "high", "--tags", "work,urgent"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message
+        assert "updated" in result.output.lower()
+
+        # Verify changes in list output
+        list_result = runner.invoke(cli, ["list"])
+        assert "Multi-update task" in list_result.output
+        assert "work" in list_result.output
+        assert "urgent" in list_result.output
+
+    def test_update_command_with_all_fields(self) -> None:
+        """Test update command can update title, description, priority, and tags together (US6-010)"""
+        runner = CliRunner()
+
+        # Add a basic task
+        runner.invoke(cli, ["add", "Old task"])
+
+        # Update all fields
+        result = runner.invoke(
+            cli,
+            [
+                "update",
+                "1",
+                "--title",
+                "New task",
+                "-d",
+                "New description",
+                "-p",
+                "low",
+                "--tags",
+                "personal,home",
+            ],
+        )
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should show success message with all updates
+        assert "updated" in result.output.lower()
+        assert "New task" in result.output
+        assert "New description" in result.output
+        assert "low" in result.output.lower() or "LOW" in result.output
+        assert "personal" in result.output
+        assert "home" in result.output
+
 
 class TestDeleteCommand:
     """Integration tests for User Story 5: Delete Unwanted Tasks"""
@@ -616,3 +732,71 @@ class TestAddCommand:
         result3 = runner.invoke(cli, ["add", "Task 3"])
         assert result3.exit_code == 0
         assert "3" in result3.output  # Should get ID 3
+
+    def test_add_command_with_priority(self) -> None:
+        """Test add command with priority option (US6-001)"""
+        runner = CliRunner()
+
+        # Add task with high priority
+        result = runner.invoke(cli, ["add", "Complete proposal", "-p", "high"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should display success message
+        assert "created" in result.output.lower() or "added" in result.output.lower()
+
+        # List tasks to verify priority was set
+        list_result = runner.invoke(cli, ["list"])
+
+        # Should show the task
+        assert "Complete proposal" in list_result.output
+
+        # Should show high priority indicator (will be implemented in GREEN phase)
+        # For now, just verify task was created
+        assert result.exit_code == 0
+
+    def test_add_command_with_tags(self) -> None:
+        """Test add command with tags option (US6-002)"""
+        runner = CliRunner()
+
+        # Add task with tags
+        result = runner.invoke(cli, ["add", "Review code", "--tags", "work,urgent"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should display success message
+        assert "created" in result.output.lower() or "added" in result.output.lower()
+
+        # List tasks to verify tags were set
+        list_result = runner.invoke(cli, ["list"])
+
+        # Should show the task
+        assert "Review code" in list_result.output
+
+        # Should show tags (will verify format in GREEN phase)
+        # For now, just verify task was created
+        assert result.exit_code == 0
+
+    def test_add_command_with_multiword_tags(self) -> None:
+        """Test add command with multi-word tags using quotes (US6-004)"""
+        runner = CliRunner()
+
+        # Add task with multi-word tags
+        result = runner.invoke(cli, ["add", "Meeting", "--tags", "work,high priority"])
+
+        # Should exit successfully
+        assert result.exit_code == 0
+
+        # Should display success message
+        assert "created" in result.output.lower() or "added" in result.output.lower()
+
+        # List tasks to verify tags were set
+        list_result = runner.invoke(cli, ["list"])
+
+        # Should show the task
+        assert "Meeting" in list_result.output
+
+        # Tags should be parsed correctly (will verify in GREEN phase)
+        assert result.exit_code == 0

@@ -1,0 +1,2 @@
+"""Phase 1 CLI Todo App - Core Package"""
+__version__ = "0.1.0"

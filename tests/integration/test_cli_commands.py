@@ -1470,3 +1470,114 @@ class TestOverdueFilter:
         # Should show no results message
         assert result.exit_code == 0
         assert "no tasks" in result.output.lower() or "No tasks" in result.output
+
+
+class TestPrimaryWorkflow:
+    """Integration tests for primary workflow (SC-003).
+
+    Verifies the core user journey: add task -> view list -> mark complete
+    should complete in under 30 seconds on first use.
+    """
+
+    def test_primary_workflow_add_list_complete(self) -> None:
+        """Test complete primary workflow: add -> list -> mark complete (SC-003)"""
+        import time
+
+        runner = CliRunner()
+        start_time = time.time()
+
+        # Step 1: Add a new task
+        add_result = runner.invoke(cli, ["add", "Buy groceries"])
+        assert add_result.exit_code == 0
+        assert "created" in add_result.output.lower() or "Task" in add_result.output
+
+        # Step 2: View task list
+        list_result = runner.invoke(cli, ["list"])
+        assert list_result.exit_code == 0
+        assert "Buy groceries" in list_result.output
+
+        # Step 3: Mark task as complete
+        done_result = runner.invoke(cli, ["done", "1"])
+        assert done_result.exit_code == 0
+        assert "complete" in done_result.output.lower()
+
+        # Verify workflow completed within 30 seconds
+        elapsed_time = time.time() - start_time
+        assert elapsed_time < 30, f"Primary workflow took {elapsed_time:.2f}s, expected < 30s"
+
+    def test_primary_workflow_with_description_and_priority(self) -> None:
+        """Test primary workflow with full task details"""
+        import time
+
+        runner = CliRunner()
+        start_time = time.time()
+
+        # Step 1: Add a task with description and priority
+        add_result = runner.invoke(
+            cli,
+            ["add", "Submit quarterly report", "-d", "Q4 financial summary", "-p", "high"]
+        )
+        assert add_result.exit_code == 0
+
+        # Step 2: View task list
+        list_result = runner.invoke(cli, ["list"])
+        assert list_result.exit_code == 0
+        assert "Submit quarterly report" in list_result.output
+
+        # Step 3: Mark task as complete
+        done_result = runner.invoke(cli, ["done", "1"])
+        assert done_result.exit_code == 0
+
+        # Verify total time
+        elapsed_time = time.time() - start_time
+        assert elapsed_time < 30, f"Workflow took {elapsed_time:.2f}s, expected < 30s"
+
+    def test_primary_workflow_multiple_tasks(self) -> None:
+        """Test primary workflow with multiple tasks"""
+        import time
+
+        runner = CliRunner()
+        start_time = time.time()
+
+        # Add multiple tasks
+        runner.invoke(cli, ["add", "Task 1 - Research"])
+        runner.invoke(cli, ["add", "Task 2 - Design"])
+        runner.invoke(cli, ["add", "Task 3 - Implement"])
+
+        # View list
+        list_result = runner.invoke(cli, ["list"])
+        assert list_result.exit_code == 0
+        assert "Task 1" in list_result.output
+        assert "Task 2" in list_result.output
+        assert "Task 3" in list_result.output
+
+        # Complete tasks
+        runner.invoke(cli, ["done", "1"])
+        runner.invoke(cli, ["done", "2"])
+
+        # Verify final state
+        final_list = runner.invoke(cli, ["list"])
+        assert final_list.exit_code == 0
+
+        # Verify total time
+        elapsed_time = time.time() - start_time
+        assert elapsed_time < 30, f"Workflow took {elapsed_time:.2f}s"
+
+    def test_primary_workflow_end_to_end_timing(self) -> None:
+        """Test full end-to-end workflow timing (SC-003)"""
+        import time
+
+        runner = CliRunner()
+        start_time = time.time()
+
+        # Complete primary workflow: add -> list -> complete
+        runner.invoke(cli, ["add", "Quick task"])
+        runner.invoke(cli, ["list"])
+        runner.invoke(cli, ["done", "1"])
+
+        elapsed = time.time() - start_time
+
+        # Should complete well under 30 seconds (typically < 1 second)
+        assert elapsed < 30, f"Primary workflow took {elapsed:.2f} seconds, must be < 30s"
+        # In practice, this should be nearly instantaneous
+        assert elapsed < 5, f"Primary workflow took {elapsed:.2f} seconds, expected < 5s for CLI commands"

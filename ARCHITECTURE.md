@@ -24,51 +24,79 @@ hackathon2/
 │   └── templates/                   # Spec-Kit templates
 │
 ├── specs/                           # Spec-Driven Development specs
-│   ├── phase1-cli/
+│   ├── 001-phase1-cli/
 │   │   ├── spec.md                 # CLI requirements
 │   │   ├── plan.md                 # CLI implementation plan
 │   │   └── tasks.md                # CLI tasks
-│   ├── phase2-web/
-│   │   ├── spec.md
-│   │   ├── plan.md
-│   │   └── tasks.md
-│   ├── phase3-chatbot/
-│   ├── phase4-k8s/
-│   └── phase5-cloud/
+│   ├── 002-phase2-fullstack-web/   # Feature-oriented specs
+│   │   ├── 00-phase2-overview.md   # Architecture overview
+│   │   └── features/               # Feature specs (12 sections each)
+│   │       ├── 01-user-authentication.md
+│   │       ├── 02-task-crud.md
+│   │       ├── 03-task-completion.md
+│   │       ├── 04-task-priority.md
+│   │       ├── 05-task-tags.md
+│   │       ├── 06-task-due-dates.md
+│   │       ├── 07-dashboard-overview.md
+│   │       └── 08-frontend-design-flow.md
+│   ├── 003-phase3-chatbot/
+│   ├── 004-phase4-k8s/
+│   └── 005-phase5-cloud/
 │
-├── src/
-│   ├── core/                        # Shared business logic (ALL PHASES)
-│   │   ├── __init__.py
-│   │   ├── models.py               # Task, User models
-│   │   ├── services.py             # TaskService (CRUD operations)
-│   │   ├── exceptions.py           # Custom exceptions
-│   │   └── storage/
-│   │       ├── __init__.py
-│   │       ├── base.py             # ITaskStorage interface
-│   │       ├── memory.py           # Phase 1: In-memory storage
-│   │       └── database.py         # Phase 2+: PostgreSQL storage
-│   │
-│   ├── cli/                         # Phase 1: Command-line interface
-│   │   ├── __init__.py
-│   │   ├── main.py                 # CLI entry point
-│   │   └── commands.py             # CLI command handlers
-│   │
-│   ├── web/                         # Phase 2: Web application
-│   │   ├── backend/
-│   │   │   ├── main.py             # FastAPI entry point
-│   │   │   ├── api/
-│   │   │   │   └── routes.py       # REST endpoints
-│   │   │   └── auth/
-│   │   │       └── jwt.py          # Better Auth integration
-│   │   └── frontend/
-│   │       └── (Next.js app)
-│   │
-│   └── chatbot/                     # Phase 3: AI-powered chatbot
-│       ├── mcp_server/             # MCP tools
-│       │   ├── main.py
-│       │   └── tools.py
-│       └── agents/
-│           └── todo_agent.py       # OpenAI Agents SDK
+├── shared/                          # Shared types (Phase 2+)
+│   └── types/                      # TypeScript/Python types
+│       ├── task.ts                 # TypeScript types for frontend
+│       └── task.py                 # Pydantic types for backend
+│
+├── cli/                            # Phase 1: Command-line interface
+│   ├── __init__.py
+│   ├── main.py                     # CLI entry point
+│   ├── commands.py                 # CLI command handlers
+│   └── storage/
+│       ├── base.py                 # ITaskStorage interface
+│       ├── memory.py               # In-memory storage
+│       └── database.py             # PostgreSQL storage (Phase 2+)
+│
+├── backend/                        # Phase 2: FastAPI backend
+│   ├── main.py                     # FastAPI entry point
+│   ├── models/                     # SQLModel database models
+│   │   └── task.py
+│   ├── schemas/                    # Pydantic request/response schemas
+│   │   └── task.py
+│   ├── routers/                    # API route handlers
+│   │   └── tasks.py
+│   ├── dependencies.py             # FastAPI dependencies (auth, db)
+│   ├── auth.py                     # JWT validation
+│   ├── database.py                 # Database connection
+│   └── tests/
+│       ├── unit/
+│       └── integration/
+│
+├── frontend/                       # Phase 2: Next.js frontend
+│   ├── app/                        # Next.js App Router
+│   │   ├── layout.tsx
+│   │   ├── page.tsx                # Dashboard
+│   │   └── tasks/
+│   │       └── page.tsx            # Task list page
+│   ├── components/                 # React components
+│   │   └── tasks/
+│   │       ├── TaskList.tsx
+│   │       ├── TaskForm.tsx
+│   │       └── TaskCard.tsx
+│   ├── lib/
+│   │   └── api.ts                  # Centralized API client
+│   ├── public/
+│   ├── tests/
+│   │   └── unit/
+│   ├── package.json
+│   └── CLAUDE.md
+│
+├── chatbot/                        # Phase 3: AI-powered chatbot
+│   ├── mcp_server/                 # MCP tools
+│   │   ├── main.py
+│   │   └── tools.py
+│   └── agents/
+│       └── todo_agent.py           # OpenAI Agents SDK
 │
 ├── deployment/
 │   ├── docker/
@@ -115,17 +143,15 @@ hackathon2/
 
 ### Phase 1: CLI with In-Memory Storage
 
-**Entry Point:** `python -m src.cli.main`
+**Entry Point:** `python -m cli.main`
 
 ```python
-# src/cli/main.py
-from src.core.services import TaskService
-from src.core.storage.memory import MemoryStorage
+# cli/main.py
+from cli.storage.memory import MemoryStorage
 
 def main():
     storage = MemoryStorage()
-    service = TaskService(storage)
-    # CLI commands...
+    # CLI commands using storage...
 ```
 
 **Features:**
@@ -140,19 +166,19 @@ def main():
 ### Phase 2: Web Application with Database
 
 **Entry Points:**
-- CLI: `python -m src.cli.main` (still works with memory storage)
-- Web Backend: `python -m src.web.backend.main`
-- Web Frontend: `cd src/web/frontend && npm run dev`
+- CLI: `python -m cli.main` (still works with memory storage)
+- Web Backend: `cd backend && uvicorn main:app --reload`
+- Web Frontend: `cd frontend && npm run dev`
 
 ```python
-# src/web/backend/main.py
-from src.core.services import TaskService
-from src.core.storage.database import DatabaseStorage
+# backend/main.py
+from fastapi import FastAPI
+from backend.routers import tasks
+from backend.database import engine
 
-def create_app():
-    storage = DatabaseStorage(connection_string=os.getenv("DATABASE_URL"))
-    service = TaskService(storage)
-    # FastAPI routes...
+app = FastAPI()
+app.include_router(tasks.router)
+# SQLModel creates tables, FastAPI serves routes...
 ```
 
 **New Features:**
@@ -163,8 +189,8 @@ def create_app():
 - JWT authentication
 
 **Phase 1 Preservation:**
-- CLI still runnable with: `python -m src.cli.main`
-- CLI can optionally use DB: `python -m src.cli.main --storage=database`
+- CLI still runnable with: `python -m cli.main`
+- CLI uses in-memory storage (independent from web app)
 
 **Deliverable:** Full-stack web app + working CLI
 
@@ -173,19 +199,19 @@ def create_app():
 ### Phase 3: AI Chatbot with MCP
 
 **Entry Points:**
-- CLI: `python -m src.cli.main` ✅
-- Web: `python -m src.web.backend.main` ✅
-- Chatbot: `python -m src.chatbot.mcp_server.main`
+- CLI: `python -m cli.main` ✅
+- Web Backend: `cd backend && uvicorn main:app --reload` ✅
+- Web Frontend: `cd frontend && npm run dev` ✅
+- Chatbot: `python -m chatbot.mcp_server.main`
 
 ```python
-# src/chatbot/mcp_server/tools.py
-from src.core.services import TaskService
-from src.core.storage.database import DatabaseStorage
+# chatbot/mcp_server/tools.py
+from backend.database import get_db
+from backend.routers.tasks import get_tasks, create_task
 
 def create_mcp_tools():
-    storage = DatabaseStorage(...)
-    service = TaskService(storage)
-    # MCP tool wrappers around service methods...
+    # MCP tool wrappers around backend API logic...
+    # Reuses backend models and database connection
 ```
 
 **New Features:**
@@ -239,137 +265,130 @@ def create_mcp_tools():
 
 ## Storage Abstraction (Critical for Phase Independence)
 
-### Interface Definition
+### Phase 1: CLI Storage Interface
 
 ```python
-# src/core/storage/base.py
+# cli/storage/base.py
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from src.core.models import Task
 
 class ITaskStorage(ABC):
-    """Abstract interface for task storage."""
+    """Abstract interface for CLI task storage."""
 
     @abstractmethod
-    def create(self, task: Task) -> Task:
+    def create(self, title: str) -> dict:
         """Create a new task."""
         pass
 
     @abstractmethod
-    def get(self, task_id: int, user_id: str) -> Optional[Task]:
+    def get(self, task_id: int) -> Optional[dict]:
         """Get a task by ID."""
         pass
 
     @abstractmethod
-    def list(self, user_id: str, status: Optional[str] = None) -> List[Task]:
-        """List all tasks for a user."""
+    def list(self, status: Optional[str] = None) -> List[dict]:
+        """List all tasks."""
         pass
 
     @abstractmethod
-    def update(self, task: Task) -> Task:
+    def update(self, task_id: int, **kwargs) -> dict:
         """Update an existing task."""
         pass
 
     @abstractmethod
-    def delete(self, task_id: int, user_id: str) -> bool:
+    def delete(self, task_id: int) -> bool:
         """Delete a task."""
         pass
 ```
 
 ### Implementations
 
-**Phase 1: Memory Storage**
+**Phase 1: CLI Memory Storage**
 ```python
-# src/core/storage/memory.py
+# cli/storage/memory.py
 class MemoryStorage(ITaskStorage):
     def __init__(self):
-        self._tasks: Dict[int, Task] = {}
+        self._tasks: Dict[int, dict] = {}
         self._counter = 0
 
-    def create(self, task: Task) -> Task:
+    def create(self, title: str) -> dict:
         self._counter += 1
-        task.id = self._counter
-        self._tasks[task.id] = task
+        task = {"id": self._counter, "title": title, "completed": False}
+        self._tasks[task["id"]] = task
         return task
     # ... other methods
 ```
 
-**Phase 2+: Database Storage**
+**Phase 2: Backend Database (SQLModel)**
 ```python
-# src/core/storage/database.py
-class DatabaseStorage(ITaskStorage):
-    def __init__(self, connection_string: str):
-        self.engine = create_engine(connection_string)
+# backend/models/task.py
+from sqlmodel import SQLModel, Field
 
-    def create(self, task: Task) -> Task:
-        with Session(self.engine) as session:
-            session.add(task)
-            session.commit()
-            session.refresh(task)
-            return task
-    # ... other methods
+class Task(SQLModel, table=True):
+    __tablename__ = "tasks"
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: str = Field(index=True)
+    title: str
+    completed: bool = False
+    deleted_at: datetime | None = None
+    # ... Phase 2 required patterns
 ```
 
 ## Configuration Strategy
 
-```python
-# src/core/config.py
-from enum import Enum
+**Phase 1 (CLI):**
+- Uses `cli/storage/memory.py` (in-memory)
+- No configuration needed
+- Independent from web app
 
-class StorageType(Enum):
-    MEMORY = "memory"
-    DATABASE = "database"
-
-def get_storage(storage_type: StorageType = None):
-    """Factory function to get appropriate storage."""
-    if storage_type is None:
-        storage_type = os.getenv("STORAGE_TYPE", "memory")
-
-    if storage_type == StorageType.MEMORY:
-        return MemoryStorage()
-    elif storage_type == StorageType.DATABASE:
-        return DatabaseStorage(os.getenv("DATABASE_URL"))
-    else:
-        raise ValueError(f"Unknown storage type: {storage_type}")
-```
+**Phase 2 (Web App):**
+- Backend uses SQLModel with PostgreSQL
+- Frontend uses centralized API client
+- Environment variables in root `.env`:
+  ```bash
+  DATABASE_URL=postgresql://...
+  JWT_SECRET=your-secret-key
+  NEXT_PUBLIC_API_URL=http://localhost:8000
+  ```
 
 ## Running Different Phases
 
 ### Phase 1 (CLI only, in-memory)
 ```bash
-# Set storage to memory
-export STORAGE_TYPE=memory
-
 # Run CLI
-python -m src.cli.main
+python -m cli.main add "Buy groceries"
+python -m cli.main list
+python -m cli.main complete 1
 ```
 
-### Phase 2+ (CLI with database)
+### Phase 2 (Full-Stack Web App)
 ```bash
-# Set storage to database
-export STORAGE_TYPE=database
-export DATABASE_URL=postgresql://...
+# Terminal 1: Backend
+cd backend
+uvicorn main:app --reload --port 8000
 
-# Run CLI (now uses DB)
-python -m src.cli.main
+# Terminal 2: Frontend
+cd frontend
+npm run dev
 
-# Or run web app
-python -m src.web.backend.main
+# Terminal 3: CLI (still works independently)
+python -m cli.main list
 ```
 
-### Phase 3+ (All interfaces)
+### Phase 3+ (All interfaces including Chatbot)
 ```bash
 # Terminal 1: CLI
-python -m src.cli.main
+python -m cli.main
 
 # Terminal 2: Web Backend
-python -m src.web.backend.main
+cd backend && uvicorn main:app --reload
 
 # Terminal 3: Web Frontend
-cd src/web/frontend && npm run dev
+cd frontend && npm run dev
 
 # Terminal 4: Chatbot MCP Server
-python -m src.chatbot.mcp_server.main
+python -m chatbot.mcp_server.main
 ```
 
 ## Demo Strategy for Hackathon Judges
@@ -404,28 +423,40 @@ python -m src.chatbot.mcp_server.main
 
 ## Testing Strategy
 
-### Unit Tests (Test Core Logic)
-```python
-# tests/unit/test_services.py
-def test_task_service_with_memory_storage():
-    storage = MemoryStorage()
-    service = TaskService(storage)
-    task = service.create_task(title="Test", user_id="user1")
-    assert task.id is not None
+### Unit Tests (Test Each Layer)
 
-def test_task_service_with_database_storage():
-    storage = DatabaseStorage(test_db_url)
-    service = TaskService(storage)
-    task = service.create_task(title="Test", user_id="user1")
-    assert task.id is not None
+**Backend Tests:**
+```python
+# backend/tests/unit/test_tasks.py
+def test_create_task_returns_201(client, auth_headers):
+    response = client.post(
+        "/api/v1/tasks",
+        json={"title": "Test Task"},
+        headers=auth_headers
+    )
+    assert response.status_code == 201
+    assert response.json()["title"] == "Test Task"
 ```
 
-### Integration Tests (Test Interfaces)
+**Frontend Tests:**
+```typescript
+// frontend/tests/unit/TaskList.test.tsx
+import { render, screen } from '@testing-library/react';
+import { TaskList } from '@/components/tasks/TaskList';
+
+test('renders task list', () => {
+  const tasks = [{ id: 1, title: 'Test' }];
+  render(<TaskList tasks={tasks} />);
+  expect(screen.getByText('Test')).toBeInTheDocument();
+});
+```
+
+**CLI Tests:**
 ```python
-# tests/integration/test_cli.py
+# cli/tests/test_cli.py
 def test_cli_add_command():
     result = subprocess.run(
-        ["python", "-m", "src.cli.main", "add", "Buy milk"],
+        ["python", "-m", "cli.main", "add", "Buy milk"],
         capture_output=True
     )
     assert "Task added" in result.stdout.decode()

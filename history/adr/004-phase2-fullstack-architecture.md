@@ -417,39 +417,54 @@ frontend/tests/
 
 ### 11. Spec Organization
 
-**Decision:** Separate specs for each phase, organized by type.
+**Decision:** Feature-oriented specs for Phase 2, each containing all 12 required sections (API contract, data model, UI/UX).
 
 **Structure:**
 ```
 specs/
-├── phase1/            # CLI specs (preserved)
+├── 001-phase1-cli/            # CLI specs (preserved)
 │   ├── spec.md
 │   ├── plan.md
 │   └── tasks.md
-└── phase2/            # Web app specs (new)
-    ├── 00-phase2-overview.md
-    ├── plan.md
-    ├── tasks.md
-    ├── features/      # User stories
-    │   └── task-crud.md
-    ├── api/           # API contracts
-    │   └── tasks-endpoints.md
-    ├── database/      # Schema design
-    │   └── schema.md
-    └── ui/            # Component specs
-        └── task-list.md
+└── 002-phase2-fullstack-web/  # Feature-oriented specs
+    ├── 00-phase2-overview.md  # Architecture overview (not a feature)
+    └── features/              # Feature specs (12 sections each)
+        ├── 01-user-authentication.md
+        ├── 02-task-crud.md
+        ├── 03-task-completion.md
+        ├── 04-task-priority.md
+        ├── 05-task-tags.md
+        ├── 06-task-due-dates.md
+        ├── 07-dashboard-overview.md
+        └── 08-frontend-design-flow.md
 ```
+
+**Each Feature Spec Contains (12 Sections):**
+1. Feature Name
+2. Overview
+3. Priority
+4. Dependencies
+5. User Stories (As-Want-So format)
+6. Acceptance Criteria (Given-When-Then format)
+7. Edge Cases
+8. Error Handling
+9. Non-Goals
+10. **API Contract** (Backend endpoints)
+11. **Data Model** (Database schema)
+12. **UI/UX Requirements** (Frontend components)
 
 **Rationale:**
 - Clear separation between phases
-- Organized by type (features, API, database, UI)
-- Easy for skills to locate relevant specs
-- Preserves Phase 1 for reference
+- Feature-oriented (not layer-oriented) aligns with agent architecture
+- Each spec is self-contained (all layers in one file)
+- Spec Writer Agent creates complete specs (all 12 sections)
+- Agents can work autonomously (read one file, not 3-4)
+- Easy to track progress (8 features, not 20+ scattered specs)
 
 **Alternatives Considered:**
+- Layer-oriented (api/, database/, ui/) - rejected: violates spec-architect pattern, requires reading multiple files per feature
 - Flat structure (rejected: hard to navigate)
 - Combined phase specs (rejected: confusing)
-- Feature-based folders (rejected: cross-cutting concerns)
 
 ---
 

@@ -50,7 +50,7 @@ Phase 2 transforms the Phase 1 CLI todo application into a **multi-user, full-st
    - Soft deletes for data safety
 
 3. **Modern Web Interface**
-   - Next.js 15+ with App Router
+   - Next.js 16+ with App Router
    - Responsive design (mobile + desktop)
    - Real-time feedback and error handling
 

@@ -934,7 +934,7 @@ export function LoginForm() {
 - ✅ Session management
 - ✅ Password hashing (bcrypt)
 - ✅ Database integration (Drizzle ORM)
-- ✅ Next.js 15 App Router integration
+- ✅ Next.js 16 App Router integration
 - ✅ TypeScript support
 - ✅ Security best practices (CSRF, XSS, SQL injection protection)
 

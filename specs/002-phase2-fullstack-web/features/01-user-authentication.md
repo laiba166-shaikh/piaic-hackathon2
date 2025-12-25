@@ -13,7 +13,7 @@ User Authentication provides secure access control for the multi-user task manag
 ## Dependencies
 
 **Required Before Implementation:**
-- Frontend Next.js 15+ application setup with App Router
+- Frontend Next.js 16+ application setup with App Router
 - Backend FastAPI application setup with basic server configuration
 - PostgreSQL database connection (for Better Auth user storage on frontend side)
 - Better Auth library installed and configured in frontend

@@ -53,7 +53,7 @@ The frontend serves as the **user-facing interface** for the multi-user task man
 
 | Technology | Purpose |
 |------------|---------|
-| **Next.js 15+** | React framework with App Router |
+| **Next.js 16+** | React framework with App Router |
 | **React 18+** | UI library with Server/Client Components |
 | **TypeScript** | Type safety |
 | **Tailwind CSS** | Utility-first styling |

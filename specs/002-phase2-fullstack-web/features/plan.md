@@ -12,7 +12,7 @@ Implement secure user authentication for the multi-user task management applicat
 ## Technical Context
 
 **Language/Version**:
-- Frontend: TypeScript 5.x, React 18+, Next.js 15+ (App Router)
+- Frontend: TypeScript 5.x, React 18+, Next.js 16+ (App Router)
 - Backend: Python 3.11+
 
 **Primary Dependencies**:
@@ -219,24 +219,50 @@ No violations to justify.
 **Status:** To be generated in research.md
 
 **Unknowns to Research:**
-1. Better Auth configuration for Next.js 15 App Router
+1. Better Auth configuration for Next.js 16 App Router
 2. JWT secret sharing between frontend and backend (environment variables)
 3. HTTP-only cookie configuration with SameSite and Secure flags
 4. Better Auth database schema and migration setup
-5. Frontend middleware pattern for protected routes (Next.js 15)
+5. Frontend middleware pattern for protected routes (Next.js 16)
 6. Backend JWT validation with PyJWT (algorithm, expiration, claims)
 7. Error handling patterns for expired/invalid tokens
 8. CORS configuration for frontend-backend communication
 9. Testing patterns for JWT-based auth (mocking tokens)
 10. Accessibility best practices for authentication forms
 
+**Architecture Pattern References:**
+- **Backend:** Follow patterns from `../00-backend-architecture.md`
+  - JWT validation dependency pattern (Security & Authentication section)
+  - Error response format (Error Behavior section)
+  - CORS configuration (Security section)
+  - Testing fixture patterns (Testing Standards section)
+- **Frontend:** Follow patterns from `../08-frontend-design-flow.md`
+  - Authentication flow (Authentication Flow section)
+  - Better Auth integration patterns
+  - Middleware configuration (Routing & Navigation section)
+  - Server vs Client Component boundaries (Component Boundaries section)
+  - Form submission states (UI State Management section)
+- **API Endpoints:** Reference `../api/rest-endpoints.md`
+  - No authentication endpoints in backend (Better Auth manages all)
+  - All task endpoints require JWT authentication
+  - Standard error responses and status codes
+- **Database Schema:** Reference `../database/schema.md`
+  - NO users table in backend database
+  - user_id field in tasks table (from JWT sub claim)
+  - Auto-managed timestamps and soft deletes
+- **UI Design:** Reference `../ui/design-system.md`
+  - Journal/diary aesthetic for forms
+  - Color palette (Paper Cream, Ink Black, Vintage Blue)
+  - Typography (Crimson Text, Playfair Display)
+  - Form component styling and states
+
 **Research Tasks:**
 - [ ] Better Auth documentation review (Next.js integration, JWT token generation)
-- [ ] Next.js 15 middleware patterns for authentication
-- [ ] FastAPI JWT validation patterns (dependency injection)
+- [ ] Next.js 16 middleware patterns for authentication (reference: 08-frontend-design-flow.md lines 118-146)
+- [ ] FastAPI JWT validation patterns (reference: 00-backend-architecture.md lines 590-640)
 - [ ] HTTP-only cookie security best practices
-- [ ] CORS configuration for JWT cookies (credentials: 'include')
-- [ ] Testing strategies for authentication flows (E2E and unit)
+- [ ] CORS configuration for JWT cookies (reference: 00-backend-architecture.md lines 662-677)
+- [ ] Testing strategies for authentication flows (reference: 00-backend-architecture.md lines 765-838)
 - [ ] Accessibility guidelines for login/register forms (WCAG 2.1)
 
 **Output:** research.md with decisions, rationale, and alternatives for each unknown.
@@ -281,22 +307,139 @@ No violations to justify.
   - Visit /login → log in → redirected to dashboard
   - Visit / without auth → redirected to /login
 
-## Next Steps After Planning
+## Implementation Workflow
 
-1. **Generate research.md** (Phase 0) - Resolve all unknowns listed above
-2. **Generate data-model.md** (Phase 1) - Document user_id field specification
-3. **Generate contracts/** (Phase 1) - JWT validation and Better Auth flow contracts
-4. **Generate quickstart.md** (Phase 1) - Developer setup guide
-5. **Run /sp.tasks** (Phase 2) - Generate tasks.md with test-driven implementation tasks
-6. **Implement** (Phases 3-6) - Execute tasks in TDD red-green-refactor cycles
+Following the 7-phase spec-driven workflow from `00-phase2-overview.md`:
 
-**Agent Coordination:**
-- **Spec Coordinator:** Validates plan aligns with 01-user-authentication.md spec
-- **Schema Architect:** Documents user_id field (no users table)
-- **API Developer:** Implements get_current_user dependency (backend)
-- **UI Developer:** Implements Better Auth integration, auth forms (frontend)
-- **Test Engineer:** Writes TDD tests for auth flow (frontend and backend)
+### Phase 0: Research & Decision Documentation (Current Phase)
+**Agent:** Spec Coordinator
+**Input:** This plan, architecture documents, feature spec
+**Tasks:**
+- Research Better Auth integration patterns
+- Document JWT validation approach
+- Define frontend middleware strategy
+- Document CORS configuration
+- Define testing approach
+**Output:** research.md with decisions and rationale
+
+### Phase 1: Design Artifacts (COMPLETED ✅)
+**Agent:** Schema Architect (for data model), Spec Coordinator (for contracts)
+**Input:** Research findings, architecture patterns
+**Tasks:**
+- ✅ Document user_id field specification (data-model.md)
+- ✅ Create JWT validation contract (contracts/jwt-validation.md)
+- ✅ Create Better Auth flow documentation (contracts/better-auth-flow.md)
+- ✅ Create developer quickstart guide (quickstart.md)
+- ✅ Consolidate API endpoints (../api/rest-endpoints.md)
+- ✅ Document database schema (../database/schema.md)
+- ✅ Define UI design system (../ui/design-system.md)
+**Output:** Design artifacts in features/ and root spec directories
+
+### Phase 2: Task Generation
+**Agent:** Spec Coordinator
+**Command:** `/sp.tasks`
+**Input:** Spec, plan, research, contracts
+**Output:** tasks.md with test-driven implementation tasks
+
+### Phase 3: Backend Implementation (TDD - RED)
+**Agent:** API Developer, Test Engineer
+**Tasks:**
+- Write failing JWT validation tests (backend/tests/test_dependencies.py)
+- Write failing integration tests (backend/tests/test_auth_flow.py)
+**Output:** Failing tests (RED state)
+
+### Phase 4: Backend Implementation (TDD - GREEN)
+**Agent:** API Developer
+**Tasks:**
+- Implement get_current_user dependency (backend/dependencies.py)
+- Configure JWT_SECRET in config (backend/config.py)
+- Configure CORS middleware (backend/main.py)
+- Make tests pass
+**Output:** Working backend JWT validation (GREEN state)
+
+### Phase 5: Frontend Implementation (TDD - RED + GREEN)
+**Agent:** UI Developer, Test Engineer
+**Tasks:**
+- Configure Better Auth (frontend/lib/auth.ts)
+- Implement login/register pages (frontend/app/login/, frontend/app/register/)
+- Implement auth components (frontend/components/auth/)
+- Implement middleware (frontend/middleware.ts)
+- Write and pass frontend tests
+**Output:** Working frontend authentication
+
+### Phase 6: Integration & Validation
+**Agent:** Quality Guardian
+**Tasks:**
+- Validate JWT flow end-to-end
+- Verify user isolation (test cross-user access returns 404)
+- Audit test coverage against acceptance criteria
+- Validate architecture compliance
+**Output:** Approval or fix requests
+
+### Phase 7: Refinement (if needed)
+**Agent:** All agents
+**Tasks:** Address Quality Guardian feedback
+**Output:** Production-ready authentication
 
 ---
 
-**Plan Status:** ✅ Technical Context and Constitution Check complete. Ready for Phase 0 research.
+## Next Steps After Planning
+
+**Phase 1 Status:** ✅ COMPLETE
+
+**Phase 1 Artifacts Created:**
+- ✅ data-model.md - User authentication data model (no backend users table)
+- ✅ contracts/jwt-validation.md - JWT token validation contract
+- ✅ contracts/better-auth-flow.md - Better Auth integration flow
+- ✅ quickstart.md - Developer setup guide
+- ✅ ../api/rest-endpoints.md - Complete REST API specification (6 endpoints)
+- ✅ ../database/schema.md - PostgreSQL schema with tasks table
+- ✅ ../ui/design-system.md - Journal-themed UI design system
+
+**Ready for Phase 2:**
+1. **Run /sp.tasks** - Generate tasks.md with test-driven implementation tasks
+   - Input: 01-user-authentication.md, 02-task-crud.md, 03-task-completion.md
+   - Reference: api/rest-endpoints.md, database/schema.md, ui/design-system.md
+   - Output: tasks.md with RED-GREEN-REFACTOR cycles
+
+2. **Implement** (Phases 3-6) - Execute tasks in TDD workflow
+   - Phase 3: Write failing tests (RED)
+   - Phase 4: Implement to pass tests (GREEN)
+   - Phase 5: Refactor and optimize
+   - Phase 6: Integration testing
+
+3. **Validate** (Phase 7) - Quality Guardian approval
+   - Test coverage audit
+   - Architecture compliance check
+   - Security validation
+
+**Agent Coordination:**
+- **Spec Coordinator:** Validates plan aligns with 01-user-authentication.md spec, orchestrates phases
+- **Schema Architect:** Documents user_id field (no users table)
+- **API Developer:** Implements get_current_user dependency (backend), follows 00-backend-architecture.md patterns
+- **UI Developer:** Implements Better Auth integration, auth forms (frontend), follows 08-frontend-design-flow.md patterns
+- **Test Engineer:** Writes TDD tests for auth flow (frontend and backend), follows testing standards
+- **Quality Guardian:** Validates implementation against spec and architecture requirements
+
+**Critical Architecture Patterns to Follow:**
+- Backend: JWT validation with dependency injection (00-backend-architecture.md:590-640)
+- Backend: Error response format (00-backend-architecture.md:338-440)
+- Backend: CORS with credentials (00-backend-architecture.md:662-677)
+- Frontend: Middleware for protected routes (08-frontend-design-flow.md:118-146)
+- Frontend: Better Auth integration (08-frontend-design-flow.md:206-333)
+- Frontend: Form submission states (08-frontend-design-flow.md:659-697)
+
+---
+
+**Plan Status:** ✅ Phase 1 Design Artifacts Complete. Ready for Phase 2 Task Generation (/sp.tasks).
+
+**Architecture Foundation:**
+- ✅ Backend patterns documented (00-backend-architecture.md)
+- ✅ Frontend patterns documented (08-frontend-design-flow.md)
+- ✅ API specification complete (api/rest-endpoints.md)
+- ✅ Database schema defined (database/schema.md)
+- ✅ UI design system ready (ui/design-system.md)
+- ✅ Feature specs complete (01, 02, 03)
+- ✅ Data contracts established (contracts/)
+
+**Next Command:** `/sp.tasks` to generate implementation tasks for all 3 features.

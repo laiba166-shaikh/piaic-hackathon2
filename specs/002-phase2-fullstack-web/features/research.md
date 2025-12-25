@@ -7,14 +7,14 @@
 
 ## Summary
 
-This research document resolves all technical unknowns identified in the planning phase for implementing user authentication using Better Auth on the frontend and JWT validation on the backend. Key decisions include using Better Auth's Next.js 15 App Router integration, sharing JWT secrets via environment variables, implementing HTTP-only cookies with SameSite=Strict, and establishing clear patterns for JWT validation, error handling, and testing.
+This research document resolves all technical unknowns identified in the planning phase for implementing user authentication using Better Auth on the frontend and JWT validation on the backend. Key decisions include using Better Auth's Next.js 16 App Router integration, sharing JWT secrets via environment variables, implementing HTTP-only cookies with SameSite=Strict, and establishing clear patterns for JWT validation, error handling, and testing.
 
 ---
 
-## Research Item 1: Better Auth Configuration for Next.js 15 App Router
+## Research Item 1: Better Auth Configuration for Next.js 16 App Router
 
 ### Decision
-Use Better Auth's official Next.js 15 App Router integration with API routes for authentication endpoints.
+Use Better Auth's official Next.js 16 App Router integration with API routes for authentication endpoints.
 
 ### Investigation
 - **Better Auth Documentation:** Provides first-class Next.js support via `better-auth/nextjs` package
@@ -60,7 +60,7 @@ export const { GET, POST } = toNextJsHandler(auth);
 ```
 
 ### Rationale
-- **Official Support:** Better Auth provides native Next.js 15 integration
+- **Official Support:** Better Auth provides native Next.js 16 integration
 - **Automatic API Routes:** `[...all]` dynamic route handles all auth endpoints
 - **Type Safety:** TypeScript support built-in
 - **Database Flexibility:** Drizzle adapter works with Neon PostgreSQL
@@ -72,7 +72,7 @@ export const { GET, POST } = toNextJsHandler(auth);
 
 **Resources:**
 - [Better Auth Docs](https://www.better-auth.com/docs/nextjs)
-- [Next.js 15 App Router API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
+- [Next.js 16 App Router API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
 
 ---
 
@@ -322,7 +322,7 @@ npm run db:migrate
 ## Research Item 5: Frontend Middleware Pattern for Protected Routes
 
 ### Decision
-Use Next.js 15 middleware with Better Auth session check to protect routes.
+Use Next.js 16 middleware with Better Auth session check to protect routes.
 
 ### Investigation
 - **Middleware Location:** `middleware.ts` in `app/` directory
@@ -1088,7 +1088,7 @@ export function LoginForm() {
 
 | Research Item | Decision | Key Technology |
 |---------------|----------|----------------|
-| 1. Better Auth Config | Official Next.js 15 App Router integration | better-auth/nextjs, Drizzle ORM |
+| 1. Better Auth Config | Official Next.js 16 App Router integration | better-auth/nextjs, Drizzle ORM |
 | 2. JWT Secret Sharing | Single `.env` file with JWT_SECRET variable | Environment variables |
 | 3. HTTP-Only Cookies | SameSite=Strict, Secure, HttpOnly, 24hr expiry | Better Auth cookie config |
 | 4. Better Auth Schema | Automatic schema generation, separate DB from backend | Drizzle migrations |

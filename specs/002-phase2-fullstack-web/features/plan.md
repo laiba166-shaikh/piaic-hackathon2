@@ -149,6 +149,7 @@ specs/002-phase2-fullstack-web/features/
 
 hackathon2/
 ├── frontend/
+│   ├── CLAUDE.md                     # Frontend-specific Claude Code guidelines
 │   ├── app/
 │   │   ├── login/
 │   │   │   └── page.tsx              # Login page component
@@ -184,6 +185,7 @@ hackathon2/
 │           └── protected-routes.spec.ts
 │
 ├── backend/
+│   ├── CLAUDE.md                     # Backend-specific Claude Code guidelines
 │   ├── dependencies.py               # get_current_user dependency
 │   ├── config.py                     # JWT_SECRET configuration
 │   ├── main.py                       # FastAPI app (CORS, middleware)

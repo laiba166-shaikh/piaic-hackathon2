@@ -91,7 +91,7 @@ psql -l
 ### Step 2.1: Install Frontend Dependencies
 
 ```bash
-cd frontend
+cd src/core/frontend
 
 # Install Next.js, React, and Better Auth dependencies
 npm install better-auth drizzle-orm postgres
@@ -107,7 +107,7 @@ npm list better-auth drizzle-orm
 
 ### Step 2.2: Configure Frontend Environment Variables
 
-Create `frontend/.env.local`:
+Create `src/core/frontend/.env.local`:
 
 ```bash
 # Database connection (Frontend - Better Auth)
@@ -128,7 +128,7 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 ### Step 2.3: Setup Drizzle Database Client
 
-Create `frontend/lib/db.ts`:
+Create `src/core/frontend/lib/db.ts`:
 
 ```typescript
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -146,7 +146,7 @@ export const db = drizzle(client);
 
 ### Step 2.4: Configure Better Auth
 
-Create `frontend/lib/auth.ts`:
+Create `src/core/frontend/lib/auth.ts`:
 
 ```typescript
 import { betterAuth } from "better-auth";
@@ -195,7 +195,7 @@ export const { signIn, signUp, signOut, getSession } = auth;
 
 ### Step 2.5: Create Better Auth API Routes
 
-Create `frontend/app/api/auth/[...all]/route.ts`:
+Create `src/core/frontend/app/api/auth/[...all]/route.ts`:
 
 ```typescript
 import { auth } from "@/lib/auth";
@@ -215,7 +215,7 @@ This creates all authentication endpoints automatically:
 Better Auth will auto-create tables on first run. Start the dev server to trigger migrations:
 
 ```bash
-cd frontend
+cd src/core/frontend
 npm run dev
 ```
 
@@ -251,7 +251,7 @@ psql frontend_auth
 ### Step 3.1: Install Backend Dependencies
 
 ```bash
-cd backend
+cd src/core/backend
 
 # Install FastAPI and JWT dependencies
 pip install fastapi uvicorn pyjwt sqlmodel psycopg2-binary pydantic-settings
@@ -265,7 +265,7 @@ pip list | grep -E "fastapi|pyjwt|sqlmodel"
 
 ### Step 3.2: Configure Backend Environment Variables
 
-Create `backend/.env`:
+Create `src/core/backend/.env`:
 
 ```bash
 # Database connection (Backend - Task Management)
@@ -288,7 +288,7 @@ FRONTEND_URL=http://localhost:3000
 
 ### Step 3.3: Create Settings Configuration
 
-Create `backend/config.py`:
+Create `src/core/backend/config.py`:
 
 ```python
 import os
@@ -315,7 +315,7 @@ settings = Settings()
 
 ### Step 3.4: Create JWT Validation Dependency
 
-Create `backend/dependencies.py`:
+Create `src/core/backend/dependencies.py`:
 
 ```python
 from fastapi import Depends, HTTPException, Security, Cookie
@@ -393,7 +393,7 @@ async def get_current_user(
 
 ### Step 3.5: Setup FastAPI with CORS
 
-Create `backend/main.py`:
+Create `src/core/backend/main.py`:
 
 ```python
 from fastapi import FastAPI
@@ -431,7 +431,7 @@ async def health():
 
 ### Step 3.6: Create Backend Database Tables
 
-Create `backend/models.py`:
+Create `src/core/backend/models.py`:
 
 ```python
 from sqlmodel import SQLModel, Field
@@ -451,7 +451,7 @@ class Task(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 ```
 
-Create `backend/create_db.py`:
+Create `src/core/backend/create_db.py`:
 
 ```python
 from sqlmodel import SQLModel, create_engine
@@ -472,7 +472,7 @@ if __name__ == "__main__":
 Run the database creation script:
 
 ```bash
-cd backend
+cd src/core/backend
 python -m backend.create_db
 ```
 
@@ -495,7 +495,7 @@ psql backend_tasks
 ### Step 3.7: Start Backend Server
 
 ```bash
-cd backend
+cd src/core/backend
 uvicorn backend.main:app --reload --port 8000
 ```
 
@@ -639,7 +639,7 @@ echo "JWT_SECRET=<your-secret-here>" >> .env
 
 **Fix:**
 ```python
-# backend/main.py
+# src/core/backend/main.py
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -676,10 +676,10 @@ echo $DATABASE_URL
 ```bash
 # Compare secrets
 echo "Frontend:"
-cat frontend/.env.local | grep JWT_SECRET
+cat src/core/frontend/.env.local | grep JWT_SECRET
 
 echo "Backend:"
-cat backend/.env | grep JWT_SECRET
+cat src/core/backend/.env | grep JWT_SECRET
 
 # They MUST be identical
 # If different, copy frontend secret to backend .env
@@ -717,13 +717,13 @@ After completing this quickstart:
 **What's Next:**
 
 1. **Create UI Components:**
-   - Login page (`frontend/app/login/page.tsx`)
-   - Registration page (`frontend/app/register/page.tsx`)
-   - Logout button (`frontend/components/auth/LogoutButton.tsx`)
+   - Login page (`src/core/frontend/app/login/page.tsx`)
+   - Registration page (`src/core/frontend/app/register/page.tsx`)
+   - Logout button (`src/core/frontend/components/auth/LogoutButton.tsx`)
 
 2. **Add Protected Routes:**
-   - Middleware (`frontend/middleware.ts`)
-   - Dashboard page (`frontend/app/page.tsx`)
+   - Middleware (`src/core/frontend/middleware.ts`)
+   - Dashboard page (`src/core/frontend/app/page.tsx`)
 
 3. **Write Tests:**
    - Frontend unit tests (Vitest)
@@ -743,7 +743,7 @@ After completing this quickstart:
 ### Frontend Commands
 
 ```bash
-cd frontend
+cd src/core/frontend
 
 # Start dev server
 npm run dev
@@ -758,7 +758,7 @@ npm run build
 ### Backend Commands
 
 ```bash
-cd backend
+cd src/core/backend
 
 # Start dev server
 uvicorn backend.main:app --reload --port 8000

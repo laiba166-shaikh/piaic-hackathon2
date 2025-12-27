@@ -108,7 +108,7 @@ Spec: specs/phase2/features/[name].md (Section 11)
 
 **Step 1: Create SQLModel (10 min)**
 - Read spec data model section
-- Create backend/models/[entity].py
+- Create src/core/backend/models/[entity].py
 - Apply Phase 2 patterns
 - Add indexes
 
@@ -128,7 +128,7 @@ Spec: specs/phase2/features/[name].md (Section 11)
 📤 Output: Database Schema
 
 Created:
-- backend/models/task.py (SQLModel)
+- src/core/backend/models/task.py (SQLModel)
 - backend/migrations/xxx_add_tasks_table.py (Alembic)
 
 Indexes:
@@ -148,7 +148,7 @@ Ready for: API Developer Agent
 🗄️ Schema Architect - Database Schema Ready
 
 **Entity:** Task
-**Model:** backend/models/task.py
+**Model:** src/core/backend/models/task.py
 
 **Schema:**
 \`\`\`python
@@ -256,7 +256,7 @@ def downgrade():
 ```
 📋 Database Schema Ready
 
-**Model:** backend/models/task.py
+**Model:** src/core/backend/models/task.py
 **Table:** tasks
 
 **Key Fields:**
@@ -272,7 +272,7 @@ def downgrade():
 - Fast queries by user_id
 - Fast soft delete filtering
 
-Ready to implement routes in backend/routers/tasks.py
+Ready to implement routes in src/core/backend/routers/tasks.py
 ```
 
 **Version:** 1.0

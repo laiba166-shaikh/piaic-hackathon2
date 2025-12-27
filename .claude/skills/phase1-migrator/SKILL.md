@@ -50,7 +50,7 @@ Present migration analysis using this structure:
 🔄 Migration Analysis: [component-name]
 
 Phase 1 Source: cli/src/core/[file].py
-Phase 2 Target: backend/[location]/[file].py
+Phase 2 Target: src/core/backend/[location]/[file].py
 
 Reusable:
 ✅ Task model structure (title, description, priority)
@@ -192,7 +192,7 @@ def add_task(title: str, description: str = None):
 **Phase 2 (FastAPI Route):**
 ```python
 from fastapi import APIRouter, Depends
-from backend.dependencies import get_current_user, get_db
+from src.core.backend.dependencies import get_current_user, get_db
 
 router = APIRouter()
 

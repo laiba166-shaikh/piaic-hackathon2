@@ -104,7 +104,7 @@ We will create **7 focused agents** organized into three phases (Planning, Imple
 - Adding new entities
 
 **Output:**
-- SQLModel models in `backend/models/`
+- SQLModel models in `src/core/backend/models/`
 - Alembic migrations
 - Database indexes and constraints
 
@@ -129,9 +129,9 @@ We will create **7 focused agents** organized into three phases (Planning, Imple
 - After database models are ready
 
 **Output:**
-- Route handlers in `backend/routers/`
-- Pydantic schemas in `backend/schemas/`
-- Service layer in `backend/services/`
+- Route handlers in `src/core/backend/routers/`
+- Pydantic schemas in `src/core/backend/schemas/`
+- Service layer in `src/core/backend/services/`
 
 ---
 
@@ -155,9 +155,9 @@ We will create **7 focused agents** organized into three phases (Planning, Imple
 - After backend API is ready (or mocked)
 
 **Output:**
-- Pages in `frontend/app/`
-- Components in `frontend/components/`
-- API client methods in `frontend/lib/api.ts`
+- Pages in `src/core/frontend/app/`
+- Components in `src/core/frontend/components/`
+- API client methods in `src/core/frontend/lib/api.ts`
 
 ---
 
@@ -180,8 +180,8 @@ We will create **7 focused agents** organized into three phases (Planning, Imple
 - Before PR creation
 
 **Output:**
-- Backend tests in `backend/tests/`
-- Frontend tests in `frontend/tests/`
+- Backend tests in `src/core/backend/tests/`
+- Frontend tests in `src/core/frontend/tests/`
 - Integration tests
 
 ---
@@ -235,23 +235,23 @@ We will create **7 focused agents** organized into three phases (Planning, Imple
 
    2.2 Database Layer
        └─ Schema Architect Agent
-          → Creates backend/models/
+          → Creates src/core/backend/models/
           → Generates migrations
 
    2.3 Backend Layer (After 2.2)
        └─ API Developer Agent
-          → Implements backend/routers/
-          → Creates backend/schemas/
+          → Implements src/core/backend/routers/
+          → Creates src/core/backend/schemas/
 
    2.4 Frontend Layer (After 2.3 or parallel with mocks)
        └─ UI Developer Agent
-          → Creates frontend/app/
-          → Builds frontend/components/
+          → Creates src/core/frontend/app/
+          → Builds src/core/frontend/components/
 
    2.5 Test Layer (After 2.3 and 2.4, or TDD throughout)
        └─ Test Engineer Agent
-          → Generates backend/tests/
-          → Generates frontend/tests/
+          → Generates src/core/backend/tests/
+          → Generates src/core/frontend/tests/
 
 3. Validation Phase (Always Last)
    └─ Quality Guardian Agent

@@ -24,7 +24,7 @@ Use Better Auth's official Next.js 16 App Router integration with API routes for
 
 ### Implementation Pattern
 ```typescript
-// frontend/lib/auth.ts
+// src/core/frontend/lib/auth.ts
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
@@ -52,7 +52,7 @@ export const { signIn, signUp, signOut, getSession } = auth;
 ```
 
 ```typescript
-// frontend/app/api/auth/[...all]/route.ts
+// src/core/frontend/app/api/auth/[...all]/route.ts
 import { auth } from "@/lib/auth";
 import { toNextJsHandler } from "better-auth/nextjs";
 
@@ -103,7 +103,7 @@ BACKEND_DATABASE_URL=postgresql://user:password@localhost:5432/backend_tasks
 
 **Frontend (Next.js):**
 ```typescript
-// frontend/lib/auth.ts
+// src/core/frontend/lib/auth.ts
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET environment variable is required");
@@ -112,7 +112,7 @@ if (!JWT_SECRET) {
 
 **Backend (FastAPI):**
 ```python
-# backend/config.py
+# src/core/backend/config.py
 import os
 from pydantic_settings import BaseSettings
 
@@ -165,7 +165,7 @@ Use HTTP-only cookies with SameSite=Strict and Secure flag for JWT token storage
 Better Auth handles cookie configuration internally, but we can customize:
 
 ```typescript
-// frontend/lib/auth.ts
+// src/core/frontend/lib/auth.ts
 export const auth = betterAuth({
   // ... other config
   session: {
@@ -183,7 +183,7 @@ export const auth = betterAuth({
 
 **Backend (reads cookie or Authorization header):**
 ```python
-# backend/dependencies.py
+# src/core/backend/dependencies.py
 from fastapi import Cookie, Header, HTTPException
 from typing import Optional
 
@@ -292,7 +292,7 @@ CREATE INDEX "idx_verification_identifier" ON "verification"("identifier");
 ### Migration Pattern
 
 ```typescript
-// frontend/lib/db.ts
+// src/core/frontend/lib/db.ts
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
@@ -333,7 +333,7 @@ Use Next.js 16 middleware with Better Auth session check to protect routes.
 ### Implementation Pattern
 
 ```typescript
-// frontend/middleware.ts
+// src/core/frontend/middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
@@ -421,7 +421,7 @@ Use PyJWT library with HS256 algorithm for JWT validation in FastAPI dependency.
 ### Implementation Pattern
 
 ```python
-# backend/dependencies.py
+# src/core/backend/dependencies.py
 from fastapi import Depends, HTTPException, Security, Cookie, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
@@ -497,7 +497,7 @@ async def get_current_user(
 
 **Usage in Route:**
 ```python
-# backend/api/v1/tasks.py
+# src/core/backend/api/v1/tasks.py
 from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 from ...dependencies import get_current_user, get_db
@@ -563,7 +563,7 @@ Returns specific error messages:
 
 **Frontend API Client:**
 ```typescript
-// frontend/lib/api.ts
+// src/core/frontend/lib/api.ts
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 class AuthError extends Error {
@@ -672,7 +672,7 @@ Configure FastAPI CORS middleware to allow frontend origin with credentials.
 ### Implementation Pattern
 
 ```python
-# backend/main.py
+# src/core/backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
@@ -698,7 +698,7 @@ app.add_middleware(
 
 **Frontend Fetch Configuration:**
 ```typescript
-// frontend/lib/api.ts
+// src/core/frontend/lib/api.ts
 fetch(`${API_BASE}${endpoint}`, {
   credentials: "include", // Send cookies cross-origin
   // ... other options
@@ -718,7 +718,7 @@ fetch(`${API_BASE}${endpoint}`, {
 
 **Environment Variables:**
 ```bash
-# backend/.env
+# src/core/backend/.env
 FRONTEND_URL=http://localhost:3000  # Dev
 # FRONTEND_URL=https://your-app.com  # Prod
 ```
@@ -743,7 +743,7 @@ Mock JWT tokens in tests, test validation logic independently from Better Auth.
 
 **Backend Tests:**
 ```python
-# backend/tests/fixtures/jwt_tokens.py
+# src/core/backend/tests/fixtures/jwt_tokens.py
 import jwt
 from datetime import datetime, timedelta
 from ..config import settings
@@ -767,7 +767,7 @@ def create_invalid_jwt() -> str:
 ```
 
 ```python
-# backend/tests/test_dependencies.py
+# src/core/backend/tests/test_dependencies.py
 import pytest
 from fastapi import HTTPException
 from ..dependencies import get_current_user
@@ -820,7 +820,7 @@ async def test_get_current_user_missing_token():
 
 **Frontend Tests:**
 ```typescript
-// frontend/tests/unit/useAuth.test.ts
+// src/core/frontend/tests/unit/useAuth.test.ts
 import { renderHook, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import { useAuth } from "@/hooks/useAuth";
@@ -863,7 +863,7 @@ describe("useAuth", () => {
 
 **E2E Tests:**
 ```typescript
-// frontend/tests/e2e/login.spec.ts
+// src/core/frontend/tests/e2e/login.spec.ts
 import { test, expect } from "@playwright/test";
 
 test.describe("Authentication Flow", () => {
@@ -927,7 +927,7 @@ Follow WCAG 2.1 Level AA guidelines for authentication forms (labels, ARIA, keyb
 ### Implementation Pattern
 
 ```typescript
-// frontend/components/auth/LoginForm.tsx
+// src/core/frontend/components/auth/LoginForm.tsx
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { signIn } from "@/lib/auth";

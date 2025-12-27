@@ -57,7 +57,7 @@ hackathon2/
 │       ├── memory.py               # In-memory storage
 │       └── database.py             # PostgreSQL storage (Phase 2+)
 │
-├── backend/                        # Phase 2: FastAPI backend
+├── src/core/backend/                        # Phase 2: FastAPI backend
 │   ├── main.py                     # FastAPI entry point
 │   ├── models/                     # SQLModel database models
 │   │   └── task.py
@@ -72,7 +72,7 @@ hackathon2/
 │       ├── unit/
 │       └── integration/
 │
-├── frontend/                       # Phase 2: Next.js frontend
+├── src/core/frontend/                       # Phase 2: Next.js frontend
 │   ├── app/                        # Next.js App Router
 │   │   ├── layout.tsx
 │   │   ├── page.tsx                # Dashboard
@@ -167,14 +167,14 @@ def main():
 
 **Entry Points:**
 - CLI: `python -m cli.main` (still works with memory storage)
-- Web Backend: `cd backend && uvicorn main:app --reload`
-- Web Frontend: `cd frontend && npm run dev`
+- Web Backend: `cd src/core/backend && uvicorn main:app --reload`
+- Web Frontend: `cd src/core/frontend && npm run dev`
 
 ```python
-# backend/main.py
+# src/core/backend/main.py
 from fastapi import FastAPI
-from backend.routers import tasks
-from backend.database import engine
+from src.core.backend.routers import tasks
+from src.core.backend.database import engine
 
 app = FastAPI()
 app.include_router(tasks.router)
@@ -200,14 +200,14 @@ app.include_router(tasks.router)
 
 **Entry Points:**
 - CLI: `python -m cli.main` ✅
-- Web Backend: `cd backend && uvicorn main:app --reload` ✅
-- Web Frontend: `cd frontend && npm run dev` ✅
+- Web Backend: `cd src/core/backend && uvicorn main:app --reload` ✅
+- Web Frontend: `cd src/core/frontend && npm run dev` ✅
 - Chatbot: `python -m chatbot.mcp_server.main`
 
 ```python
 # chatbot/mcp_server/tools.py
-from backend.database import get_db
-from backend.routers.tasks import get_tasks, create_task
+from src.core.backend.database import get_db
+from src.core.backend.routers.tasks import get_tasks, create_task
 
 def create_mcp_tools():
     # MCP tool wrappers around backend API logic...
@@ -321,7 +321,7 @@ class MemoryStorage(ITaskStorage):
 
 **Phase 2: Backend Database (SQLModel)**
 ```python
-# backend/models/task.py
+# src/core/backend/models/task.py
 from sqlmodel import SQLModel, Field
 
 class Task(SQLModel, table=True):
@@ -365,11 +365,11 @@ python -m cli.main complete 1
 ### Phase 2 (Full-Stack Web App)
 ```bash
 # Terminal 1: Backend
-cd backend
+cd src/core/backend
 uvicorn main:app --reload --port 8000
 
 # Terminal 2: Frontend
-cd frontend
+cd src/core/frontend
 npm run dev
 
 # Terminal 3: CLI (still works independently)
@@ -382,10 +382,10 @@ python -m cli.main list
 python -m cli.main
 
 # Terminal 2: Web Backend
-cd backend && uvicorn main:app --reload
+cd src/core/backend && uvicorn main:app --reload
 
 # Terminal 3: Web Frontend
-cd frontend && npm run dev
+cd src/core/frontend && npm run dev
 
 # Terminal 4: Chatbot MCP Server
 python -m chatbot.mcp_server.main
@@ -427,7 +427,7 @@ python -m chatbot.mcp_server.main
 
 **Backend Tests:**
 ```python
-# backend/tests/unit/test_tasks.py
+# src/core/backend/tests/unit/test_tasks.py
 def test_create_task_returns_201(client, auth_headers):
     response = client.post(
         "/api/v1/tasks",
@@ -440,7 +440,7 @@ def test_create_task_returns_201(client, auth_headers):
 
 **Frontend Tests:**
 ```typescript
-// frontend/tests/unit/TaskList.test.tsx
+// src/core/frontend/tests/unit/TaskList.test.tsx
 import { render, screen } from '@testing-library/react';
 import { TaskList } from '@/components/tasks/TaskList';
 

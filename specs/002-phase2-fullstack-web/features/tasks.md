@@ -64,17 +64,17 @@ For each feature:
 ### Monorepo Structure
 
 - [✅] **[T001]** [P] Create monorepo directory structure
-  - **Path:** `D:\piaic-hackathon\hackathon2\`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\`
   - **Directories:**
-    - `backend/` - FastAPI application
-    - `frontend/` - Next.js application
-    - `shared/` - Shared TypeScript types
+    - `src/core/backend/` - FastAPI application
+    - `src/core/frontend/` - Next.js application
+    - `src/core/shared/` - Shared TypeScript types
   - **Acceptance:** All three directories exist with README.md files
 
 - [✅] **[T001A]** [P] Create CLAUDE.md files for frontend and backend
   - **Paths:**
-    - `D:\piaic-hackathon\hackathon2\frontend\CLAUDE.md`
-    - `D:\piaic-hackathon\hackathon2\backend\CLAUDE.md`
+    - `D:\piaic-hackathon\hackathon2\src\core\frontend\CLAUDE.md`
+    - `D:\piaic-hackathon\hackathon2\src\core\backend\CLAUDE.md`
   - **Purpose:** Provide Claude Code with context-specific guidelines for each part of the monorepo
   - **Content:**
     - Frontend CLAUDE.md: Next.js patterns, API client usage, Tailwind CSS conventions
@@ -82,22 +82,22 @@ For each feature:
   - **Acceptance:** Both CLAUDE.md files exist with comprehensive guidelines
 
 - [✅] **[T002]** [P] Setup backend project (Python/FastAPI)
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\`
   - **Actions:**
     - Create `pyproject.toml` with dependencies (FastAPI, SQLModel, Alembic, PyJWT)
     - Create `requirements.txt` for pip fallback
     - Create `.python-version` file (3.11+)
-    - Create `backend/__init__.py`
+    - Create `src/core/backend/__init__.py`
     - Add `[tool.uv]` section in pyproject.toml
   - **Acceptance:** `uv pip install -e .` or `pip install -r requirements.txt` succeeds
 
 - [✅] **[T003]** [P] Setup frontend project (Next.js 16+)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\`
   - **Actions:**
     - Run `npx create-next-app@latest frontend --typescript --tailwind --app --no-src-dir`
     - Install dependencies: `npm install better-auth @better-fetch/fetch jose`
     - Install dev dependencies: `npm install -D vitest @testing-library/react @testing-library/jest-dom`
-    - Create `frontend/.env.local` with `NEXT_PUBLIC_API_URL=http://localhost:8000`
+    - Create `src/core/frontend/.env.local` with `NEXT_PUBLIC_API_URL=http://localhost:8000`
   - **Acceptance:** `npm run dev` starts Next.js dev server
 
 - [✅] **[T004]** Setup environment variables
@@ -120,9 +120,9 @@ For each feature:
   - **Acceptance:** `.env.example` exists for documentation, `.env` exists for local dev (gitignored)
 
 - [✅] **[T005]** [P] Setup linters and formatters
-  - **Backend:** Configure Ruff (`backend/pyproject.toml`)
-  - **Frontend:** Configure ESLint and Prettier (`frontend/.eslintrc.json`, `frontend/.prettierrc`)
-  - **Acceptance:** `ruff check backend/` and `npm run lint` run without errors
+  - **Backend:** Configure Ruff (`src/core/backend/pyproject.toml`)
+  - **Frontend:** Configure ESLint and Prettier (`src/core/frontend/.eslintrc.json`, `src/core/frontend/.prettierrc`)
+  - **Acceptance:** `ruff check src/core/backend/` and `npm run lint` run without errors
 
 - [✅] **[T006]** Setup Git pre-commit hooks
   - **Path:** `D:\piaic-hackathon\hackathon2\.git\hooks\pre-commit`
@@ -140,16 +140,16 @@ For each feature:
 
 ### Database Setup
 
-- [ ] **[T007]** Create Neon PostgreSQL database
+- [✅] **[T007]** Create Neon PostgreSQL database
   - **Actions:**
     - Sign up for Neon.tech free tier
-    - Create project: `todo-app-phase2`
+    - Create project: `todo-app-eval`
     - Create database: `todo_db`
-    - Copy connection string to `backend/.env`
+    - Copy connection string to `src/core/backend/.env`
   - **Acceptance:** Connection string saved in `.env`
 
 - [ ] **[T008]** Setup Alembic migrations
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\migrations\`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\migrations\`
   - **Actions:**
     - Run `alembic init migrations`
     - Configure `alembic.ini` to use `DATABASE_URL` from `.env`
@@ -160,17 +160,17 @@ For each feature:
 
 - [ ] **[T009]** Create FastAPI application structure
   - **Paths:**
-    - `D:\piaic-hackathon\hackathon2\backend\main.py`
-    - `D:\piaic-hackathon\hackathon2\backend\config.py`
-    - `D:\piaic-hackathon\hackathon2\backend\db.py`
+    - `D:\piaic-hackathon\hackathon2\src\core\backend\main.py`
+    - `D:\piaic-hackathon\hackathon2\src\core\backend\config.py`
+    - `D:\piaic-hackathon\hackathon2\src\core\backend\db.py`
   - **Actions:**
     - Create `main.py` with FastAPI app initialization
     - Create `config.py` with Pydantic Settings (JWT_SECRET, DATABASE_URL)
     - Create `db.py` with SQLModel engine and session dependency
-  - **Acceptance:** `uvicorn backend.main:app --reload` starts server at http://localhost:8000
+  - **Acceptance:** `uvicorn src.core.backend.main:app --reload` starts server at http://localhost:8000
 
 - [ ] **[T010]** [P] Configure CORS middleware
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\main.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\main.py`
   - **Config:**
     ```python
     allow_origins=["http://localhost:3000"]
@@ -181,7 +181,7 @@ For each feature:
   - **Acceptance:** Frontend can make API requests without CORS errors
 
 - [ ] **[T011]** [P] Create health check endpoint
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\main.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\main.py`
   - **Endpoint:** `GET /health`
   - **Response:** `{"status": "ok"}`
   - **Acceptance:** `curl http://localhost:8000/health` returns 200 OK
@@ -189,7 +189,7 @@ For each feature:
 ### Frontend Foundation
 
 - [ ] **[T012]** Configure Tailwind CSS with journal theme
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\tailwind.config.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\tailwind.config.ts`
   - **Colors (Light & Dark Mode):**
     - Light Mode:
       - `paper.cream`: #F5F1E8
@@ -209,20 +209,20 @@ For each feature:
   - **Acceptance:** Colors and fonts available via Tailwind classes, dark mode toggle implemented
 
 - [ ] **[T013]** Setup Google Fonts
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\app\layout.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\layout.tsx`
   - **Fonts:** Import Inter, Patrick_Hand, Courier_Prime from `next/font/google`
   - **Acceptance:** Fonts load and apply to text
 
 - [ ] **[T014]** Create root layout with sidebar
   - **Paths:**
-    - `D:\piaic-hackathon\hackathon2\frontend\app\layout.tsx`
-    - `D:\piaic-hackathon\hackathon2\frontend\components\layout\Sidebar.tsx`
-    - `D:\piaic-hackathon\hackathon2\frontend\components\layout\Header.tsx`
+    - `D:\piaic-hackathon\hackathon2\src\core\frontend\app\layout.tsx`
+    - `D:\piaic-hackathon\hackathon2\src\core\frontend\components\layout\Sidebar.tsx`
+    - `D:\piaic-hackathon\hackathon2\src\core\frontend\components\layout\Header.tsx`
   - **Structure:** Sidebar (left, 240px), Header (top right), Main content
   - **Acceptance:** Layout renders with journal aesthetic
 
 - [ ] **[T015]** Create centralized API client
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\lib\api.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\lib\api.ts`
   - **Functions:** `fetchWithAuth()`, `api.getTasks()`, etc.
   - **Features:** Auto-include JWT cookie, error handling, response parsing
   - **Acceptance:** API client exports typed functions for all endpoints
@@ -230,7 +230,7 @@ For each feature:
 ### Shared Types
 
 - [ ] **[T016]** [P] Create shared TypeScript types
-  - **Path:** `D:\piaic-hackathon\hackathon2\shared\types\task.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\shared\types\task.ts`
   - **Types:** `Task`, `TaskCreate`, `TaskUpdate`, `TaskResponse`
   - **Acceptance:** Types exported and usable in frontend code
 
@@ -248,7 +248,7 @@ For each feature:
 #### RED - Write Failing Tests
 
 - [ ] **[T017]** [F1] Write JWT validation tests (RED)
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\tests\test_auth.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\tests\test_auth.py`
   - **Test Cases:**
     - `test_get_current_user_with_valid_token()` - Should extract user_id from JWT
     - `test_get_current_user_with_expired_token()` - Should return 401
@@ -256,12 +256,12 @@ For each feature:
     - `test_get_current_user_with_missing_token()` - Should return 401
     - `test_get_current_user_with_missing_sub_claim()` - Should return 401
   - **Status:** Tests should FAIL (dependency not implemented yet)
-  - **Acceptance:** `pytest backend/tests/test_auth.py` shows 5 failing tests
+  - **Acceptance:** `pytest src/core/backend/tests/test_auth.py` shows 5 failing tests
 
 #### GREEN - Implement JWT Validation
 
 - [ ] **[T018]** [F1] Implement get_current_user dependency (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\dependencies.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\dependencies.py`
   - **Function:** `async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(HTTPBearer())) -> str`
   - **Logic:**
     - Decode JWT with PyJWT
@@ -271,7 +271,7 @@ For each feature:
   - **Acceptance:** All tests in T017 pass
 
 - [ ] **[T019]** [F1] Configure JWT_SECRET in config
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\config.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\config.py`
   - **Field:** `JWT_SECRET: str` (from environment variable)
   - **Validation:** Raise error if JWT_SECRET not set
   - **Acceptance:** Config loads JWT_SECRET from `.env`
@@ -279,7 +279,7 @@ For each feature:
 #### REFACTOR
 
 - [ ] **[T020]** [F1] Add logging to JWT validation
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\dependencies.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\dependencies.py`
   - **Actions:** Log failed validation attempts (without exposing tokens)
   - **Acceptance:** Logs show authentication events
 
@@ -290,11 +290,11 @@ For each feature:
 - [ ] **[T021]** [F1] Setup Better Auth database (Neon)
   - **Actions:**
     - Create separate Neon database for Better Auth user data
-    - Copy connection string to `frontend/.env.local` as `DATABASE_URL`
+    - Copy connection string to `src/core/frontend/.env.local` as `DATABASE_URL`
   - **Acceptance:** Better Auth can connect to database
 
 - [ ] **[T022]** [F1] Configure Better Auth
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\lib\auth.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\lib\auth.ts`
   - **Config:**
     - Database URL
     - JWT secret (shared with backend)
@@ -309,7 +309,7 @@ For each feature:
 #### RED - Write Failing Frontend Tests
 
 - [ ] **[T024]** [F1] Write login form tests (RED)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\__tests__\components\auth\LoginForm.test.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\components\auth\LoginForm.test.tsx`
   - **Test Cases:**
     - `test_login_form_renders_correctly()`
     - `test_login_form_validation_requires_email()`
@@ -322,31 +322,31 @@ For each feature:
 #### GREEN - Implement Auth UI
 
 - [ ] **[T025]** [F1] Create login page (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\app\login\page.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\login\page.tsx`
   - **Component:** Server Component rendering LoginForm
   - **Acceptance:** Page accessible at /login
 
 - [ ] **[T026]** [F1] Create LoginForm component (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\auth\LoginForm.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\LoginForm.tsx`
   - **Fields:** Email (type="email"), Password (type="password", show/hide toggle)
   - **Validation:** Client-side validation before submission
   - **Actions:** Call Better Auth `signIn()`, redirect to / on success
   - **Acceptance:** All tests in T024 pass
 
 - [ ] **[T027]** [F1] Create register page
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\app\register\page.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\register\page.tsx`
   - **Component:** Server Component rendering RegisterForm
   - **Acceptance:** Page accessible at /register
 
 - [ ] **[T028]** [F1] Create RegisterForm component
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\auth\RegisterForm.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\RegisterForm.tsx`
   - **Fields:** Email, Password (min 8 chars), Confirm Password
   - **Validation:** Password strength indicator, match validation
   - **Actions:** Call Better Auth `signUp()`, redirect to / on success
   - **Acceptance:** User can register and auto-login
 
 - [ ] **[T029]** [F1] Create LogoutButton component
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\auth\LogoutButton.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\LogoutButton.tsx`
   - **Actions:** Call Better Auth `signOut()`, redirect to /login
   - **Placement:** In Header component
   - **Acceptance:** User can logout successfully
@@ -354,7 +354,7 @@ For each feature:
 #### Middleware & Protection
 
 - [ ] **[T030]** [F1] Create authentication middleware
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\middleware.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\middleware.ts`
   - **Logic:**
     - Check for auth-token cookie
     - Redirect to /login if not authenticated (for protected routes)
@@ -365,15 +365,15 @@ For each feature:
 
 - [ ] **[T031]** [F1] Create reusable auth UI components
   - **Paths:**
-    - `frontend\components\ui\ErrorMessage.tsx`
-    - `frontend\components\ui\LoadingSpinner.tsx`
-    - `frontend\components\auth\PasswordToggle.tsx`
+    - `src/core/frontend\components\ui\ErrorMessage.tsx`
+    - `src/core/frontend\components\ui\LoadingSpinner.tsx`
+    - `src/core/frontend\components\auth\PasswordToggle.tsx`
   - **Acceptance:** Components reusable across auth forms
 
 ### Integration Tests
 
 - [ ] **[T032]** [F1] Write end-to-end auth flow tests
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\__tests__\e2e\auth.spec.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\e2e\auth.spec.ts`
   - **Test Cases:**
     - Complete registration flow
     - Complete login flow
@@ -394,7 +394,7 @@ For each feature:
 ### Database: Tasks Table
 
 - [ ] **[T033]** [F2] Create tasks table migration
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\migrations\versions\001_create_tasks.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\migrations\versions\001_create_tasks.py`
   - **Schema:**
     - id (SERIAL, PRIMARY KEY)
     - user_id (VARCHAR(255), NOT NULL, INDEXED)
@@ -409,7 +409,7 @@ For each feature:
   - **Acceptance:** `alembic upgrade head` creates table
 
 - [ ] **[T034]** [F2] Create Task SQLModel
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\models\task.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\models\task.py`
   - **Model:** `class Task(SQLModel, table=True)`
   - **Fields:** All fields from migration
   - **Validation:** Title length, required fields
@@ -420,7 +420,7 @@ For each feature:
 #### RED - Write Failing Tests
 
 - [ ] **[T035]** [F2] Write task CRUD tests (RED)
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\tests\test_tasks.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\tests\test_tasks.py`
   - **Test Categories:**
     - **Create:** Valid creation, missing title, title too long, user isolation
     - **Read List:** Get user tasks, empty list, exclude deleted, exclude other users' tasks
@@ -429,12 +429,12 @@ For each feature:
     - **Delete:** Soft delete, 404 after delete, 404 for other user's task
     - **User Isolation:** User A cannot access User B's tasks
   - **Status:** Tests should FAIL (routes not implemented yet)
-  - **Acceptance:** `pytest backend/tests/test_tasks.py` shows ~20 failing tests
+  - **Acceptance:** `pytest src/core/backend/tests/test_tasks.py` shows ~20 failing tests
 
 #### GREEN - Implement Task CRUD
 
 - [ ] **[T036]** [F2] Implement POST /api/v1/tasks (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\api\v1\tasks.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\api\v1\tasks.py`
   - **Route:** `@router.post("/api/v1/tasks")`
   - **Logic:**
     - Extract user_id from JWT (Depends(get_current_user))
@@ -476,7 +476,7 @@ For each feature:
 #### REFACTOR
 
 - [ ] **[T041]** [F2] Refactor common query patterns
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\api\v1\tasks.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\api\v1\tasks.py`
   - **Actions:** Extract `get_user_task()` helper function
   - **Acceptance:** Code DRY, tests still pass
 
@@ -485,7 +485,7 @@ For each feature:
 #### RED - Write Failing Frontend Tests
 
 - [ ] **[T042]** [F2] Write task UI tests (RED)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\__tests__\components\tasks\TaskList.test.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\components\tasks\TaskList.test.tsx`
   - **Test Cases:**
     - Task list renders tasks
     - Empty state shows correct message
@@ -499,36 +499,36 @@ For each feature:
 #### GREEN - Implement Task UI
 
 - [ ] **[T043]** [F2] Create tasks page (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\app\tasks\page.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\tasks\page.tsx`
   - **Component:** Server Component fetching tasks
   - **Layout:** "Want todos" heading, Create Task button, TaskList
   - **Acceptance:** Page accessible at /tasks
 
 - [ ] **[T044]** [F2] Create TaskList component (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\tasks\TaskList.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskList.tsx`
   - **Features:** Display task cards, handle loading/empty/error states
   - **Acceptance:** All tests in T042 pass
 
 - [ ] **[T045]** [F2] Create TaskCard component
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\tasks\TaskCard.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskCard.tsx`
   - **Layout:** Title, description, metadata, Edit/Delete buttons
   - **Styling:** Paper-like card with journal aesthetic
   - **Acceptance:** Task card displays all fields correctly
 
 - [ ] **[T046]** [F2] Create Modal component
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\ui\Modal.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\ui\Modal.tsx`
   - **Features:** Backdrop, close button, keyboard navigation (Escape to close)
   - **Acceptance:** Modal opens and closes correctly
 
 - [ ] **[T047]** [F2] Create TaskForm component
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\tasks\TaskForm.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskForm.tsx`
   - **Fields:** Title (required, max 200 chars), Description (optional)
   - **Validation:** Client-side validation before submission
   - **Actions:** Call api.createTask(), close modal on success
   - **Acceptance:** Form validation works, task creates successfully
 
 - [ ] **[T048]** [F2] Create task detail page
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\app\tasks\[id]\page.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\tasks\[id]\page.tsx`
   - **Component:** Server Component fetching single task
   - **Features:** Display full task details, Edit/Delete buttons
   - **Acceptance:** Task detail page accessible at /tasks/[id]
@@ -547,15 +547,15 @@ For each feature:
 
 - [ ] **[T051]** [F2] Extract reusable UI components
   - **Paths:**
-    - `frontend\components\ui\Button.tsx`
-    - `frontend\components\ui\Input.tsx`
-    - `frontend\components\ui\Card.tsx`
+    - `src/core/frontend\components\ui\Button.tsx`
+    - `src/core/frontend\components\ui\Input.tsx`
+    - `src/core/frontend\components\ui\Card.tsx`
   - **Acceptance:** Components follow design system, reusable
 
 ### Integration Tests
 
 - [ ] **[T052]** [F2] Write end-to-end task CRUD tests
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\__tests__\e2e\tasks.spec.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\e2e\tasks.spec.ts`
   - **Test Cases:**
     - Create task flow
     - View task details
@@ -579,7 +579,7 @@ For each feature:
 #### RED - Write Failing Tests
 
 - [ ] **[T053]** [F3] Write completion toggle tests (RED)
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\tests\test_completion.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\tests\test_completion.py`
   - **Test Cases:**
     - Toggle false → true
     - Toggle true → false
@@ -588,12 +588,12 @@ For each feature:
     - 404 for other user's task
     - 404 for deleted task
   - **Status:** Tests should FAIL (endpoint not implemented yet)
-  - **Acceptance:** `pytest backend/tests/test_completion.py` shows failing tests
+  - **Acceptance:** `pytest src/core/backend/tests/test_completion.py` shows failing tests
 
 #### GREEN - Implement Completion Toggle
 
 - [ ] **[T054]** [F3] Implement PATCH /api/v1/tasks/{id}/toggle (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\api\v1\tasks.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\api\v1\tasks.py`
   - **Route:** `@router.patch("/api/v1/tasks/{id}/toggle")`
   - **Logic:**
     - Get task by id and user_id
@@ -603,14 +603,14 @@ For each feature:
   - **Acceptance:** All tests in T053 pass
 
 - [ ] **[T055]** [F3] Add completion index to database
-  - **Migration:** `D:\piaic-hackathon\hackathon2\backend\migrations\versions\002_add_completion_index.py`
+  - **Migration:** `D:\piaic-hackathon\hackathon2\src\core\backend\migrations\versions\002_add_completion_index.py`
   - **Index:** `CREATE INDEX idx_tasks_completed ON tasks(completed);`
   - **Acceptance:** `alembic upgrade head` adds index
 
 #### REFACTOR
 
 - [ ] **[T056]** [F3] Add logging for completion events
-  - **Path:** `D:\piaic-hackathon\hackathon2\backend\api\v1\tasks.py`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\api\v1\tasks.py`
   - **Actions:** Log task completions for analytics
   - **Acceptance:** Logs show completion events
 
@@ -619,7 +619,7 @@ For each feature:
 #### RED - Write Failing Frontend Tests
 
 - [ ] **[T057]** [F3] Write completion UI tests (RED)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\__tests__\components\tasks\TaskCheckbox.test.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\components\tasks\TaskCheckbox.test.tsx`
   - **Test Cases:**
     - Checkbox renders checked/unchecked based on completed status
     - Clicking checkbox toggles state
@@ -632,7 +632,7 @@ For each feature:
 #### GREEN - Implement Completion UI
 
 - [ ] **[T058]** [F3] Create TaskCheckbox component (GREEN)
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\tasks\TaskCheckbox.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskCheckbox.tsx`
   - **Features:**
     - Checkbox bound to task.completed
     - Click handler calls api.toggleTask()
@@ -641,18 +641,18 @@ For each feature:
   - **Acceptance:** All tests in T057 pass
 
 - [ ] **[T059]** [F3] Add strike-through styling for completed tasks
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\tasks\TaskCard.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskCard.tsx`
   - **Styling:** Apply `line-through` and opacity to completed task title/description
   - **Acceptance:** Completed tasks visually distinct
 
 - [ ] **[T060]** [F3] Create TaskFilter component
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\tasks\TaskFilter.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskFilter.tsx`
   - **Options:** All, Active (completed=false), Completed (completed=true)
   - **Logic:** Filter tasks client-side based on selection
   - **Acceptance:** User can filter tasks by completion status
 
 - [ ] **[T061]** [F3] Add completion count display
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\app\tasks\page.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\tasks\page.tsx`
   - **Display:** "X of Y completed" or "X active tasks"
   - **Update:** Dynamically update on task completion
   - **Acceptance:** Count displays correctly
@@ -660,14 +660,14 @@ For each feature:
 #### REFACTOR
 
 - [ ] **[T062]** [F3] Add loading state to checkbox during toggle
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\components\tasks\TaskCheckbox.tsx`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskCheckbox.tsx`
   - **Actions:** Disable checkbox, show subtle spinner during API request
   - **Acceptance:** Loading state provides feedback
 
 ### Integration Tests
 
 - [ ] **[T063]** [F3] Write end-to-end completion tests
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\__tests__\e2e\completion.spec.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\e2e\completion.spec.ts`
   - **Test Cases:**
     - Toggle task completion
     - Filter by completion status
@@ -688,7 +688,7 @@ For each feature:
 ### Full Integration Testing
 
 - [ ] **[T064]** Write full integration test suite
-  - **Path:** `D:\piaic-hackathon\hackathon2\frontend\__tests__\e2e\integration.spec.ts`
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\e2e\integration.spec.ts`
   - **Test Cases:**
     - Complete user journey: Register → Login → Create Task → Complete Task → Logout
     - User isolation: Two users with separate task lists
@@ -840,7 +840,7 @@ For each feature:
 
 - [ ] **[T083]** Run full test suite
   - **Commands:**
-    - Backend: `pytest backend/tests/`
+    - Backend: `pytest src/core/backend/tests/`
     - Frontend: `npm test`
     - E2E: `npm run test:e2e`
   - **Acceptance:** All tests pass

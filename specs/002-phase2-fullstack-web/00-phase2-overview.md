@@ -237,41 +237,43 @@ hackathon2/
 │       ├── memory.py              # In-memory storage
 │       └── database.py            # Optional DB storage
 │
-├── backend/                        # Phase 2 Backend
-│   ├── main.py                    # FastAPI app entry point
-│   ├── models/                    # SQLModel database models
-│   │   └── task.py
-│   ├── schemas/                   # Pydantic request/response schemas
-│   │   └── task.py
-│   ├── routers/                   # API route handlers
-│   │   └── tasks.py
-│   ├── dependencies.py            # FastAPI dependencies (auth, db)
-│   ├── auth.py                    # JWT validation
-│   ├── database.py                # Database connection
-│   ├── migrations/                # Alembic migrations
-│   └── tests/
-│       ├── unit/
-│       └── integration/
-│
-├── frontend/                      # Phase 2 Frontend
-│   ├── app/                       # Next.js App Router
-│   │   ├── layout.tsx
-│   │   ├── page.tsx               # Dashboard
-│   │   ├── login/
-│   │   └── tasks/
-│   │       └── page.tsx
-│   ├── components/                # React components
-│   │   └── tasks/
-│   │       ├── TaskList.tsx
-│   │       ├── TaskForm.tsx
-│   │       └── TaskCard.tsx
-│   ├── lib/
-│   │   └── api.ts                 # Centralized API client
-│   ├── tests/
-│   │   └── unit/
-│   ├── package.json
-│   ├── tailwind.config.js
-│   └── CLAUDE.md                  # Frontend-specific guidance
+├── src/
+│   └── core/
+│       ├── backend/                        # Phase 2 Backend
+│       │   ├── main.py                    # FastAPI app entry point
+│       │   ├── models/                    # SQLModel database models
+│       │   │   └── task.py
+│       │   ├── schemas/                   # Pydantic request/response schemas
+│       │   │   └── task.py
+│       │   ├── routers/                   # API route handlers
+│       │   │   └── tasks.py
+│       │   ├── dependencies.py            # FastAPI dependencies (auth, db)
+│       │   ├── auth.py                    # JWT validation
+│       │   ├── database.py                # Database connection
+│       │   ├── migrations/                # Alembic migrations
+│       │   └── tests/
+│       │       ├── unit/
+│       │       └── integration/
+│       │
+│       └── frontend/                      # Phase 2 Frontend
+│           ├── app/                       # Next.js App Router
+│           │   ├── layout.tsx
+│           │   ├── page.tsx               # Dashboard
+│           │   ├── login/
+│           │   └── tasks/
+│           │       └── page.tsx
+│           ├── components/                # React components
+│           │   └── tasks/
+│           │       ├── TaskList.tsx
+│           │       ├── TaskForm.tsx
+│           │       └── TaskCard.tsx
+│           ├── lib/
+│           │   └── api.ts                 # Centralized API client
+│           ├── tests/
+│           │   └── unit/
+│           ├── package.json
+│           ├── tailwind.config.js
+│           └── CLAUDE.md                  # Frontend-specific guidance
 │
 ├── history/
 │   ├── prompts/                   # Prompt History Records (PHRs)
@@ -472,25 +474,25 @@ Phase 2 follows a strict **spec → implementation → validation** workflow:
    ├─> Schema Architect Agent creates SQLModel
    ├─> Applies Phase 2 patterns (user_id, deleted_at, etc.)
    ├─> Generates Alembic migration
-   └─> Output: backend/models/{entity}.py, migrations/
+   └─> Output: src/core/backend/models/{entity}.py, migrations/
 
 4. BACKEND PHASE
    ├─> API Developer Agent implements FastAPI routes
    ├─> Enforces auth boundaries (JWT, user_id filtering)
    ├─> Creates Pydantic schemas
-   └─> Output: backend/routers/{entity}.py, backend/schemas/
+   └─> Output: src/core/backend/routers/{entity}.py, src/core/backend/schemas/
 
 5. FRONTEND PHASE
    ├─> UI Developer Agent builds Next.js components
    ├─> Uses centralized API client
    ├─> Implements UI/UX from spec
-   └─> Output: frontend/app/, frontend/components/
+   └─> Output: src/core/frontend/app/, src/core/frontend/components/
 
 6. TESTING PHASE
    ├─> Test Engineer Agent generates test suites
    ├─> Backend: Pytest (unit + integration)
    ├─> Frontend: Vitest + RTL (unit tests)
-   └─> Output: backend/tests/, frontend/tests/
+   └─> Output: src/core/backend/tests/, src/core/frontend/tests/
 
 7. VALIDATION PHASE
    ├─> Quality Guardian Agent validates implementation
@@ -572,11 +574,11 @@ Phase 2 uses **7 specialized agents** (documented in ADR-005):
    cd hackathon2
 
    # Backend setup
-   cd backend
+   cd src/core/backend
    uv sync  # Install Python dependencies
 
    # Frontend setup
-   cd ../frontend
+   cd ../../frontend
    npm install
    ```
 
@@ -597,7 +599,7 @@ Phase 2 uses **7 specialized agents** (documented in ADR-005):
 3. **Run Database Migrations**
 
    ```bash
-   cd backend
+   cd src/core/backend
    alembic upgrade head
    ```
 
@@ -605,11 +607,11 @@ Phase 2 uses **7 specialized agents** (documented in ADR-005):
 
    ```bash
    # Terminal 1: Backend
-   cd backend
+   cd src/core/backend
    uvicorn main:app --reload --port 8000
 
    # Terminal 2: Frontend
-   cd frontend
+   cd src/core/frontend
    npm run dev
 
    # Terminal 3: CLI (optional, still works!)

@@ -86,7 +86,7 @@ The frontend serves as the **user-facing interface** for the multi-user task man
 ### Next.js App Router Structure
 
 ```
-frontend/app/
+src/core/frontend/app/
 ├── layout.tsx              # Root layout (wraps all pages)
 ├── page.tsx                # Home/Dashboard page (/)
 ├── login/
@@ -785,7 +785,7 @@ export function TaskForm() {
 ### Component Organization
 
 ```
-frontend/components/
+src/core/frontend/components/
 ├── ui/                      # Shared UI components (Client)
 │   ├── Button.tsx
 │   ├── Input.tsx

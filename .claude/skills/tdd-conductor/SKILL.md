@@ -106,7 +106,7 @@ Next Steps:
 
 **Unit Test Pattern:**
 ```python
-# backend/tests/unit/test_tasks.py
+# src/core/backend/tests/unit/test_tasks.py
 import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
@@ -180,7 +180,7 @@ def test_create_task_without_auth_returns_401(client):
 
 **Component Test Pattern:**
 ```typescript
-// frontend/tests/unit/TaskList.test.tsx
+// src/core/frontend/tests/unit/TaskList.test.tsx
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -226,7 +226,7 @@ describe('TaskList', () => {
 
 **API Integration Test Pattern:**
 ```typescript
-// frontend/tests/integration/api.test.ts
+// src/core/frontend/tests/integration/api.test.ts
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { api } from '@/lib/api';
 

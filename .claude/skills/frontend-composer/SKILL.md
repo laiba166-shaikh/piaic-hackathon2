@@ -50,7 +50,7 @@ Present frontend architecture using this structure:
 🎨 Frontend Component: [component-name]
 
 Component Type: Server Component | Client Component
-Location: frontend/app/[path]/page.tsx
+Location: src/core/frontend/app/[path]/page.tsx
 
 Props:
 - tasks: Task[] (from @/types/task)

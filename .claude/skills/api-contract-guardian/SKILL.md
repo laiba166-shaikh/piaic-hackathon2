@@ -14,8 +14,8 @@ Follow these steps when validating API contracts:
 
 1. **Compare API spec with actual implementation**
    - Read spec from `specs/phase2/api/[endpoint].md`
-   - Check backend implementation in `backend/routers/`
-   - Review frontend API client in `frontend/lib/api.ts`
+   - Check backend implementation in `src/core/backend/routers/`
+   - Review frontend API client in `src/core/frontend/lib/api.ts`
    - Validate shared types in `shared/types/`
 
 2. **Verify request/response shapes match**
@@ -50,8 +50,8 @@ Present API contract validation using this structure:
 📋 API Contract Check: [endpoint-name]
 
 Specification: specs/phase2/api/tasks-endpoints.md
-Backend: backend/routers/tasks.py:45
-Frontend: frontend/lib/api.ts:23
+Backend: src/core/backend/routers/tasks.py:45
+Frontend: src/core/frontend/lib/api.ts:23
 Types: shared/types/task.ts, shared/types/task.py
 
 Endpoint: POST /api/v1/tasks
@@ -65,22 +65,22 @@ Endpoint: POST /api/v1/tasks
 
 ❌ Violations Found:
 
-1. Missing field in response (Line 67 in backend/routers/tasks.py)
+1. Missing field in response (Line 67 in src/core/backend/routers/tasks.py)
    Spec requires: created_at (ISO 8601 string)
    Backend returns: No created_at field
    Fix: Add created_at to TaskResponse schema
 
-2. Incorrect status code (Line 45 in backend/routers/tasks.py)
+2. Incorrect status code (Line 45 in src/core/backend/routers/tasks.py)
    Spec requires: 201 Created
    Backend returns: 200 OK
    Fix: Change status_code=status.HTTP_201_CREATED
 
-3. Type mismatch (Line 23 in frontend/lib/api.ts)
+3. Type mismatch (Line 23 in src/core/frontend/lib/api.ts)
    Spec defines: tags as string[]
    Frontend expects: tags as string (incorrect)
    Fix: Update TaskResponse interface tags: string[]
 
-4. Missing error handling (Line 89 in backend/routers/tasks.py)
+4. Missing error handling (Line 89 in src/core/backend/routers/tasks.py)
    Spec requires: 400 Bad Request for invalid input
    Backend: No validation for missing title
    Fix: Add Pydantic validation with Field(...)

@@ -50,7 +50,7 @@ Present authentication boundary checks using this structure:
 🔐 Auth Boundary Check: [endpoint/component]
 
 Endpoint: POST /api/v1/tasks
-Source: backend/routers/tasks.py:45
+Source: src/core/backend/routers/tasks.py:45
 
 Rules Verified:
 ✅ JWT extracted from Authorization header

@@ -133,18 +133,18 @@ Spec: specs/phase2/features/[name].md (Section 12: UI/UX)
 ### Process
 
 **Step 1: API Client (10 min)**
-- Add methods to frontend/lib/api.ts
+- Add methods to src/core/frontend/lib/api.ts
 - Use shared types
 - Include auth headers
 - Error handling
 
 **Step 2: Pages (15 min)**
-- Create frontend/app/tasks/page.tsx
+- Create src/core/frontend/app/tasks/page.tsx
 - Server Component for data fetching
 - Use API client methods
 
 **Step 3: Components (20 min)**
-- Create frontend/components/tasks/
+- Create src/core/frontend/components/tasks/
 - TaskList, TaskForm, TaskCard
 - Client Components for interactivity
 - Tailwind styling
@@ -159,10 +159,10 @@ Spec: specs/phase2/features/[name].md (Section 12: UI/UX)
 📤 Output: Frontend UI Ready
 
 Created:
-- frontend/lib/api.ts (updated)
-- frontend/app/tasks/page.tsx
-- frontend/components/tasks/TaskList.tsx
-- frontend/components/tasks/TaskForm.tsx
+- src/core/frontend/lib/api.ts (updated)
+- src/core/frontend/app/tasks/page.tsx
+- src/core/frontend/components/tasks/TaskList.tsx
+- src/core/frontend/components/tasks/TaskForm.tsx
 
 Ready for: Test Engineer Agent
 ```
@@ -177,11 +177,11 @@ Ready for: Test Engineer Agent
 🎨 UI Developer - Frontend Components Ready
 
 **Feature:** Task Management
-**Pages:** frontend/app/tasks/
+**Pages:** src/core/frontend/app/tasks/
 
 **API Client Methods:**
 \`\`\`typescript
-// frontend/lib/api.ts
+// src/core/frontend/lib/api.ts
 export const api = {
   getTasks: () => fetchWithAuth<Task[]>('/api/v1/tasks'),
   getTask: (id: number) => fetchWithAuth<Task>(\`/api/v1/tasks/\${id}\`),
@@ -196,7 +196,7 @@ export const api = {
 
 **Pages Created:**
 
-1. **frontend/app/tasks/page.tsx** (Task List)
+1. **src/core/frontend/app/tasks/page.tsx** (Task List)
    - Type: Server Component
    - Fetches tasks on server
    - Passes to TaskList component
@@ -253,7 +253,7 @@ export const api = {
 ## Code Template
 
 ```typescript
-// frontend/lib/api.ts
+// src/core/frontend/lib/api.ts
 import type { Task, TaskCreate, TaskUpdate } from '@shared/types/task';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -286,7 +286,7 @@ export const api = {
 ```
 
 ```typescript
-// frontend/app/tasks/page.tsx
+// src/core/frontend/app/tasks/page.tsx
 import { api } from '@/lib/api';
 import { TaskList } from '@/components/tasks/TaskList';
 
@@ -303,7 +303,7 @@ export default async function TasksPage() {
 ```
 
 ```typescript
-// frontend/components/tasks/TaskList.tsx
+// src/core/frontend/components/tasks/TaskList.tsx
 'use client';
 
 import { useState } from 'react';
@@ -360,8 +360,8 @@ export function TaskList({ tasks: initialTasks }: TaskListProps) {
 ```
 📋 Frontend Ready for Testing
 
-**Pages:** frontend/app/tasks/page.tsx
-**Components:** frontend/components/tasks/
+**Pages:** src/core/frontend/app/tasks/page.tsx
+**Components:** src/core/frontend/components/tasks/
 
 **Test Coverage Needed:**
 
@@ -377,7 +377,7 @@ Integration Tests:
 - Task delete flow
 
 **API Client:**
-All methods in frontend/lib/api.ts need tests
+All methods in src/core/frontend/lib/api.ts need tests
 
 **Mocking:**
 Use vi.mock('@/lib/api') for component tests

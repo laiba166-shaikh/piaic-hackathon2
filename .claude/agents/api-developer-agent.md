@@ -107,25 +107,25 @@ async def get_tasks(
 ```
 📥 From: Schema Architect Agent
 
-Model: backend/models/task.py
+Model: src/core/backend/models/task.py
 Spec: specs/phase2/features/[name].md (Section 10: API Contract)
 ```
 
 ### Process
 
 **Step 1: Create Schemas (10 min)**
-- Request schemas: backend/schemas/task.py
+- Request schemas: src/core/backend/schemas/task.py
 - Response schemas (use shared types)
 - Validation rules from spec
 
 **Step 2: Implement Routes (20 min)**
-- CRUD endpoints: backend/routers/tasks.py
+- CRUD endpoints: src/core/backend/routers/tasks.py
 - Add authentication dependencies
 - Filter by user_id + deleted_at
 - Error handling
 
 **Step 3: Register Router (2 min)**
-- Add to backend/main.py
+- Add to src/core/backend/main.py
 - Test endpoints exist
 
 ### Output
@@ -133,8 +133,8 @@ Spec: specs/phase2/features/[name].md (Section 10: API Contract)
 📤 Output: Backend API Ready
 
 Created:
-- backend/schemas/task.py
-- backend/routers/tasks.py
+- src/core/backend/schemas/task.py
+- src/core/backend/routers/tasks.py
 
 Endpoints:
 - POST   /api/v1/tasks (create)
@@ -156,7 +156,7 @@ Ready for: UI Developer Agent
 ⚙️ API Developer - Backend Routes Ready
 
 **Feature:** Task Management
-**Router:** backend/routers/tasks.py
+**Router:** src/core/backend/routers/tasks.py
 
 **Endpoints Implemented:**
 
@@ -216,7 +216,7 @@ Ready for: UI Developer Agent
 ## Code Template
 
 ```python
-# backend/routers/tasks.py
+# src/core/backend/routers/tasks.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 from backend.models.task import Task
@@ -284,7 +284,7 @@ async def get_tasks(
 **Types Available:**
 - shared/types/task.ts (use these!)
 
-**API Methods Needed in frontend/lib/api.ts:**
+**API Methods Needed in src/core/frontend/lib/api.ts:**
 - api.getTasks() → Task[]
 - api.getTask(id) → Task
 - api.createTask(data) → Task

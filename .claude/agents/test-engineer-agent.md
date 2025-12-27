@@ -87,7 +87,7 @@ Generate comprehensive test suites for backend and frontend with full scenario c
 
 **Backend Test Pattern (Pytest):**
 ```python
-# backend/tests/unit/test_tasks.py
+# src/core/backend/tests/unit/test_tasks.py
 import pytest
 from fastapi.testclient import TestClient
 
@@ -127,7 +127,7 @@ def test_create_task_validates_title_required(client, auth_headers):
 
 **Frontend Test Pattern (Vitest + RTL):**
 ```typescript
-// frontend/tests/unit/TaskList.test.tsx
+// src/core/frontend/tests/unit/TaskList.test.tsx
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TaskList } from '@/components/tasks/TaskList';
@@ -183,9 +183,9 @@ describe('TaskList', () => {
 📥 From: UI Developer Agent (or API Developer Agent)
 
 Implemented Code:
-- Backend: backend/routers/tasks.py
-- Frontend: frontend/components/tasks/TaskList.tsx
-- API Client: frontend/lib/api.ts
+- Backend: src/core/backend/routers/tasks.py
+- Frontend: src/core/frontend/components/tasks/TaskList.tsx
+- API Client: src/core/frontend/lib/api.ts
 
 Spec: specs/phase2/features/[name].md (Acceptance Criteria)
 ```
@@ -193,7 +193,7 @@ Spec: specs/phase2/features/[name].md (Acceptance Criteria)
 ### Process
 
 **Step 1: Backend Unit Tests (10 min)**
-- Create backend/tests/unit/test_tasks.py
+- Create src/core/backend/tests/unit/test_tasks.py
 - Test all 6 scenario categories:
   1. Happy path (201, 200 responses)
   2. Validation errors (422)
@@ -203,19 +203,19 @@ Spec: specs/phase2/features/[name].md (Acceptance Criteria)
   6. Integration (create → update → delete flow)
 
 **Step 2: Frontend Component Tests (10 min)**
-- Create frontend/tests/unit/TaskList.test.tsx
+- Create src/core/frontend/tests/unit/TaskList.test.tsx
 - Test rendering, user interactions, error states
 - Mock API client (vi.mock)
 - Test loading and success states
 
 **Step 3: API Client Tests (5 min)**
-- Create frontend/tests/unit/api.test.ts
+- Create src/core/frontend/tests/unit/api.test.ts
 - Test API methods with mocked fetch
 - Test error handling (401, 404, network errors)
 - Test request formatting
 
 **Step 4: Integration Tests (10 min)**
-- Create backend/tests/integration/test_tasks_flow.py
+- Create src/core/backend/tests/integration/test_tasks_flow.py
 - Test complete user flows (CRUD operations)
 - Verify database state changes
 - Test auth boundaries
@@ -226,13 +226,13 @@ Spec: specs/phase2/features/[name].md (Acceptance Criteria)
 
 Created:
 Backend Tests:
-- backend/tests/unit/test_tasks.py (20+ tests)
-- backend/tests/integration/test_tasks_flow.py (5+ tests)
+- src/core/backend/tests/unit/test_tasks.py (20+ tests)
+- src/core/backend/tests/integration/test_tasks_flow.py (5+ tests)
 
 Frontend Tests:
-- frontend/tests/unit/TaskList.test.tsx (8+ tests)
-- frontend/tests/unit/TaskForm.test.tsx (6+ tests)
-- frontend/tests/unit/api.test.ts (10+ tests)
+- src/core/frontend/tests/unit/TaskList.test.tsx (8+ tests)
+- src/core/frontend/tests/unit/TaskForm.test.tsx (6+ tests)
+- src/core/frontend/tests/unit/api.test.ts (10+ tests)
 
 Coverage:
 - Backend: 90%+ route coverage
@@ -256,7 +256,7 @@ Ready for: Quality Guardian Agent
 
 **Backend Tests (25 tests):**
 
-📄 backend/tests/unit/test_tasks.py (20 tests)
+📄 src/core/backend/tests/unit/test_tasks.py (20 tests)
 
 Happy Path Scenarios (5 tests):
 ✅ test_create_task_returns_201_with_task_data
@@ -288,7 +288,7 @@ Edge Cases (4 tests):
 ✅ test_soft_deleted_tasks_not_returned
 ✅ test_update_task_preserves_user_id
 
-📄 backend/tests/integration/test_tasks_flow.py (5 tests)
+📄 src/core/backend/tests/integration/test_tasks_flow.py (5 tests)
 
 Integration Flows (5 tests):
 ✅ test_complete_task_crud_flow
@@ -299,7 +299,7 @@ Integration Flows (5 tests):
 
 **Frontend Tests (24 tests):**
 
-📄 frontend/tests/unit/TaskList.test.tsx (8 tests)
+📄 src/core/frontend/tests/unit/TaskList.test.tsx (8 tests)
 
 Rendering (3 tests):
 ✅ renders task list with all tasks
@@ -315,7 +315,7 @@ Error Handling (2 tests):
 ✅ shows error message when delete fails
 ✅ disables buttons during delete operation
 
-📄 frontend/tests/unit/TaskForm.test.tsx (6 tests)
+📄 src/core/frontend/tests/unit/TaskForm.test.tsx (6 tests)
 
 Form Rendering (2 tests):
 ✅ renders empty form for create mode
@@ -329,7 +329,7 @@ Submission (2 tests):
 ✅ calls api.createTask on submit
 ✅ shows success message after creation
 
-📄 frontend/tests/unit/api.test.ts (10 tests)
+📄 src/core/frontend/tests/unit/api.test.ts (10 tests)
 
 API Methods (5 tests):
 ✅ getTasks() calls fetch with correct URL
@@ -385,13 +385,13 @@ All acceptance criteria from spec have corresponding tests.
 
 Backend:
 ```bash
-pytest backend/tests/ -v --cov=backend/routers --cov=backend/models
+pytest src/core/backend/tests/ -v --cov=backend/routers --cov=backend/models
 # 25 passed, 95% coverage
 ```
 
 Frontend:
 ```bash
-vitest run frontend/tests/
+vitest run src/core/frontend/tests/
 # 24 passed, 85% coverage
 ```
 
@@ -404,7 +404,7 @@ vitest run frontend/tests/
 
 ### Backend Test Fixture Setup
 ```python
-# backend/tests/conftest.py
+# src/core/backend/tests/conftest.py
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, create_engine, SQLModel
@@ -455,7 +455,7 @@ def other_user_headers(other_user_token):
 
 ### Frontend Test Setup
 ```typescript
-// frontend/tests/setup.ts
+// src/core/frontend/tests/setup.ts
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
@@ -480,7 +480,7 @@ vi.mock('next/navigation', () => ({
 
 ### Integration Test Template
 ```python
-# backend/tests/integration/test_tasks_flow.py
+# src/core/backend/tests/integration/test_tasks_flow.py
 import pytest
 from fastapi.testclient import TestClient
 
@@ -548,11 +548,11 @@ def test_complete_task_crud_flow(client, auth_headers, session):
 📋 Tests Complete - Ready for Final Validation
 
 **Test Suites:**
-- Backend: backend/tests/unit/test_tasks.py (20 tests)
-- Backend: backend/tests/integration/test_tasks_flow.py (5 tests)
-- Frontend: frontend/tests/unit/TaskList.test.tsx (8 tests)
-- Frontend: frontend/tests/unit/TaskForm.test.tsx (6 tests)
-- Frontend: frontend/tests/unit/api.test.ts (10 tests)
+- Backend: src/core/backend/tests/unit/test_tasks.py (20 tests)
+- Backend: src/core/backend/tests/integration/test_tasks_flow.py (5 tests)
+- Frontend: src/core/frontend/tests/unit/TaskList.test.tsx (8 tests)
+- Frontend: src/core/frontend/tests/unit/TaskForm.test.tsx (6 tests)
+- Frontend: src/core/frontend/tests/unit/api.test.ts (10 tests)
 
 **Coverage:**
 - Backend routes: 95%
@@ -562,11 +562,11 @@ def test_complete_task_crud_flow(client, auth_headers, session):
 **Test Execution:**
 ```bash
 # Backend
-pytest backend/tests/ -v --cov=backend/routers
+pytest src/core/backend/tests/ -v --cov=backend/routers
 # 25 passed, 0 failed
 
 # Frontend
-vitest run frontend/tests/
+vitest run src/core/frontend/tests/
 # 24 passed, 0 failed
 ```
 

@@ -114,7 +114,7 @@ CREATE INDEX idx_tasks_deleted_at ON tasks(deleted_at);
 ```python
 # Every query MUST filter by user_id
 from sqlmodel import Session, select
-from backend.dependencies import get_current_user
+from src.core.backend.dependencies import get_current_user
 
 @router.get("/api/v1/tasks")
 async def get_tasks(
@@ -407,7 +407,7 @@ Frontend: user.id ──→ JWT Token 'sub' claim ──→ Backend: tasks.user_
 
 **Example Validation Code:**
 ```python
-# backend/dependencies.py
+# src/core/backend/dependencies.py
 import jwt
 from fastapi import HTTPException
 
@@ -503,7 +503,7 @@ Note: Tasks are never transferred between users
 npm install better-auth drizzle-orm postgres
 
 # Configure database connection
-# frontend/.env
+# src/core/frontend/.env
 DATABASE_URL=postgresql://user:password@localhost:5432/frontend_auth
 
 # Better Auth will auto-create tables on app start
@@ -536,7 +536,7 @@ alembic upgrade head
 
 **Migration File Example:**
 ```python
-# backend/migrations/versions/001_initial_schema.py
+# src/core/backend/migrations/versions/001_initial_schema.py
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import JSONB
@@ -662,7 +662,7 @@ async def get_task(
 
 **Test Data:**
 ```typescript
-// frontend/tests/fixtures/users.ts
+// src/core/frontend/tests/fixtures/users.ts
 export const testUsers = {
   user1: {
     email: "user1@example.com",
@@ -687,8 +687,8 @@ await signUp({ email: testUsers.user1.email, password: testUsers.user1.password 
 
 **Test Data:**
 ```python
-# backend/tests/fixtures/tasks.py
-from backend.models import Task
+# src/core/backend/tests/fixtures/tasks.py
+from src.core.backend.models import Task
 
 def create_test_task(session, user_id: str = "test-user-123") -> Task:
     """Create a test task with given user_id."""
@@ -706,7 +706,7 @@ def create_test_task(session, user_id: str = "test-user-123") -> Task:
 
 **Isolation Test:**
 ```python
-# backend/tests/test_user_isolation.py
+# src/core/backend/tests/test_user_isolation.py
 def test_user_cannot_access_other_users_tasks(session):
     """User A cannot access User B's tasks."""
     # Create tasks for two users

@@ -55,12 +55,12 @@ Source: specs/phase2/features/[feature].md
 Test Files to Create:
 
 Backend Tests:
-- backend/tests/unit/test_[feature].py (15 tests)
-- backend/tests/integration/test_[feature]_api.py (8 tests)
+- src/core/backend/tests/unit/test_[feature].py (15 tests)
+- src/core/backend/tests/integration/test_[feature]_api.py (8 tests)
 
 Frontend Tests:
-- frontend/tests/unit/[Component].test.tsx (12 tests)
-- frontend/tests/integration/[feature]-flow.test.ts (6 tests)
+- src/core/frontend/tests/unit/[Component].test.tsx (12 tests)
+- src/core/frontend/tests/integration/[feature]-flow.test.ts (6 tests)
 
 Coverage:
 ✅ Happy Paths: 8 scenarios
@@ -85,7 +85,7 @@ Total: 41 tests generated
 
 **Backend Example (Pytest):**
 ```python
-# backend/tests/unit/test_tasks.py
+# src/core/backend/tests/unit/test_tasks.py
 import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
@@ -207,7 +207,7 @@ def test_delete_task_success(client, auth_headers, create_task):
 
 **Frontend Example (Vitest + RTL):**
 ```typescript
-// frontend/tests/unit/TaskList.test.tsx
+// src/core/frontend/tests/unit/TaskList.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -745,7 +745,7 @@ def test_create_task_with_many_tags(client, auth_headers):
 
 **Backend Integration Example:**
 ```python
-# backend/tests/integration/test_tasks_full_flow.py
+# src/core/backend/tests/integration/test_tasks_full_flow.py
 def test_complete_task_lifecycle(client, auth_headers):
     """Integration: Full CRUD lifecycle"""
     # 1. Create task
@@ -791,7 +791,7 @@ def test_complete_task_lifecycle(client, auth_headers):
 
 **Frontend Integration Example:**
 ```typescript
-// frontend/tests/integration/task-flow.test.ts
+// src/core/frontend/tests/integration/task-flow.test.ts
 describe('Task Management Flow', () => {
   it('should complete full task lifecycle', async () => {
     // Mock API responses
@@ -832,7 +832,7 @@ describe('Task Management Flow', () => {
 Generate reusable fixtures for common operations:
 
 ```python
-# backend/tests/conftest.py
+# src/core/backend/tests/conftest.py
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, create_engine, SQLModel

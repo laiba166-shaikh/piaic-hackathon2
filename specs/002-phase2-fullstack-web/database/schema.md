@@ -49,7 +49,7 @@ postgresql://<username>:<password>@<host>/<database>?sslmode=require
 ### Connection Pooling Configuration
 
 ```python
-# backend/db.py
+# src/core/backend/db.py
 from sqlmodel import create_engine, Session
 
 engine = create_engine(
@@ -414,7 +414,7 @@ SQLModel combines SQLAlchemy ORM with Pydantic validation, providing type-safe d
 ### Task Model (Python)
 
 ```python
-# backend/models.py
+# src/core/backend/models.py
 from sqlmodel import SQLModel, Field, Column
 from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
@@ -576,7 +576,7 @@ Alembic is the database migration tool for SQLAlchemy/SQLModel, providing versio
 
 ### Initial Migration Script
 
-**File:** `backend/migrations/versions/001_create_tasks_table.py`
+**File:** `src/core/backend/migrations/versions/001_create_tasks_table.py`
 
 ```python
 """Initial schema: Create tasks table
@@ -683,7 +683,7 @@ def downgrade():
 
 ```bash
 # Initialize Alembic (first time setup)
-cd backend
+cd src/core/backend
 alembic init migrations
 
 # Configure alembic.ini with DATABASE_URL
@@ -965,7 +965,7 @@ def toggle_task_completion(session: Session, task_id: int, user_id: str) -> Task
 ### Step 4: Configure Backend Environment
 
 ```bash
-# backend/.env
+# src/core/backend/.env
 DATABASE_URL=postgresql://username:password@ep-example-123456.us-east-1.aws.neon.tech/todo_db?sslmode=require
 
 # Optional: Database connection pool settings
@@ -977,7 +977,7 @@ DB_POOL_RECYCLE=3600
 ### Step 5: Install Dependencies
 
 ```bash
-cd backend
+cd src/core/backend
 
 # Install SQLModel and Alembic
 pip install sqlmodel alembic psycopg2-binary
@@ -999,7 +999,7 @@ alembic init migrations
 **migrations/env.py:**
 ```python
 from sqlmodel import SQLModel
-from backend.models import Task  # Import all models
+from src.core.backend.models import Task  # Import all models
 
 target_metadata = SQLModel.metadata
 ```
@@ -1026,7 +1026,7 @@ alembic upgrade head
 ### Step 9: Test Connection
 
 ```python
-# backend/test_db.py
+# src/core/backend/test_db.py
 from sqlmodel import create_engine, Session, select
 from models import Task
 import os
@@ -1211,7 +1211,7 @@ ORDER BY updated_at DESC;
 ### Connection Pooling
 
 ```python
-# backend/db.py
+# src/core/backend/db.py
 from sqlmodel import create_engine
 
 engine = create_engine(
@@ -1329,10 +1329,10 @@ statement = select(Task).where(Task.user_id == user_id)
 ### Database Test Setup
 
 ```python
-# backend/tests/conftest.py
+# src/core/backend/tests/conftest.py
 import pytest
 from sqlmodel import create_engine, Session, SQLModel
-from backend.models import Task
+from src.core.backend.models import Task
 
 # In-memory SQLite for fast tests
 TEST_DATABASE_URL = "sqlite:///:memory:"

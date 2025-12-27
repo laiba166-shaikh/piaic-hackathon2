@@ -54,15 +54,15 @@ Affected Areas:
 - specs/phase2/api/tasks-endpoints.md (authoritative)
 - shared/types/task.ts (generated from spec)
 - shared/types/task.py (generated from spec)
-- backend/routers/tasks.py (implementation)
-- frontend/lib/api.ts (implementation)
+- src/core/backend/routers/tasks.py (implementation)
+- src/core/frontend/lib/api.ts (implementation)
 
 Change Flow:
 1. ✅ Update spec first (specs/phase2/api/tasks-endpoints.md)
 2. ✅ Generate types (shared/types/task.ts, task.py)
-3. ✅ Update backend (backend/routers/tasks.py)
-4. ✅ Update frontend (frontend/lib/api.ts)
-5. ✅ Update tests (backend/tests/, frontend/tests/)
+3. ✅ Update backend (src/core/backend/routers/tasks.py)
+4. ✅ Update frontend (src/core/frontend/lib/api.ts)
+5. ✅ Update tests (src/core/backend/tests/, src/core/frontend/tests/)
 
 Boundary Validation:
 ✅ Spec is authoritative source
@@ -109,50 +109,52 @@ hackathon2/                          # Monorepo root
 │   │   └── commands/                # CLI commands
 │   └── tests/
 │
-├── backend/                         # Phase 2: FastAPI backend (ISOLATED from frontend)
-│   ├── main.py                      # FastAPI app entry
-│   ├── config.py                    # Settings from env
-│   ├── dependencies.py              # Shared dependencies (auth, db)
-│   │
-│   ├── models/                      # SQLModel database models
-│   │   ├── task.py                  # Can import from shared/types/task.py
-│   │   └── base.py
-│   │
-│   ├── schemas/                     # Pydantic request/response schemas
-│   │   ├── task.py                  # Can import from shared/types/task.py
-│   │   └── common.py
-│   │
-│   ├── routers/                     # API route handlers
-│   │   ├── tasks.py
-│   │   └── tags.py
-│   │
-│   ├── services/                    # Business logic
-│   │   └── task_service.py
-│   │
-│   └── tests/                       # Backend tests
-│       ├── unit/
-│       └── integration/
-│
-├── frontend/                        # Phase 2: Next.js frontend (ISOLATED from backend)
-│   ├── app/                         # Next.js App Router
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   └── tasks/
-│   │       └── page.tsx
-│   │
-│   ├── components/                  # React components
-│   │   ├── ui/
-│   │   └── tasks/
-│   │
-│   ├── lib/                         # Frontend utilities
-│   │   ├── api.ts                   # Centralized API client (can import shared/types/task.ts)
-│   │   └── auth.ts
-│   │
-│   ├── types/                       # Frontend-specific types (or use shared/types/)
-│   │
-│   └── tests/                       # Frontend tests
-│       ├── unit/
-│       └── integration/
+├── src/
+│   └── core/
+│       ├── backend/                         # Phase 2: FastAPI backend (ISOLATED from frontend)
+│       │   ├── main.py                      # FastAPI app entry
+│       │   ├── config.py                    # Settings from env
+│       │   ├── dependencies.py              # Shared dependencies (auth, db)
+│       │   │
+│       │   ├── models/                      # SQLModel database models
+│       │   │   ├── task.py                  # Can import from shared/types/task.py
+│       │   │   └── base.py
+│       │   │
+│       │   ├── schemas/                     # Pydantic request/response schemas
+│       │   │   ├── task.py                  # Can import from shared/types/task.py
+│       │   │   └── common.py
+│       │   │
+│       │   ├── routers/                     # API route handlers
+│       │   │   ├── tasks.py
+│       │   │   └── tags.py
+│       │   │
+│       │   ├── services/                    # Business logic
+│       │   │   └── task_service.py
+│       │   │
+│       │   └── tests/                       # Backend tests
+│       │       ├── unit/
+│       │       └── integration/
+│       │
+│       └── frontend/                        # Phase 2: Next.js frontend (ISOLATED from backend)
+│           ├── app/                         # Next.js App Router
+│           │   ├── layout.tsx
+│           │   ├── page.tsx
+│           │   └── tasks/
+│           │       └── page.tsx
+│           │
+│           ├── components/                  # React components
+│           │   ├── ui/
+│           │   └── tasks/
+│           │
+│           ├── lib/                         # Frontend utilities
+│           │   ├── api.ts                   # Centralized API client (can import shared/types/task.ts)
+│           │   └── auth.ts
+│           │
+│           ├── types/                       # Frontend-specific types (or use shared/types/)
+│           │
+│           └── tests/                       # Frontend tests
+│               ├── unit/
+│               └── integration/
 │
 ├── history/                         # Project history
 │   ├── prompts/                     # Prompt History Records
@@ -316,7 +318,7 @@ Phase 2 can READ CLI ✅ (for migration reference)
 Phase 2 MODIFIES CLI ❌ (keep Phase 1 working)
 ```
 
-### 4. Backend (`backend/`)
+### 4. Backend (`src/core/backend/`)
 
 **Purpose:** Phase 2 FastAPI backend (isolated from frontend)
 
@@ -333,14 +335,14 @@ Phase 2 MODIFIES CLI ❌ (keep Phase 1 working)
 
 **Boundary Rules:**
 - ✅ Backend imports from `shared/types/*.py`
-- ❌ Backend CANNOT import from `frontend/`
+- ❌ Backend CANNOT import from `src/core/frontend/`
 - ❌ Backend CANNOT import from `cli/`
 - ✅ Backend implements contracts defined in specs
 - ✅ Backend validates JWT from frontend
 
 **Example:**
 ```python
-# backend/models/task.py
+# src/core/backend/models/task.py
 from sqlmodel import SQLModel, Field
 from shared.types.task import Task as TaskBase  # ✅ Import shared type
 
@@ -352,7 +354,7 @@ class Task(SQLModel, table=True):
 ```
 
 ```python
-# backend/schemas/task.py
+# src/core/backend/schemas/task.py
 from pydantic import BaseModel
 from shared.types.task import TaskCreate  # ✅ Import shared type
 
@@ -368,7 +370,7 @@ Backend → Frontend ❌ (isolated)
 Backend → CLI ❌ (can read for migration, don't import)
 ```
 
-### 5. Frontend (`frontend/`)
+### 5. Frontend (`src/core/frontend/`)
 
 **Purpose:** Phase 2 Next.js frontend (isolated from backend)
 
@@ -385,14 +387,14 @@ Backend → CLI ❌ (can read for migration, don't import)
 
 **Boundary Rules:**
 - ✅ Frontend imports from `shared/types/*.ts`
-- ❌ Frontend CANNOT import from `backend/`
+- ❌ Frontend CANNOT import from `src/core/backend/`
 - ❌ Frontend CANNOT import from `cli/`
 - ✅ Frontend calls backend via API (not direct imports)
 - ✅ Frontend issues JWT tokens (Better Auth)
 
 **Example:**
 ```typescript
-// frontend/lib/api.ts
+// src/core/frontend/lib/api.ts
 import type { Task, TaskCreate } from '@shared/types/task';  // ✅ Import shared type
 
 export const api = {
@@ -403,7 +405,7 @@ export const api = {
 ```
 
 ```typescript
-// frontend/components/tasks/TaskList.tsx
+// src/core/frontend/components/tasks/TaskList.tsx
 import type { Task } from '@shared/types/task';  // ✅ Import shared type
 
 interface TaskListProps {
@@ -521,25 +523,25 @@ export interface Task {
    - shared/types/task.py (adds priority: int)
 
 4. Update Backend
-   backend/models/task.py:
+   src/core/backend/models/task.py:
    - Add: priority: int | None = Field(None, ge=1, le=5)
 
-   backend/routers/tasks.py:
+   src/core/backend/routers/tasks.py:
    - Use updated TaskCreate schema (now has priority)
 
 5. Update Frontend
-   frontend/components/tasks/TaskForm.tsx:
+   src/core/frontend/components/tasks/TaskForm.tsx:
    - Add priority input field
 
-   frontend/lib/api.ts:
+   src/core/frontend/lib/api.ts:
    - Already type-safe with updated Task interface
 
 6. Update Tests
-   backend/tests/unit/test_tasks.py:
+   src/core/backend/tests/unit/test_tasks.py:
    - test_create_task_with_priority()
    - test_create_task_with_invalid_priority()
 
-   frontend/tests/unit/TaskForm.test.tsx:
+   src/core/frontend/tests/unit/TaskForm.test.tsx:
    - should set priority field
    - should validate priority range
 
@@ -558,8 +560,8 @@ export interface Task {
 from shared.types.task import Task, TaskCreate
 
 # Backend can import from other backend modules
-from backend.models.task import Task as DBTask
-from backend.dependencies import get_current_user
+from src.core.backend.models.task import Task as DBTask
+from src.core.backend.dependencies import get_current_user
 
 # Backend can import standard libraries
 from fastapi import APIRouter, Depends
@@ -569,7 +571,7 @@ from sqlmodel import Session
 **❌ FORBIDDEN:**
 ```python
 # Backend CANNOT import from frontend
-from frontend.lib.api import api  # ❌ WRONG
+from src.core.frontend.lib.api import api  # ❌ WRONG
 
 # Backend CANNOT import from CLI
 from cli.src.core.models import Task  # ❌ WRONG
@@ -593,7 +595,7 @@ import { useState } from 'react';
 **❌ FORBIDDEN:**
 ```typescript
 // Frontend CANNOT import from backend
-import { createTask } from '@backend/routers/tasks';  // ❌ WRONG
+import { createTask } from '@/src/core/backend/routers/tasks';  // ❌ WRONG
 
 // Frontend CANNOT import from CLI
 import { Task } from '@cli/src/core/models';  // ❌ WRONG
@@ -616,10 +618,10 @@ import click
 **❌ FORBIDDEN:**
 ```python
 # CLI CANNOT import from backend
-from backend.models.task import Task  # ❌ WRONG
+from src.core.backend.models.task import Task  # ❌ WRONG
 
 # CLI CANNOT import from frontend
-from frontend.lib.api import api  # ❌ WRONG
+from src.core.frontend.lib.api import api  # ❌ WRONG
 ```
 
 ## Validation Checklist
@@ -676,7 +678,7 @@ export interface Task {
 
 **Problem:**
 ```python
-# backend/models/task.py
+# src/core/backend/models/task.py
 class Task(SQLModel, table=True):
     new_feature: str  # ❌ Added without spec update
 ```
@@ -693,13 +695,13 @@ class Task(SQLModel, table=True):
 
 **Problem:**
 ```typescript
-// frontend/lib/tasks.ts
-import { Task } from '@backend/models/task';  // ❌ WRONG
+// src/core/frontend/lib/tasks.ts
+import { Task } from '@/src/core/backend/models/task';  // ❌ WRONG
 ```
 
 **Fix:**
 ```typescript
-// frontend/lib/tasks.ts
+// src/core/frontend/lib/tasks.ts
 import type { Task } from '@shared/types/task';  // ✅ CORRECT
 ```
 

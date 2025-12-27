@@ -67,7 +67,7 @@ npm install better-auth drizzle-orm postgres
 
 **Configuration File:**
 ```typescript
-// frontend/lib/auth.ts
+// src/core/frontend/lib/auth.ts
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
@@ -121,7 +121,7 @@ export const { signIn, signUp, signOut, getSession } = auth;
 
 **API Routes Setup:**
 ```typescript
-// frontend/app/api/auth/[...all]/route.ts
+// src/core/frontend/app/api/auth/[...all]/route.ts
 import { auth } from "@/lib/auth";
 import { toNextJsHandler } from "better-auth/nextjs";
 
@@ -131,7 +131,7 @@ export const { GET, POST } = toNextJsHandler(auth);
 
 **Environment Variables:**
 ```bash
-# frontend/.env
+# src/core/frontend/.env
 DATABASE_URL=postgresql://user:password@localhost:5432/frontend_auth
 JWT_SECRET=your-super-secret-key-at-least-256-bits-long-random-string
 NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -217,7 +217,7 @@ async function signUp(credentials: {
 
 **Usage Example:**
 ```typescript
-// frontend/components/auth/RegisterForm.tsx
+// src/core/frontend/components/auth/RegisterForm.tsx
 "use client";
 import { signUp } from "@/lib/auth";
 import { useRouter } from "next/navigation";
@@ -323,7 +323,7 @@ async function signIn(credentials: {
 
 **Usage Example:**
 ```typescript
-// frontend/components/auth/LoginForm.tsx
+// src/core/frontend/components/auth/LoginForm.tsx
 "use client";
 import { signIn } from "@/lib/auth";
 import { useRouter } from "next/navigation";
@@ -398,7 +398,7 @@ async function signOut(): Promise<void>
 
 **Usage Example:**
 ```typescript
-// frontend/components/auth/LogoutButton.tsx
+// src/core/frontend/components/auth/LogoutButton.tsx
 "use client";
 import { signOut } from "@/lib/auth";
 import { useRouter } from "next/navigation";
@@ -480,7 +480,7 @@ null
 
 **Usage Example (Server Component):**
 ```typescript
-// frontend/app/page.tsx
+// src/core/frontend/app/page.tsx
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -502,7 +502,7 @@ export default async function DashboardPage() {
 
 **Usage Example (Client Component with Hook):**
 ```typescript
-// frontend/hooks/useAuth.ts
+// src/core/frontend/hooks/useAuth.ts
 "use client";
 import { useEffect, useState } from "react";
 import { getSession } from "@/lib/auth";
@@ -531,7 +531,7 @@ export function useAuth() {
 
 **Usage in Client Component:**
 ```typescript
-// frontend/components/UserProfile.tsx
+// src/core/frontend/components/UserProfile.tsx
 "use client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -649,7 +649,7 @@ null
 
 **Implementation:**
 ```typescript
-// frontend/middleware.ts
+// src/core/frontend/middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
@@ -805,7 +805,7 @@ CREATE TABLE "session" (
 ### Mock Better Auth Methods
 
 ```typescript
-// frontend/tests/mocks/auth.ts
+// src/core/frontend/tests/mocks/auth.ts
 import { vi } from "vitest";
 
 export const mockSignUp = vi.fn();
@@ -824,7 +824,7 @@ vi.mock("@/lib/auth", () => ({
 ### Unit Test Example
 
 ```typescript
-// frontend/tests/unit/LoginForm.test.tsx
+// src/core/frontend/tests/unit/LoginForm.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { mockSignIn } from "../mocks/auth";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -859,7 +859,7 @@ describe("LoginForm", () => {
 ### E2E Test Example
 
 ```typescript
-// frontend/tests/e2e/auth-flow.spec.ts
+// src/core/frontend/tests/e2e/auth-flow.spec.ts
 import { test, expect } from "@playwright/test";
 
 test("user can register, login, and logout", async ({ page }) => {
@@ -889,7 +889,7 @@ test("user can register, login, and logout", async ({ page }) => {
 ### Frontend Error Handling Pattern
 
 ```typescript
-// frontend/components/auth/LoginForm.tsx
+// src/core/frontend/components/auth/LoginForm.tsx
 import { signIn } from "@/lib/auth";
 
 export function LoginForm() {

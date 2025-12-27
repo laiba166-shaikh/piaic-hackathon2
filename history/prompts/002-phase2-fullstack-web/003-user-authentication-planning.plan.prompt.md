@@ -61,7 +61,7 @@ Completed the full implementation planning workflow for User Authentication feat
 - Generated plan.md with:
   - Technical Context (TypeScript 5.x, Python 3.11+, Better Auth, PyJWT, PostgreSQL)
   - Constitution Check (all 6 principles PASS)
-  - Project Structure (monorepo with frontend/backend separation)
+  - Project Structure (monorepo with src/core/frontend/backend separation)
   - Complexity Tracking (no violations)
   - Phase 0 research plan and Phase 1 design artifact plan
 

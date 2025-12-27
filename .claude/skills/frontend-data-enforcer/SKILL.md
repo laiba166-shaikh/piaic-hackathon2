@@ -49,7 +49,7 @@ Present data access review using this structure:
 ```
 🔍 Data Access Review: [component-name]
 
-File: frontend/components/tasks/TaskList.tsx
+File: src/core/frontend/components/tasks/TaskList.tsx
 
 ✅ Compliant Patterns:
 - Uses centralized API client (api.getTasks)

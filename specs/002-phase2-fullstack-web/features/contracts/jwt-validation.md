@@ -34,8 +34,8 @@ async def get_current_user(
     """
 ```
 
-**Location:** `backend/dependencies.py`
-**Import:** `from backend.dependencies import get_current_user`
+**Location:** `src/core/backend/dependencies.py`
+**Import:** `from src.core.backend.dependencies import get_current_user`
 
 ---
 
@@ -268,7 +268,7 @@ async def get_tasks(
 ### Dependency Function (Backend)
 
 ```python
-# backend/dependencies.py
+# src/core/backend/dependencies.py
 from fastapi import Depends, HTTPException, Security, Cookie
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
@@ -349,11 +349,11 @@ async def get_current_user(
 ### Usage in Protected Route
 
 ```python
-# backend/api/v1/tasks.py
+# src/core/backend/api/v1/tasks.py
 from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
-from backend.dependencies import get_current_user, get_db
-from backend.models import Task
+from src.core.backend.dependencies import get_current_user, get_db
+from src.core.backend.models import Task
 
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
 
@@ -398,7 +398,7 @@ JWT_ALGORITHM=HS256
 ### Settings Class
 
 ```python
-# backend/config.py
+# src/core/backend/config.py
 import os
 from pydantic_settings import BaseSettings
 
@@ -493,10 +493,10 @@ assert "missing user_id" in exc_info.value.detail.lower()
 ### Test Fixtures
 
 ```python
-# backend/tests/fixtures/jwt_tokens.py
+# src/core/backend/tests/fixtures/jwt_tokens.py
 import jwt
 from datetime import datetime, timedelta
-from backend.config import settings
+from src.core.backend.config import settings
 
 def create_test_jwt(
     user_id: str = "test-user-123",

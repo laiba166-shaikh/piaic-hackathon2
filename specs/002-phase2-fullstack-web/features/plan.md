@@ -81,7 +81,7 @@ Implement secure user authentication for the multi-user task management applicat
 ### IV. Version Control and CI/CD ✅ PASS
 - **Requirement:** GitHub repository, pull requests, automated testing, semantic versioning
 - **Status:** PASS - Plan aligns with:
-  - **Repository:** Monorepo structure (frontend/ and backend/ directories)
+  - **Repository:** Monorepo structure (src/core/frontend/ and src/core/backend/ directories)
   - **Pull Requests:** Feature implemented on 002-phase2-fullstack-web branch
   - **CI/CD:** Tests run on pull request (GitHub Actions)
   - **Versioning:** Phase 2 version (aligns with project roadmap)
@@ -148,7 +148,7 @@ specs/002-phase2-fullstack-web/features/
 # Option 2: Web application (frontend + backend monorepo)
 
 hackathon2/
-├── frontend/
+├── src/core/frontend/
 │   ├── CLAUDE.md                     # Frontend-specific Claude Code guidelines
 │   ├── app/
 │   │   ├── login/
@@ -184,7 +184,7 @@ hackathon2/
 │           ├── register.spec.ts
 │           └── protected-routes.spec.ts
 │
-├── backend/
+├── src/core/backend/
 │   ├── CLAUDE.md                     # Backend-specific Claude Code guidelines
 │   ├── dependencies.py               # get_current_user dependency
 │   ├── config.py                     # JWT_SECRET configuration
@@ -202,7 +202,7 @@ hackathon2/
 │   └── types/
 │       └── auth.ts                   # Shared auth types (TypeScript/Python)
 │
-└── .env                              # JWT_SECRET shared between frontend/backend
+└── .env                              # JWT_SECRET shared between src/core/frontend/backend
 ```
 
 **Structure Decision:** Web application monorepo structure with separate frontend and backend directories. Frontend contains Better Auth integration, UI components, and authentication flow. Backend contains JWT validation dependency and protected API routes. Shared types ensure consistency between frontend and backend. No users table in backend database - Better Auth manages users entirely on frontend side.
@@ -346,26 +346,26 @@ Following the 7-phase spec-driven workflow from `00-phase2-overview.md`:
 ### Phase 3: Backend Implementation (TDD - RED)
 **Agent:** API Developer, Test Engineer
 **Tasks:**
-- Write failing JWT validation tests (backend/tests/test_dependencies.py)
-- Write failing integration tests (backend/tests/test_auth_flow.py)
+- Write failing JWT validation tests (src/core/backend/tests/test_dependencies.py)
+- Write failing integration tests (src/core/backend/tests/test_auth_flow.py)
 **Output:** Failing tests (RED state)
 
 ### Phase 4: Backend Implementation (TDD - GREEN)
 **Agent:** API Developer
 **Tasks:**
-- Implement get_current_user dependency (backend/dependencies.py)
-- Configure JWT_SECRET in config (backend/config.py)
-- Configure CORS middleware (backend/main.py)
+- Implement get_current_user dependency (src/core/backend/dependencies.py)
+- Configure JWT_SECRET in config (src/core/backend/config.py)
+- Configure CORS middleware (src/core/backend/main.py)
 - Make tests pass
 **Output:** Working backend JWT validation (GREEN state)
 
 ### Phase 5: Frontend Implementation (TDD - RED + GREEN)
 **Agent:** UI Developer, Test Engineer
 **Tasks:**
-- Configure Better Auth (frontend/lib/auth.ts)
-- Implement login/register pages (frontend/app/login/, frontend/app/register/)
-- Implement auth components (frontend/components/auth/)
-- Implement middleware (frontend/middleware.ts)
+- Configure Better Auth (src/core/frontend/lib/auth.ts)
+- Implement login/register pages (src/core/frontend/app/login/, src/core/frontend/app/register/)
+- Implement auth components (src/core/frontend/components/auth/)
+- Implement middleware (src/core/frontend/middleware.ts)
 - Write and pass frontend tests
 **Output:** Working frontend authentication
 

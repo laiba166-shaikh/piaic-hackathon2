@@ -15,7 +15,7 @@ FastAPI backend with JWT authentication and PostgreSQL database.
 ## Project Structure
 
 ```
-backend/
+src/core/backend/
 ├── main.py                 # FastAPI app entry point
 ├── config.py               # Configuration (Pydantic Settings)
 ├── db.py                   # Database connection
@@ -50,7 +50,7 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 2. **Install dependencies:**
 
 ```bash
-cd backend
+cd src/core/backend
 
 # Using uv (recommended - faster)
 uv pip install -e .

@@ -40,9 +40,9 @@ hackathon2/
 ├── shared/
 │   └── types/            # Shared TypeScript/Python types
 ├── cli/                  # Phase 1 CLI (keep working)
-├── frontend/             # Next.js application
+├── src/core/frontend/             # Next.js application
 │   └── CLAUDE.md
-├── backend/              # FastAPI application
+├── src/core/backend/              # FastAPI application
 │   └── CLAUDE.md
 ├── CLAUDE.md             # Root monorepo guide
 ├── .env                  # Shared environment variables
@@ -193,7 +193,7 @@ specs/phase2/api/tasks-endpoints.md
          ↓ (generate)
     ┌────────────────┐
     ↓                ↓
-frontend/types/    backend/models.py
+src/core/frontend/types/    src/core/backend/models.py
 task.ts            (Pydantic)
 ```
 
@@ -343,11 +343,11 @@ const tasks = await api.getTasks();
 **Local Development:**
 ```bash
 # Terminal 1 - Backend
-cd backend
+cd src/core/backend
 uvicorn main:app --reload --port 8000
 
 # Terminal 2 - Frontend
-cd frontend
+cd src/core/frontend
 npm run dev
 
 # Terminal 3 - CLI (anytime)
@@ -362,7 +362,7 @@ python -m src.cli.main list
 **Rationale:**
 - Feature specs drive implementation
 - TDD ensures quality
-- Parallel backend/frontend work possible
+- Parallel src/core/backend/frontend work possible
 - Simple local setup
 
 **Alternatives Considered:**
@@ -378,7 +378,7 @@ python -m src.cli.main list
 
 **Backend Tests:**
 ```
-backend/tests/
+src/core/backend/tests/
 ├── unit/              # Route handlers, models
 └── integration/       # Database operations
 ```
@@ -388,7 +388,7 @@ backend/tests/
 
 **Frontend Tests:**
 ```
-frontend/tests/
+src/core/frontend/tests/
 ├── unit/              # Components, hooks
 └── e2e/               # Playwright (critical flows only)
 ```
@@ -475,8 +475,8 @@ specs/
 **Structure:**
 ```
 CLAUDE.md (root)          # Monorepo navigation, skills, workflows
-  ├── frontend/CLAUDE.md  # Next.js patterns
-  ├── backend/CLAUDE.md   # FastAPI patterns
+  ├── src/core/frontend/CLAUDE.md  # Next.js patterns
+  ├── src/core/backend/CLAUDE.md   # FastAPI patterns
   └── cli/CLAUDE.md       # Phase 1 CLI (preserved)
 ```
 
@@ -534,7 +534,7 @@ CLAUDE.md (root)          # Monorepo navigation, skills, workflows
 ### Risks
 
 🔴 Better Auth configuration complexity
-🔴 JWT secret sharing between frontend/backend
+🔴 JWT secret sharing between src/core/frontend/backend
 🔴 Skills might not catch all violations initially
 🔴 Type generation tool might need iteration
 

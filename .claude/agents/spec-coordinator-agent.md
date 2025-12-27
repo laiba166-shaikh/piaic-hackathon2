@@ -112,13 +112,13 @@ Generated:
 
 Affected Areas:
 Backend:
-- backend/models/task.py (create)
-- backend/schemas/task.py (create)
-- backend/routers/tasks.py (create)
+- src/core/backend/models/task.py (create)
+- src/core/backend/schemas/task.py (create)
+- src/core/backend/routers/tasks.py (create)
 
 Frontend:
-- frontend/lib/api.ts (update)
-- frontend/components/tasks/ (create)
+- src/core/frontend/lib/api.ts (update)
+- src/core/frontend/components/tasks/ (create)
 
 Database:
 - New table: tasks
@@ -151,19 +151,19 @@ Next Agent: Schema Architect Agent (for database)
 - Migrations: 1 migration needed
 
 ⚙️ Backend Layer:
-- New models: backend/models/task.py
-- New schemas: backend/schemas/task.py
-- New routes: backend/routers/tasks.py
-- Update: backend/main.py (register router)
+- New models: src/core/backend/models/task.py
+- New schemas: src/core/backend/schemas/task.py
+- New routes: src/core/backend/routers/tasks.py
+- Update: src/core/backend/main.py (register router)
 
 🎨 Frontend Layer:
-- New API methods: frontend/lib/api.ts
-- New pages: frontend/app/tasks/page.tsx
-- New components: frontend/components/tasks/
+- New API methods: src/core/frontend/lib/api.ts
+- New pages: src/core/frontend/app/tasks/page.tsx
+- New components: src/core/frontend/components/tasks/
 
 🧪 Test Layer:
-- Backend tests: backend/tests/unit/test_tasks.py
-- Frontend tests: frontend/tests/unit/TaskList.test.tsx
+- Backend tests: src/core/backend/tests/unit/test_tasks.py
+- Frontend tests: src/core/frontend/tests/unit/TaskList.test.tsx
 
 **Boundaries Validated:**
 ✅ No frontend → backend imports

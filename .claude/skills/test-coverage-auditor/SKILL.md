@@ -55,12 +55,12 @@ Acceptance Criteria Coverage:
 
 ✅ TESTED:
 1. "User can create a task with title and description"
-   → backend/tests/unit/test_tasks.py::test_create_task
-   → frontend/tests/unit/TaskForm.test.tsx::should create task
+   → src/core/backend/tests/unit/test_tasks.py::test_create_task
+   → src/core/frontend/tests/unit/TaskForm.test.tsx::should create task
 
 2. "Task requires a title (validation)"
-   → backend/tests/unit/test_tasks.py::test_create_task_without_title_returns_400
-   → frontend/tests/unit/TaskForm.test.tsx::should show error for missing title
+   → src/core/backend/tests/unit/test_tasks.py::test_create_task_without_title_returns_400
+   → src/core/frontend/tests/unit/TaskForm.test.tsx::should show error for missing title
 
 ❌ UNTESTED:
 3. "Task shows created date in user's timezone"
@@ -73,10 +73,10 @@ Acceptance Criteria Coverage:
    → Missing: Frontend test for 403 forbidden handling
 
 Test Files Reviewed:
-- backend/tests/unit/test_tasks.py (12 tests)
-- backend/tests/integration/test_tasks_api.py (8 tests)
-- frontend/tests/unit/TaskList.test.tsx (6 tests)
-- frontend/tests/unit/TaskForm.test.tsx (5 tests)
+- src/core/backend/tests/unit/test_tasks.py (12 tests)
+- src/core/backend/tests/integration/test_tasks_api.py (8 tests)
+- src/core/frontend/tests/unit/TaskList.test.tsx (6 tests)
+- src/core/frontend/tests/unit/TaskForm.test.tsx (5 tests)
 
 Coverage Statistics:
 - Acceptance Criteria: 8 total, 6 tested (75%)

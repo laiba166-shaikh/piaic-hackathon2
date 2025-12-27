@@ -50,7 +50,7 @@ Present backend architecture using this structure:
 🏗️ Backend Architecture: [feature-name]
 
 Endpoint: POST /api/v1/tasks
-Handler: create_task() in backend/routers/tasks.py
+Handler: create_task() in src/core/backend/routers/tasks.py
 
 Dependencies:
 - get_current_user() → user_id: str (from JWT)
@@ -113,7 +113,7 @@ backend/
 
 **1. Database Model (SQLModel):**
 ```python
-# backend/models/task.py
+# src/core/backend/models/task.py
 from sqlmodel import SQLModel, Field
 from datetime import datetime
 from sqlalchemy import Column
@@ -136,7 +136,7 @@ class Task(SQLModel, table=True):
 
 **2. Pydantic Schemas:**
 ```python
-# backend/schemas/task.py
+# src/core/backend/schemas/task.py
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -170,7 +170,7 @@ class TaskResponse(BaseModel):
 
 **3. Dependencies:**
 ```python
-# backend/dependencies.py
+# src/core/backend/dependencies.py
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
@@ -211,7 +211,7 @@ async def get_db() -> Session:
 
 **4. Route Handler:**
 ```python
-# backend/routers/tasks.py
+# src/core/backend/routers/tasks.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 from backend.models.task import Task
@@ -331,7 +331,7 @@ async def delete_task(
 
 **5. Main App Setup:**
 ```python
-# backend/main.py
+# src/core/backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import tasks

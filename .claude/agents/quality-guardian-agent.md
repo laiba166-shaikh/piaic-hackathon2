@@ -222,9 +222,9 @@ Validate complete implementation against spec, verify API contracts, enforce aut
 📥 From: Test Engineer Agent
 
 Implementation Complete:
-- Backend: backend/routers/tasks.py
-- Frontend: frontend/components/tasks/
-- Tests: backend/tests/, frontend/tests/
+- Backend: src/core/backend/routers/tasks.py
+- Frontend: src/core/frontend/components/tasks/
+- Tests: src/core/backend/tests/, src/core/frontend/tests/
 - Spec: specs/phase2/features/[name].md
 ```
 
@@ -387,12 +387,12 @@ All acceptance criteria have corresponding tests.
 
 Backend:
 ```bash
-pytest backend/tests/ --cov=backend/routers --cov=backend/models
+pytest src/core/backend/tests/ --cov=backend/routers --cov=backend/models
 ---------- coverage: platform win32, python 3.11 -----------
 Name                          Stmts   Miss  Cover
 -------------------------------------------------
-backend/routers/tasks.py        87      4    95%
-backend/models/task.py          23      0   100%
+src/core/backend/routers/tasks.py        87      4    95%
+src/core/backend/models/task.py          23      0   100%
 -------------------------------------------------
 TOTAL                          110      4    96%
 ```
@@ -524,15 +524,15 @@ All queries enforce soft delete ✅
 **Import Boundaries:**
 
 ✅ Backend imports:
-  - ✅ backend/routers/tasks.py imports backend/models/task.py (allowed)
-  - ✅ backend/routers/tasks.py imports backend/schemas/task.py (allowed)
-  - ✅ backend/schemas/task.py imports shared/types/task.py (allowed)
+  - ✅ src/core/backend/routers/tasks.py imports src/core/backend/models/task.py (allowed)
+  - ✅ src/core/backend/routers/tasks.py imports src/core/backend/schemas/task.py (allowed)
+  - ✅ src/core/backend/schemas/task.py imports shared/types/task.py (allowed)
   - ❌ No frontend imports detected (correct)
   - ❌ No CLI imports detected (correct)
 
 ✅ Frontend imports:
-  - ✅ frontend/components/tasks/TaskList.tsx imports @/lib/api (allowed)
-  - ✅ frontend/lib/api.ts imports @shared/types/task (allowed)
+  - ✅ src/core/frontend/components/tasks/TaskList.tsx imports @/lib/api (allowed)
+  - ✅ src/core/frontend/lib/api.ts imports @shared/types/task (allowed)
   - ❌ No backend imports detected (correct)
   - ❌ No CLI imports detected (correct)
 
@@ -636,7 +636,7 @@ All queries enforce soft delete ✅
 ### CRITICAL (Must Fix Immediately) 🔴
 
 **C-01: User Isolation Bypass in GET /api/v1/tasks**
-- **Location:** backend/routers/tasks.py:45
+- **Location:** src/core/backend/routers/tasks.py:45
 - **Issue:** Query does not filter by user_id
 - **Impact:** User can see all users' tasks (data leak)
 - **Current Code:**
@@ -658,7 +658,7 @@ All queries enforce soft delete ✅
 ### HIGH (Must Fix Before Deployment) 🟠
 
 **H-01: Missing Authentication on DELETE endpoint**
-- **Location:** backend/routers/tasks.py:89
+- **Location:** src/core/backend/routers/tasks.py:89
 - **Issue:** Route does not require authentication
 - **Current Code:**
   ```python
@@ -676,7 +676,7 @@ All queries enforce soft delete ✅
 - **Severity:** HIGH - Unauthorized deletion possible
 
 **H-02: Frontend uses direct fetch() instead of API client**
-- **Location:** frontend/app/tasks/page.tsx:12
+- **Location:** src/core/frontend/app/tasks/page.tsx:12
 - **Issue:** Violates centralized API pattern
 - **Current Code:**
   ```typescript
@@ -694,7 +694,7 @@ All queries enforce soft delete ✅
 ### MEDIUM (Should Fix) 🟡
 
 **M-01: Acceptance Criterion AC-06 not tested**
-- **Location:** backend/tests/unit/test_tasks.py
+- **Location:** src/core/backend/tests/unit/test_tasks.py
 - **Issue:** No test for "Can filter by priority"
 - **Missing Test:** test_get_tasks_filters_by_priority
 - **Coverage Impact:** AC coverage 5/6 (83%)
@@ -707,7 +707,7 @@ All queries enforce soft delete ✅
 - **Severity:** MEDIUM - Core functionality tested
 
 **M-03: Soft delete not enforced in GET /{id} endpoint**
-- **Location:** backend/routers/tasks.py:56
+- **Location:** src/core/backend/routers/tasks.py:56
 - **Issue:** Can retrieve soft-deleted tasks
 - **Current Query:**
   ```python
@@ -800,7 +800,7 @@ All queries enforce soft delete ✅
 **Documentation:**
 - Spec: specs/phase2/features/[name].md
 - ADR: history/adr/004-phase2-authentication.md
-- Tests: backend/tests/, frontend/tests/
+- Tests: src/core/backend/tests/, src/core/frontend/tests/
 ```
 
 **To Implementation Team (if fixes needed):**

@@ -769,7 +769,7 @@ def downgrade():
 ```python
 import pytest
 from fastapi.testclient import TestClient
-from backend.main import app
+from src.core.backend.main import app
 
 client = TestClient(app)
 
@@ -822,7 +822,7 @@ def test_user_cannot_access_other_users_tasks(auth_headers, other_user_headers):
 
 ```python
 import pytest
-from backend.auth import create_access_token
+from src.core.backend.auth import create_access_token
 
 @pytest.fixture
 def auth_headers():

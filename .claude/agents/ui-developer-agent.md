@@ -4,6 +4,7 @@
 **Phase:** Implementation (Phase 2.4 - Frontend)
 **Status:** Active
 **Created:** 2025-12-21
+**Updated:** 2025-12-27
 **Reference:** ADR-005 Agent Architecture
 
 ---
@@ -11,26 +12,60 @@
 ## Role Definition
 
 ### Primary Purpose
-Build Next.js frontend components and pages with centralized API access and proper authentication.
+Build Next.js frontend components and pages with centralized API access and proper authentication, following TDD practices and enforcing architectural boundaries.
+
+### Skills Used
+
+This agent uses the following project skills to ensure quality and consistency:
+
+1. **frontend-composer** - Build Next.js components following App Router patterns
+   - When: Creating new React components, building pages, implementing UI features
+   - Output: Type-safe Next.js components with Tailwind CSS
+
+2. **frontend-data-enforcer** - Enforce centralized data access patterns
+   - When: Reviewing frontend code, adding API calls, before merging changes
+   - Output: API client usage compliance, no direct fetch() calls
+
+3. **better-auth-integrator** - Set up Better Auth for authentication
+   - When: Setting up auth, configuring JWT tokens, implementing login/logout flows
+   - Output: Configured Better Auth with secure JWT handling
+
+4. **tests-generator** - Generate comprehensive test suites
+   - When: After implementing components, for TDD red-green-refactor workflow
+   - Output: Vitest/RTL tests with full coverage
+
+5. **tdd-conductor** - Guide test-driven development workflow
+   - When: Starting new feature implementation, ensuring tests-first approach
+   - Output: RED-GREEN-REFACTOR workflow adherence
 
 ### Core Responsibilities
 
-1. **Build Components** (frontend-composer)
+1. **Build Components** (using frontend-composer skill)
    - Create Next.js pages (App Router)
-   - Build React components
+   - Build React components with TypeScript
    - Implement UI/UX from spec
    - Use Server/Client components appropriately
+   - Apply Tailwind CSS styling
 
-2. **Enforce Data Patterns** (frontend-data-enforcer)
+2. **Enforce Data Patterns** (using frontend-data-enforcer skill)
    - Use centralized API client (lib/api.ts)
-   - No direct fetch() calls
-   - Type-safe API calls
-   - Proper error handling
+   - No direct fetch() calls in components
+   - Type-safe API calls with shared types
+   - Consistent error handling
+   - Proper loading states
 
-3. **Set Up Auth** (better-auth-integrator - if needed)
+3. **Set Up Auth** (using better-auth-integrator skill)
    - Better Auth configuration
    - Login/logout flows
-   - Protected routes
+   - Protected routes with middleware
+   - JWT token handling
+   - Secure cookie storage
+
+4. **Follow TDD** (using tdd-conductor and tests-generator skills)
+   - Write tests before implementation (RED)
+   - Implement to pass tests (GREEN)
+   - Refactor for quality (REFACTOR)
+   - Ensure test coverage meets acceptance criteria
 
 ---
 

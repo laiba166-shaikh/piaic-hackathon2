@@ -63,7 +63,7 @@ For each feature:
 
 ### Monorepo Structure
 
-- [ ] **[T001]** [P] Create monorepo directory structure
+- [✅] **[T001]** [P] Create monorepo directory structure
   - **Path:** `D:\piaic-hackathon\hackathon2\`
   - **Directories:**
     - `backend/` - FastAPI application
@@ -71,7 +71,7 @@ For each feature:
     - `shared/` - Shared TypeScript types
   - **Acceptance:** All three directories exist with README.md files
 
-- [ ] **[T001A]** [P] Create CLAUDE.md files for frontend and backend
+- [✅] **[T001A]** [P] Create CLAUDE.md files for frontend and backend
   - **Paths:**
     - `D:\piaic-hackathon\hackathon2\frontend\CLAUDE.md`
     - `D:\piaic-hackathon\hackathon2\backend\CLAUDE.md`
@@ -81,16 +81,17 @@ For each feature:
     - Backend CLAUDE.md: FastAPI patterns, SQLModel usage, JWT validation, database conventions
   - **Acceptance:** Both CLAUDE.md files exist with comprehensive guidelines
 
-- [ ] **[T002]** [P] Setup backend project (Python/FastAPI)
+- [✅] **[T002]** [P] Setup backend project (Python/FastAPI)
   - **Path:** `D:\piaic-hackathon\hackathon2\backend\`
   - **Actions:**
     - Create `pyproject.toml` with dependencies (FastAPI, SQLModel, Alembic, PyJWT)
-    - Create `requirements.txt` for pip
+    - Create `requirements.txt` for pip fallback
     - Create `.python-version` file (3.11+)
     - Create `backend/__init__.py`
-  - **Acceptance:** `uv pip install` or `pip install -r requirements.txt` succeeds
+    - Add `[tool.uv]` section in pyproject.toml
+  - **Acceptance:** `uv pip install -e .` or `pip install -r requirements.txt` succeeds
 
-- [ ] **[T003]** [P] Setup frontend project (Next.js 16+)
+- [✅] **[T003]** [P] Setup frontend project (Next.js 16+)
   - **Path:** `D:\piaic-hackathon\hackathon2\frontend\`
   - **Actions:**
     - Run `npx create-next-app@latest frontend --typescript --tailwind --app --no-src-dir`
@@ -99,7 +100,7 @@ For each feature:
     - Create `frontend/.env.local` with `NEXT_PUBLIC_API_URL=http://localhost:8000`
   - **Acceptance:** `npm run dev` starts Next.js dev server
 
-- [ ] **[T004]** Setup environment variables
+- [✅] **[T004]** Setup environment variables
   - **Paths:**
     - `D:\piaic-hackathon\hackathon2\.env.example`
     - `D:\piaic-hackathon\hackathon2\.env`
@@ -118,12 +119,12 @@ For each feature:
     ```
   - **Acceptance:** `.env.example` exists for documentation, `.env` exists for local dev (gitignored)
 
-- [ ] **[T005]** [P] Setup linters and formatters
+- [✅] **[T005]** [P] Setup linters and formatters
   - **Backend:** Configure Ruff (`backend/pyproject.toml`)
   - **Frontend:** Configure ESLint and Prettier (`frontend/.eslintrc.json`, `frontend/.prettierrc`)
   - **Acceptance:** `ruff check backend/` and `npm run lint` run without errors
 
-- [ ] **[T006]** Setup Git pre-commit hooks
+- [✅] **[T006]** Setup Git pre-commit hooks
   - **Path:** `D:\piaic-hackathon\hackathon2\.git\hooks\pre-commit`
   - **Actions:** Run linters before commit
   - **Acceptance:** Commit fails if linting errors exist
@@ -189,13 +190,27 @@ For each feature:
 
 - [ ] **[T012]** Configure Tailwind CSS with journal theme
   - **Path:** `D:\piaic-hackathon\hackathon2\frontend\tailwind.config.ts`
-  - **Colors:** Paper Cream (#F5F1E8), Ink Black (#2C3E50), Vintage Blue (#4A7C99), etc.
-  - **Fonts:** Crimson Text (body), Playfair Display (heading), Courier Prime (mono)
-  - **Acceptance:** Colors and fonts available via Tailwind classes
+  - **Colors (Light & Dark Mode):**
+    - Light Mode:
+      - `paper.cream`: #F5F1E8
+      - `paper.highlight`: #E6DFC8
+      - `ink.black`: #2C3E50
+      - `ink.faded`: rgba(44, 62, 80, 0.5)
+      - `accent.blue`: #4A7C99
+      - `neutral.pencil`: #9AA5A1
+    - Dark Mode:
+      - `paper.night`: #1E2428
+      - `paper.highlight`: #2A3238
+      - `ink.primary`: #E6E1D8
+      - `ink.faded`: rgba(230, 225, 216, 0.5)
+      - `accent.vintageBlue`: #7FA6BF
+      - `neutral.pencilGray`: #A0A9A5
+  - **Fonts:** Inter (body), Patrick Hand (heading), Courier Prime (mono)
+  - **Acceptance:** Colors and fonts available via Tailwind classes, dark mode toggle implemented
 
 - [ ] **[T013]** Setup Google Fonts
   - **Path:** `D:\piaic-hackathon\hackathon2\frontend\app\layout.tsx`
-  - **Fonts:** Import Crimson_Text, Playfair_Display, Courier_Prime from `next/font/google`
+  - **Fonts:** Import Inter, Patrick_Hand, Courier_Prime from `next/font/google`
   - **Acceptance:** Fonts load and apply to text
 
 - [ ] **[T014]** Create root layout with sidebar

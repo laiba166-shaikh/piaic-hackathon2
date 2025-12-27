@@ -1,10 +1,15 @@
 """FastAPI dependencies for authentication and database access."""
 
+import logging
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jose import ExpiredSignatureError, JWTError, jwt
 
 from config import settings
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 
@@ -32,13 +37,28 @@ async def get_current_user(
             algorithms=[settings.JWT_ALGORITHM]
         )
         user_id: str = payload.get("sub")
+
         if user_id is None:
+            logger.warning("JWT validation failed: missing 'sub' claim in token")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authentication credentials"
             )
+
+        logger.info(f"JWT validation successful for user_id: {user_id}")
         return user_id
-    except JWTError:
+
+    except ExpiredSignatureError:
+        logger.warning("JWT validation failed: token has expired")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials"
+        )
+    except JWTError as e:
+        logger.warning(
+            f"JWT validation failed: {type(e).__name__} - "
+            "Invalid token signature or format"
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials"

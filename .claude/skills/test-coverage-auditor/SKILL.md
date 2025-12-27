@@ -49,7 +49,7 @@ Present test coverage audit using this structure:
 ```
 🧪 Test Coverage Audit: [feature-name]
 
-Source Specification: specs/phase2/features/tasks.md
+Source Specification: specs/002-phase2-fullstack-web/tasks.md
 
 Acceptance Criteria Coverage:
 

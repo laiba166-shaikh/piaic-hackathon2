@@ -1,6 +1,6 @@
 # Implementation Plan: User Authentication
 
-**Branch**: `002-phase2-fullstack-web` | **Date**: 2025-12-21 | **Spec**: [01-user-authentication.md](./01-user-authentication.md)
+**Branch**: `002-phase2-fullstack-web` | **Date**: 2025-12-21 | **Spec**: [01-user-authentication.md](./features/01-user-authentication.md)
 **Input**: Feature specification from `specs/002-phase2-fullstack-web/features/01-user-authentication.md`
 
 ## Summary
@@ -233,12 +233,12 @@ No violations to justify.
 10. Accessibility best practices for authentication forms
 
 **Architecture Pattern References:**
-- **Backend:** Follow patterns from `../00-backend-architecture.md`
+- **Backend:** Follow patterns from `./00-backend-architecture.md`
   - JWT validation dependency pattern (Security & Authentication section)
   - Error response format (Error Behavior section)
   - CORS configuration (Security section)
   - Testing fixture patterns (Testing Standards section)
-- **Frontend:** Follow patterns from `../08-frontend-design-flow.md`
+- **Frontend:** Follow patterns from `./08-frontend-design-flow.md`
   - Authentication flow (Authentication Flow section)
   - Better Auth integration patterns
   - Middleware configuration (Routing & Navigation section)

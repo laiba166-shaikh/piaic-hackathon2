@@ -83,14 +83,16 @@ hackathon2/                          # Monorepo root
 ├── specs/                           # AUTHORITATIVE specifications
 │   ├── phase1/                      # Phase 1 CLI specs
 │   │   └── requirements.md
-│   └── phase2/                      # Phase 2 Full-Stack specs
+│   └── 002-phase2-fullstack-web/   # Phase 2 Full-Stack specs
+│       ├── tasks.md                 # Implementation tasks
+│       ├── plan.md                  # Implementation plan
+│       ├── data-model.md            # Data models and schema
 │       ├── features/                # Feature specifications
-│       │   ├── tasks.md
-│       │   ├── tags.md
-│       │   └── search.md
+│       │   ├── 01-user-authentication.md
+│       │   ├── 02-task-crud.md
+│       │   └── 03-task-completion.md
 │       ├── api/                     # API endpoint specifications
-│       │   ├── tasks-endpoints.md
-│       │   └── tags-endpoints.md
+│       │   └── rest-endpoints.md
 │       └── database/                # Database specifications
 │           └── schema.md
 │

@@ -148,7 +148,7 @@ For each feature:
     - Copy connection string to `src/core/backend/.env`
   - **Acceptance:** Connection string saved in `.env`
 
-- [ ] **[T008]** Setup Alembic migrations
+- [✅] **[T008]** Setup Alembic migrations
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\migrations\`
   - **Actions:**
     - Run `alembic init migrations`
@@ -158,7 +158,7 @@ For each feature:
 
 ### Backend Foundation
 
-- [ ] **[T009]** Create FastAPI application structure
+- [✅] **[T009]** Create FastAPI application structure
   - **Paths:**
     - `D:\piaic-hackathon\hackathon2\src\core\backend\main.py`
     - `D:\piaic-hackathon\hackathon2\src\core\backend\config.py`
@@ -169,7 +169,7 @@ For each feature:
     - Create `db.py` with SQLModel engine and session dependency
   - **Acceptance:** `uvicorn src.core.backend.main:app --reload` starts server at http://localhost:8000
 
-- [ ] **[T010]** [P] Configure CORS middleware
+- [✅] **[T010]** [P] Configure CORS middleware
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\main.py`
   - **Config:**
     ```python
@@ -180,7 +180,7 @@ For each feature:
     ```
   - **Acceptance:** Frontend can make API requests without CORS errors
 
-- [ ] **[T011]** [P] Create health check endpoint
+- [✅] **[T011]** [P] Create health check endpoint
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\main.py`
   - **Endpoint:** `GET /health`
   - **Response:** `{"status": "ok"}`
@@ -188,7 +188,7 @@ For each feature:
 
 ### Frontend Foundation
 
-- [ ] **[T012]** Configure Tailwind CSS with journal theme
+- [✅] **[T012]** Configure Tailwind CSS with journal theme
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\tailwind.config.ts`
   - **Colors (Light & Dark Mode):**
     - Light Mode:
@@ -208,12 +208,12 @@ For each feature:
   - **Fonts:** Inter (body), Patrick Hand (heading), Courier Prime (mono)
   - **Acceptance:** Colors and fonts available via Tailwind classes, dark mode toggle implemented
 
-- [ ] **[T013]** Setup Google Fonts
+- [✅] **[T013]** Setup Google Fonts
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\layout.tsx`
   - **Fonts:** Import Inter, Patrick_Hand, Courier_Prime from `next/font/google`
   - **Acceptance:** Fonts load and apply to text
 
-- [ ] **[T014]** Create root layout with sidebar
+- [✅] **[T014]** Create root layout with sidebar
   - **Paths:**
     - `D:\piaic-hackathon\hackathon2\src\core\frontend\app\layout.tsx`
     - `D:\piaic-hackathon\hackathon2\src\core\frontend\components\layout\Sidebar.tsx`
@@ -221,7 +221,7 @@ For each feature:
   - **Structure:** Sidebar (left, 240px), Header (top right), Main content
   - **Acceptance:** Layout renders with journal aesthetic
 
-- [ ] **[T015]** Create centralized API client
+- [✅] **[T015]** Create centralized API client
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\lib\api.ts`
   - **Functions:** `fetchWithAuth()`, `api.getTasks()`, etc.
   - **Features:** Auto-include JWT cookie, error handling, response parsing
@@ -229,12 +229,12 @@ For each feature:
 
 ### Shared Types
 
-- [ ] **[T016]** [P] Create shared TypeScript types
+- [✅] **[T016]** [P] Create shared TypeScript types
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\shared\types\task.ts`
   - **Types:** `Task`, `TaskCreate`, `TaskUpdate`, `TaskResponse`
   - **Acceptance:** Types exported and usable in frontend code
 
-**Phase 1 Completed:** Infrastructure ready for feature implementation
+**Phase 1 Completed:** Infrastructure ready for feature implementation ✅
 
 ---
 
@@ -247,7 +247,7 @@ For each feature:
 
 #### RED - Write Failing Tests
 
-- [ ] **[T017]** [F1] Write JWT validation tests (RED)
+- [✅] **[T017]** [F1] Write JWT validation tests (RED)
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\tests\test_auth.py`
   - **Test Cases:**
     - `test_get_current_user_with_valid_token()` - Should extract user_id from JWT
@@ -255,33 +255,33 @@ For each feature:
     - `test_get_current_user_with_invalid_token()` - Should return 401
     - `test_get_current_user_with_missing_token()` - Should return 401
     - `test_get_current_user_with_missing_sub_claim()` - Should return 401
-  - **Status:** Tests should FAIL (dependency not implemented yet)
-  - **Acceptance:** `pytest src/core/backend/tests/test_auth.py` shows 5 failing tests
+  - **Status:** Tests PASS (all 5 tests passing)
+  - **Acceptance:** `pytest src/core/backend/tests/test_auth.py` shows 5 passing tests ✅
 
 #### GREEN - Implement JWT Validation
 
-- [ ] **[T018]** [F1] Implement get_current_user dependency (GREEN)
+- [✅] **[T018]** [F1] Implement get_current_user dependency (GREEN)
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\dependencies.py`
   - **Function:** `async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(HTTPBearer())) -> str`
   - **Logic:**
-    - Decode JWT with PyJWT
+    - Decode JWT with python-jose
     - Validate signature with JWT_SECRET
     - Extract user_id from 'sub' claim
     - Raise HTTPException(401) if invalid/expired/missing
-  - **Acceptance:** All tests in T017 pass
+  - **Acceptance:** All tests in T017 pass ✅
 
-- [ ] **[T019]** [F1] Configure JWT_SECRET in config
+- [✅] **[T019]** [F1] Configure JWT_SECRET in config
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\config.py`
   - **Field:** `JWT_SECRET: str` (from environment variable)
   - **Validation:** Raise error if JWT_SECRET not set
-  - **Acceptance:** Config loads JWT_SECRET from `.env`
+  - **Acceptance:** Config loads JWT_SECRET from `.env` ✅
 
 #### REFACTOR
 
-- [ ] **[T020]** [F1] Add logging to JWT validation
+- [✅] **[T020]** [F1] Add logging to JWT validation
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\dependencies.py`
   - **Actions:** Log failed validation attempts (without exposing tokens)
-  - **Acceptance:** Logs show authentication events
+  - **Acceptance:** Logs show authentication events ✅
 
 ### Frontend: Better Auth Integration (TDD)
 

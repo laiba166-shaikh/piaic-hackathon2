@@ -15,8 +15,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+// Mock functions must be declared using vi.hoisted to avoid hoisting issues
+const { mockPush, mockSignIn } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockSignIn: vi.fn(),
+}));
+
 // Mock Next.js router
-const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: (): { push: typeof mockPush } => ({
     push: mockPush,
@@ -24,7 +29,6 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock Better Auth client
-const mockSignIn = vi.fn();
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
     signIn: {

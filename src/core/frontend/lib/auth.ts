@@ -8,8 +8,8 @@
  * - HTTP-only cookies for secure session storage
  */
 
-import { betterAuth } from "better-auth";
-import { Pool } from "pg";
+import { betterAuth } from 'better-auth';
+import { Pool } from 'pg';
 
 // Validate required environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -17,15 +17,11 @@ const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
 const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL;
 
 if (!DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL environment variable is required for Better Auth"
-  );
+  throw new Error('DATABASE_URL environment variable is required for Better Auth');
 }
 
 if (!BETTER_AUTH_SECRET) {
-  throw new Error(
-    "BETTER_AUTH_SECRET environment variable is required for Better Auth"
-  );
+  throw new Error('BETTER_AUTH_SECRET environment variable is required for Better Auth');
 }
 
 /**
@@ -64,13 +60,13 @@ export const auth = betterAuth({
    * Base URL for Better Auth API routes
    * Default: http://localhost:3000
    */
-  baseURL: BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL: BETTER_AUTH_URL || 'http://localhost:3000',
 
   /**
    * Base path for Better Auth API routes
    * All auth endpoints will be at /api/auth/*
    */
-  basePath: "/api/auth",
+  basePath: '/api/auth',
 
   /**
    * Secret key for encryption, signing, and hashing
@@ -145,14 +141,14 @@ export const auth = betterAuth({
     /**
      * Use secure cookies in production (HTTPS only)
      */
-    useSecureCookies: process.env.NODE_ENV === "production",
+    useSecureCookies: process.env.NODE_ENV === 'production',
 
     /**
      * Cookie options
      */
     cookieOptions: {
-      sameSite: "lax" as const, // CSRF protection
-      path: "/", // Cookie available on all paths
+      sameSite: 'lax' as const, // CSRF protection
+      path: '/', // Cookie available on all paths
       httpOnly: true, // Prevent JavaScript access (XSS protection)
     },
   },
@@ -161,9 +157,7 @@ export const auth = betterAuth({
    * Trusted origins for CORS
    * Allow requests from backend API
    */
-  trustedOrigins: [
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
-  ],
+  trustedOrigins: [process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'],
 });
 
 /**
@@ -171,4 +165,4 @@ export const auth = betterAuth({
  * Use these in Server Components, Server Actions, and API Routes
  */
 export type AuthSession = typeof auth.api.getSession;
-export type AuthUser = Awaited<ReturnType<AuthSession>>["user"];
+export type AuthUser = Awaited<ReturnType<AuthSession>>['user'];

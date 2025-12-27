@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Patrick_Hand, Courier_Prime } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Header } from "@/components/layout/Header";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,21 +31,13 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>): JSX.Element {
   return (
     <html lang="en">
       <body
         className={`${inter.variable} ${patrickHand.variable} ${courierPrime.variable} antialiased bg-paper-cream`}
       >
-        <div className="flex h-screen">
-          <Sidebar />
-          <div className="flex-1 flex flex-col">
-            <Header />
-            <main className="flex-1 overflow-auto p-6">
-              {children}
-            </main>
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   );

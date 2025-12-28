@@ -222,15 +222,18 @@ No violations to justify.
 
 **Unknowns to Research:**
 1. Better Auth configuration for Next.js 16 App Router
-2. JWT secret sharing between frontend and backend (environment variables)
-3. HTTP-only cookie configuration with SameSite and Secure flags
-4. Better Auth database schema and migration setup
-5. Frontend middleware pattern for protected routes (Next.js 16)
-6. Backend JWT validation with PyJWT (algorithm, expiration, claims)
-7. Error handling patterns for expired/invalid tokens
-8. CORS configuration for frontend-backend communication
-9. Testing patterns for JWT-based auth (mocking tokens)
-10. Accessibility best practices for authentication forms
+2. **[CRITICAL]** Better Auth JWT plugin: How to retrieve JWT tokens via `authClient.token()`
+3. **[CRITICAL]** JWT storage strategy: localStorage vs. sessionStorage vs. cookie (and why Better Auth doesn't auto-set JWT cookies)
+4. **[CRITICAL]** JWT token refresh workflow: When to call `authClient.token()` (login, page load, on 401?)
+5. JWT secret sharing between frontend and backend (environment variables)
+6. HTTP-only cookie configuration with SameSite and Secure flags
+7. Better Auth database schema and migration setup
+8. Frontend middleware pattern for protected routes (Next.js 16)
+9. Backend JWT validation with PyJWT (algorithm, expiration, claims)
+10. Error handling patterns for expired/invalid tokens
+11. CORS configuration for frontend-backend communication
+12. Testing patterns for JWT-based auth (mocking tokens)
+13. Accessibility best practices for authentication forms
 
 **Architecture Pattern References:**
 - **Backend:** Follow patterns from `./00-backend-architecture.md`
@@ -260,6 +263,8 @@ No violations to justify.
 
 **Research Tasks:**
 - [ ] Better Auth documentation review (Next.js integration, JWT token generation)
+- [ ] **[CRITICAL]** Better Auth JWT plugin usage: API endpoints, token retrieval, storage patterns
+- [ ] **[CRITICAL]** Difference between Better Auth session cookie vs. JWT token for external APIs
 - [ ] Next.js 16 middleware patterns for authentication (reference: 08-frontend-design-flow.md lines 118-146)
 - [ ] FastAPI JWT validation patterns (reference: 00-backend-architecture.md lines 590-640)
 - [ ] HTTP-only cookie security best practices
@@ -308,6 +313,41 @@ No violations to justify.
   - Visit /register → create account → redirected to dashboard
   - Visit /login → log in → redirected to dashboard
   - Visit / without auth → redirected to /login
+
+### JWT Token Handling Strategy (jwt-strategy.md)
+
+**Decision:** JWT Storage Mechanism
+
+- **Rejected:** In-memory storage (lost on refresh)
+- **Rejected:** HTTP-only cookie (Better Auth doesn't set JWT in cookies)
+- **Chosen:** localStorage (persists across refreshes, accessible to API client)
+- **Security Trade-off:** XSS vulnerability accepted (mitigated by short-lived tokens)
+
+**Retrieval Workflow:**
+1. After `signIn()` success → Call `authClient.token()`
+2. On app initialization → Check localStorage for JWT, refresh if missing
+3. On 401 from backend → Re-retrieve JWT or force re-login
+
+**Transmission:**
+- Method: Authorization header (`Authorization: Bearer <token>`)
+- Not used: HTTP-only cookies (Better Auth session cookie is separate)
+
+**Lifecycle:**
+- Login: Retrieve and store JWT
+- Refresh: Read JWT from localStorage
+- API Call: Send JWT in Authorization header
+- Logout: Clear JWT from localStorage
+
+**Two-Token Architecture:**
+- **Better Auth Session Cookie:** `better-auth.session_token`
+  - Purpose: Next.js middleware, frontend routing
+  - Storage: HTTP-only cookie (secure)
+  - Lifetime: 24 hours
+- **JWT Token:** Retrieved via `authClient.token()`
+  - Purpose: Backend API authentication
+  - Storage: localStorage (accessible to API client)
+  - Lifetime: 24 hours
+- **BOTH REQUIRED:** Session for frontend UX, JWT for backend data
 
 ## Implementation Workflow
 

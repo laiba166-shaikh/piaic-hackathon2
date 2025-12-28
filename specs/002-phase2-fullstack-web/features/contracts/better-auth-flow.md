@@ -549,6 +549,95 @@ export function UserProfile() {
 
 ---
 
+### Method 5: token() **[CRITICAL FOR BACKEND AUTH]**
+
+**Purpose:** Retrieve JWT token for external API authentication (FastAPI backend)
+
+**Function Signature:**
+```typescript
+async function token(): Promise<{
+  data: { token: string } | null;
+  error: { message: string } | null;
+}>
+```
+
+**When to Call:**
+1. **After successful login** (`signIn()` returns success)
+2. **After successful registration** (`signUp()` returns success)
+3. **On page load** (if Better Auth session exists but JWT not in storage)
+4. **After 401 error from backend** (JWT expired but session still valid)
+
+**Usage Pattern:**
+```typescript
+// After login
+const loginResult = await authClient.signIn.email({ email, password });
+if (!loginResult.error) {
+  // CRITICAL: Retrieve JWT for backend
+  const tokenResult = await authClient.token();
+  if (tokenResult.data) {
+    localStorage.setItem('jwt_token', tokenResult.data.token);
+  }
+  router.push('/');
+}
+
+// On app initialization (page load/refresh)
+useEffect(() => {
+  async function initAuth() {
+    const session = await authClient.getSession();
+    if (session.data && !localStorage.getItem('jwt_token')) {
+      const tokenResult = await authClient.token();
+      if (tokenResult.data) {
+        localStorage.setItem('jwt_token', tokenResult.data.token);
+      }
+    }
+  }
+  initAuth();
+}, []);
+```
+
+**Success Response:**
+```typescript
+{
+  data: {
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  },
+  error: null
+}
+```
+
+**Error Response:**
+```typescript
+{
+  data: null,
+  error: {
+    message: "No active session"
+  }
+}
+```
+
+**JWT Token Format:**
+```json
+{
+  "sub": "550e8400-e29b-41d4-a716-446655440000",
+  "iat": 1734705600,
+  "exp": 1734792000
+}
+```
+
+**Storage Recommendations:**
+- **Production:** localStorage (persists across tabs/refreshes)
+- **Development:** localStorage (easier debugging)
+- **NOT RECOMMENDED:** In-memory (lost on refresh)
+- **SECURITY NOTE:** localStorage vulnerable to XSS, but acceptable for short-lived tokens with HttpOnly session backup
+
+**Relationship to Session Cookie:**
+- Session cookie (`better-auth.session_token`): Frontend routing/middleware
+- JWT token (from `.token()`): Backend API authentication
+- **Both required:** Session for frontend, JWT for backend
+- **Lifetimes match:** Both expire after 24 hours
+
+---
+
 ## Auto-Generated API Routes
 
 Better Auth automatically creates API routes at `/api/auth/*` when you use `toNextJsHandler()`:

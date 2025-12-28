@@ -85,13 +85,26 @@ User Authentication provides secure access control for the multi-user task manag
 **And** I receive a user-friendly message "This email is already in use"
 **And** I remain on the registration page
 
-### AC4: User Login Success
+### AC4: User Login Success Flow
 **Given** I am on the login page
 **When** I enter valid credentials (registered email and correct password)
-**Then** Better Auth validates my credentials
-**And** Better Auth issues a JWT token with my user_id in the 'sub' claim
-**And** the token is stored in an HTTP-only cookie named 'auth-token'
+**Then** Better Auth validates my credentials against the database
+**And** Better Auth creates a session and sets `better-auth.session_token` HTTP-only cookie
+**And** **[CRITICAL]** Frontend calls `authClient.token()` to retrieve a JWT token containing my user_id in the 'sub' claim
+**And** **[CRITICAL]** Frontend stores the JWT token in a mechanism that:
+  - **Persists across page refreshes** (localStorage, sessionStorage, or cookie)
+  - **Is accessible to API client** on every backend request
+  - **Is sent to backend** in the `Authorization: Bearer <token>` header
 **And** I am redirected to the dashboard page (/)
+
+**JWT Token Contract:**
+- **Issuer:** Better Auth (`authClient.token()` endpoint)
+- **Claims:** `{ "sub": "<user_id>", "exp": <timestamp>, "iat": <timestamp> }`
+- **Algorithm:** HS256
+- **Secret:** Shared between frontend (`BETTER_AUTH_SECRET`) and backend (`JWT_SECRET`)
+- **Transmission:** Authorization header (`Authorization: Bearer <token>`)
+- **Storage:** localStorage OR sessionStorage (developer decision, must persist across refreshes)
+- **Lifetime:** 24 hours (matches Better Auth session)
 
 ### AC5: User Login Failure
 **Given** I am on the login page
@@ -149,6 +162,39 @@ User Authentication provides secure access control for the multi-user task manag
 **Then** the backend returns 401 Unauthorized with error "Invalid token"
 **And** the frontend detects the 401 error
 **And** the frontend redirects the user to the login page
+
+### AC13: JWT Token Lifecycle Management
+
+**Scenario:** User logs in, refreshes page, then makes backend API call
+
+**Flow:**
+1. **Login:**
+   - User submits credentials → Better Auth validates → Session cookie set
+   - Frontend calls `authClient.token()` → JWT returned
+   - Frontend stores JWT in `localStorage.setItem('jwt_token', token)`
+
+2. **Page Refresh:**
+   - Middleware reads `better-auth.session_token` cookie → User still authenticated
+   - Frontend runs on mount: `const token = localStorage.getItem('jwt_token')`
+   - If token exists and not expired → Use for API calls
+   - If token missing or expired → Call `authClient.token()` to get new one
+
+3. **API Call:**
+   - API client reads JWT from localStorage
+   - Sends request: `Authorization: Bearer <jwt_token>`
+   - Backend validates JWT and extracts user_id
+   - Backend returns user-specific data
+
+**Acceptance Criteria:**
+- ✅ JWT token persists across page refreshes
+- ✅ Backend API calls succeed after refresh
+- ✅ Expired JWT triggers automatic re-retrieval (not implemented in Phase 2, manual re-login required)
+- ✅ Logout clears both session cookie AND JWT from localStorage
+
+**Edge Case:** JWT expires before session cookie
+- **Symptom:** Backend returns 401 but middleware allows access
+- **Expected:** Frontend detects 401, calls `authClient.token()` to refresh JWT
+- **Phase 2 Behavior:** User must re-login (refresh tokens deferred to Phase 3)
 
 ## Edge Cases
 

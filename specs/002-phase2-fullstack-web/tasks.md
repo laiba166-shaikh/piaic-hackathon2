@@ -294,15 +294,23 @@ For each feature:
   - **Acceptance:** Better Auth can connect to database ✅
   - **Completed:** Neon database configured, connection string added to .env.local
 
-- [✅] **[T022]** [F1] Configure Better Auth
+- [✅] **[T022]** [F1] Configure Better Auth with JWT Plugin
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\lib\auth.ts`
   - **Config:**
     - Database URL
-    - JWT secret (shared with backend)
+    - Secret (BETTER_AUTH_SECRET, shared with backend as JWT_SECRET)
     - Email/password provider
-    - Cookie settings (HTTP-only, SameSite=Strict)
-  - **Acceptance:** Better Auth initialized ✅
-  - **Completed:** auth.ts created with PostgreSQL pool, email/password auth, session config
+    - Session cookie settings (HTTP-only, SameSite=Strict)
+    - **[NEW]** JWT plugin: `plugins: [jwt()]`
+  - **JWT Plugin Configuration:**
+    - Algorithm: HS256
+    - Expiration: 24 hours (matches session)
+    - Claims: `{ "sub": user_id, "exp": timestamp, "iat": timestamp }`
+  - **Acceptance:**
+    - ✅ Better Auth initialized with JWT plugin
+    - ✅ `authClient.token()` endpoint available
+    - ✅ JWT secret matches backend JWT_SECRET
+  - **Completed:** auth.ts created with PostgreSQL pool, email/password auth, session config, JWT plugin
 
 - [✅] **[T023]** [F1] Run Better Auth migrations
   - **Actions:** Run Better Auth migration to create users table
@@ -339,6 +347,50 @@ For each feature:
   - **Acceptance:** All tests in T024 pass ✅
   - **Completed:** All 6 tests passing - form rendering, validation, error handling, success redirect, password toggle
 
+#### JWT Token Retrieval & Storage
+
+- [ ] **[T026A]** [F1] Create JWT storage utility
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\lib\jwt-storage.ts`
+  - **Functions:**
+    - `getJwtToken(): string | null` - Read JWT from localStorage
+    - `setJwtToken(token: string): void` - Store JWT in localStorage
+    - `clearJwtToken(): void` - Remove JWT from localStorage
+    - `hasJwtToken(): boolean` - Check if JWT exists
+  - **Storage Key:** `'jwt_token'`
+  - **NOT in-memory:** Must use localStorage for persistence
+  - **Acceptance:** JWT persists across page refreshes ✅
+
+- [ ] **[T026B]** [F1] Integrate JWT retrieval in LoginForm
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\LoginForm.tsx`
+  - **After Better Auth signIn() success:**
+    1. Call `authClient.token()` to retrieve JWT
+    2. Store JWT: `setJwtToken(tokenResult.data.token)`
+    3. Handle errors if token retrieval fails
+  - **Acceptance:**
+    - ✅ JWT retrieved after successful login
+    - ✅ JWT stored in localStorage
+    - ✅ Login fails if JWT retrieval fails
+
+- [ ] **[T026C]** [F1] Integrate JWT retrieval in RegisterForm
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\RegisterForm.tsx`
+  - **After Better Auth signUp() success:**
+    1. Call `authClient.token()` to retrieve JWT
+    2. Store JWT: `setJwtToken(tokenResult.data.token)`
+    3. Handle errors if token retrieval fails
+  - **Acceptance:**
+    - ✅ JWT retrieved after successful registration
+    - ✅ JWT stored in localStorage
+    - ✅ Registration fails if JWT retrieval fails
+
+- [ ] **[T026D]** [F1] Update LogoutButton to clear JWT
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\LogoutButton.tsx`
+  - **On logout:**
+    1. Call `authClient.signOut()` (clears session cookie)
+    2. Call `clearJwtToken()` (clears JWT from localStorage)
+  - **Acceptance:**
+    - ✅ Both session cookie AND JWT cleared on logout
+    - ✅ Subsequent API calls fail with 401 (no JWT)
+
 - [✅] **[T027]** [F1] Create register page
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\register\page.tsx`
   - **Component:** Server Component rendering RegisterForm
@@ -371,6 +423,37 @@ For each feature:
   - **Acceptance:** Middleware protects routes correctly ✅
   - **Completed:** Middleware checks Better Auth session cookie, protects all routes except auth pages and API
 
+- [ ] **[T030A]** [F1] Create JWT refresh hook for page load
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\hooks\useAuthInit.ts`
+  - **Purpose:** Refresh JWT on page load if session exists but JWT missing
+  - **Logic:**
+    ```typescript
+    useEffect(() => {
+      async function initAuth() {
+        const session = await authClient.getSession();
+        const jwt = getJwtToken();
+
+        // Session exists but no JWT → retrieve JWT
+        if (session.data && !jwt) {
+          const tokenResult = await authClient.token();
+          if (tokenResult.data) {
+            setJwtToken(tokenResult.data.token);
+          }
+        }
+
+        // No session → clear JWT if exists
+        if (!session.data && jwt) {
+          clearJwtToken();
+        }
+      }
+      initAuth();
+    }, []);
+    ```
+  - **Acceptance:**
+    - ✅ JWT refreshed on page load if session exists
+    - ✅ JWT cleared if no session exists
+    - ✅ Backend API calls succeed after page refresh
+
 #### REFACTOR
 
 - [✅] **[T031]** [F1] Create reusable auth UI components
@@ -395,6 +478,18 @@ For each feature:
   - **Tool:** Playwright
   - **Acceptance:** E2E tests pass ✅
   - **Completed:** 7 comprehensive E2E tests covering full auth flow, Playwright configured
+
+- [ ] **[T032A]** [F1] E2E test: JWT persistence after page refresh
+  - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\e2e\auth.spec.ts`
+  - **Test Flow:**
+    1. Register new user → Login succeeds
+    2. Verify JWT in localStorage
+    3. **Refresh page**
+    4. Verify JWT still in localStorage
+    5. Make backend API call (GET /api/v1/tasks)
+    6. **Assertion:** API call succeeds (200 OK, not 401)
+  - **Failure Scenario:** If JWT lost on refresh, API call returns 401
+  - **Acceptance:** Test passes (JWT persists, backend auth works)
 
 **Phase 2 Completed:** User authentication fully functional ✅
 
@@ -882,12 +977,12 @@ For each feature:
 
 ## Task Summary
 
-### Total Task Count: 85 tasks
+### Total Task Count: 91 tasks
 
 **By Phase:**
 - Phase 0 (Project Setup): 6 tasks
 - Phase 1 (Foundational Infrastructure): 10 tasks
-- Phase 2 (Feature 1 - User Authentication): 16 tasks
+- Phase 2 (Feature 1 - User Authentication): 22 tasks (was 16, added 6 JWT tasks: T026A-D, T030A, T032A)
 - Phase 3 (Feature 2 - Task CRUD): 20 tasks
 - Phase 4 (Feature 3 - Task Completion): 11 tasks
 - Phase 5 (Integration & Polish): 22 tasks

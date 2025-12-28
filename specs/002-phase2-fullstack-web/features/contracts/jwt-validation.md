@@ -16,15 +16,13 @@ This contract defines the `get_current_user()` dependency function that validate
 
 ```python
 async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False)),
-    auth_token: Optional[str] = Cookie(None, alias="auth-token")
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())
 ) -> str:
     """
     Validate JWT token and extract user_id from 'sub' claim.
 
     Args:
         credentials: JWT token from Authorization header (Bearer format)
-        auth_token: JWT token from HTTP-only cookie (fallback)
 
     Returns:
         str: User ID from JWT 'sub' claim
@@ -41,7 +39,7 @@ async def get_current_user(
 
 ## Input Specification
 
-### Input Method 1: Authorization Header (Preferred)
+### **MANDATED INPUT METHOD: Authorization Header**
 
 **Header Name:** `Authorization`
 **Format:** `Bearer <JWT_TOKEN>`
@@ -53,38 +51,50 @@ Host: localhost:8000
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsImV4cCI6MTczNDc5MjAwMH0.signature
 ```
 
+**Frontend Responsibility:**
+- Extract JWT from localStorage: `const token = localStorage.getItem('jwt_token')`
+- Include in every backend API request:
+  ```typescript
+  fetch('/api/v1/tasks', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  ```
+
+**Backend Implementation:**
+```python
+# dependencies.py
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+) -> str:
+    """Extract user_id from Authorization header JWT token."""
+    token = credentials.credentials  # From "Bearer <token>"
+    payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+    user_id: str = payload.get("sub")
+    if not user_id:
+        raise HTTPException(401, detail="Invalid token: missing user_id")
+    return user_id
+```
+
 **Validation:**
 - Header MUST start with "Bearer " (case-sensitive)
 - Token MUST be a valid JWT string (three base64-encoded parts separated by dots)
 - If header is present but malformed, return 401 Unauthorized
+- If header is missing, return 401 Unauthorized (no fallback)
 
-### Input Method 2: HTTP-Only Cookie (Fallback)
+**Cookie Fallback: REMOVED**
 
-**Cookie Name:** `auth-token`
-**Format:** JWT token string (no "Bearer " prefix)
-**Attributes:**
-- HttpOnly: true (prevents JavaScript access)
-- SameSite: Strict (CSRF protection)
-- Secure: true (production only, HTTPS required)
-- Max-Age: 86400 (24 hours)
+**Rationale:**
+- Better Auth JWT plugin **does NOT set JWT in HTTP-only cookie**
+- JWT must be **manually retrieved** via `authClient.token()`
+- Frontend stores JWT in localStorage
+- Backend **only** checks Authorization header
 
-**Example:**
-```http
-GET /api/v1/tasks HTTP/1.1
-Host: localhost:8000
-Cookie: auth-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsImV4cCI6MTczNDc5MjAwMH0.signature
-```
-
-**Validation:**
-- Cookie value MUST be a valid JWT string (no "Bearer " prefix)
-- Cookie is read automatically by FastAPI's `Cookie()` dependency
-
-### Token Precedence
-
-If both Authorization header and cookie are present:
-1. Try Authorization header first
-2. If header is invalid or missing, fall back to cookie
-3. If both are missing, return 401 Unauthorized
+**Migration from Spec v1.0:**
+- ~~Input Method 2: HTTP-Only Cookie~~ **DEPRECATED**
+- Only Authorization header supported
+- Simplifies implementation (one method, not two)
 
 ---
 
@@ -269,25 +279,21 @@ async def get_tasks(
 
 ```python
 # src/core/backend/dependencies.py
-from fastapi import Depends, HTTPException, Security, Cookie
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
-from typing import Optional
 from .config import settings
 
 # HTTP Bearer security scheme (extracts Authorization header)
-security = HTTPBearer(auto_error=False)  # Don't auto-raise, handle manually
+security = HTTPBearer()
 
 async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Security(security),
-    auth_token: Optional[str] = Cookie(None, alias="auth-token")
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> str:
     """
     Validate JWT token and extract user_id from 'sub' claim.
 
-    Supports two token sources (in order of precedence):
-    1. Authorization header: Bearer <token>
-    2. Cookie: auth-token=<token>
+    Token must be provided in Authorization header: Bearer <token>
 
     Returns:
         user_id (str): User identifier from JWT 'sub' claim
@@ -295,24 +301,10 @@ async def get_current_user(
     Raises:
         HTTPException 401: Invalid, expired, or missing token
     """
-    token = None
-
-    # Try Authorization header first (preferred method)
-    if credentials:
-        token = credentials.credentials  # Extract token from "Bearer <token>"
-    # Fallback to cookie
-    elif auth_token:
-        token = auth_token
-
-    # No token provided via any method
-    if not token:
-        raise HTTPException(
-            status_code=401,
-            detail="Authorization required",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
     try:
+        # Extract token from Authorization header
+        token = credentials.credentials  # From "Bearer <token>"
+
         # Decode and validate JWT token
         payload = jwt.decode(
             token,

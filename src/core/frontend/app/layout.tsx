@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Patrick_Hand, Courier_Prime } from "next/font/google";
 import "./globals.css";
+import AuthInitializer from "@/components/auth/AuthInitializer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${patrickHand.variable} ${courierPrime.variable} antialiased bg-paper-cream`}
       >
+        <AuthInitializer />
         {children}
       </body>
     </html>

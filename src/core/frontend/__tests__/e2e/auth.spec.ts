@@ -381,4 +381,112 @@ test.describe("Authentication Flow", () => {
     // Assert: Password is hidden again
     await expect(passwordInput).toHaveAttribute("type", "password");
   });
+
+  /**
+   * Test 8: JWT Token Persistence After Page Refresh
+   *
+   * Acceptance Criteria (from T032A):
+   * - JWT token is stored in localStorage after login
+   * - JWT token persists across page refreshes
+   * - User remains authenticated after page refresh
+   * - JWT token is automatically refreshed if missing but session exists
+   *
+   * This test validates the fix from the forensic audit:
+   * - JWT must be stored in localStorage (NOT in-memory)
+   * - JWT must survive page refresh
+   * - useAuthInit hook must refresh JWT on page load if missing
+   */
+  test("should persist JWT token across page refresh", async ({ page }) => {
+    // Arrange: Register and login a user
+    await clearAuth(page);
+    const testEmail = generateTestEmail();
+
+    await page.goto("/register");
+    await page.getByLabel(/name/i).fill(TEST_NAME);
+    await page.getByLabel(/email/i).fill(testEmail);
+    await page.getByLabel(/^password$/i).fill(TEST_PASSWORD);
+    await page.getByLabel(/confirm password/i).fill(TEST_PASSWORD);
+    await page.getByRole("button", { name: /register|sign up/i }).click();
+
+    // Wait for successful registration and redirect to dashboard
+    await expect(page).toHaveURL("/", { timeout: 10000 });
+
+    // Assert: JWT token exists in localStorage
+    const jwtBefore = await page.evaluate(() => {
+      return localStorage.getItem('jwt_token');
+    });
+    expect(jwtBefore).toBeTruthy();
+    expect(jwtBefore).not.toBe('null');
+    expect(jwtBefore).not.toBe('undefined');
+
+    // Assert: Better Auth session cookie exists
+    let cookies = await page.context().cookies();
+    let authCookie = cookies.find((cookie) =>
+      cookie.name.includes("better-auth.session_token")
+    );
+    expect(authCookie).toBeDefined();
+    expect(authCookie?.value).toBeTruthy();
+
+    // Act: Reload the page (simulates user hitting F5 or closing/reopening tab)
+    await page.reload();
+
+    // Wait for page to load completely
+    await expect(page).toHaveURL("/", { timeout: 10000 });
+
+    // Assert: JWT token STILL exists in localStorage after refresh
+    const jwtAfter = await page.evaluate(() => {
+      return localStorage.getItem('jwt_token');
+    });
+    expect(jwtAfter).toBeTruthy();
+    expect(jwtAfter).toBe(jwtBefore); // Should be the same token
+    expect(jwtAfter).not.toBe('null');
+    expect(jwtAfter).not.toBe('undefined');
+
+    // Assert: User is still authenticated (can see dashboard content)
+    await expect(
+      page.locator("text=Task").or(page.locator("text=Dashboard"))
+    ).toBeVisible({ timeout: 5000 });
+
+    // Assert: Session cookie still exists
+    cookies = await page.context().cookies();
+    authCookie = cookies.find((cookie) =>
+      cookie.name.includes("better-auth.session_token")
+    );
+    expect(authCookie).toBeDefined();
+    expect(authCookie?.value).toBeTruthy();
+
+    // Test Case 2: JWT refresh when missing but session exists
+    // This tests the useAuthInit hook functionality
+
+    // Act: Manually clear JWT from localStorage but keep session cookie
+    await page.evaluate(() => {
+      localStorage.removeItem('jwt_token');
+    });
+
+    // Verify JWT is gone
+    const jwtCleared = await page.evaluate(() => {
+      return localStorage.getItem('jwt_token');
+    });
+    expect(jwtCleared).toBeNull();
+
+    // Act: Reload the page (useAuthInit should restore JWT from session)
+    await page.reload();
+
+    // Wait for page to load and useAuthInit to run
+    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await page.waitForTimeout(1000); // Give useAuthInit time to run
+
+    // Assert: JWT token is automatically restored by useAuthInit hook
+    const jwtRestored = await page.evaluate(() => {
+      return localStorage.getItem('jwt_token');
+    });
+    expect(jwtRestored).toBeTruthy();
+    expect(jwtRestored).not.toBe('null');
+    expect(jwtRestored).not.toBe('undefined');
+
+    // Assert: User can still access protected content
+    await expect(
+      page.locator("text=Task").or(page.locator("text=Dashboard"))
+    ).toBeVisible({ timeout: 5000 });
+  });
 });

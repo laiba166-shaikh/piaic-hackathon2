@@ -349,7 +349,7 @@ For each feature:
 
 #### JWT Token Retrieval & Storage
 
-- [ ] **[T026A]** [F1] Create JWT storage utility
+- [✅] **[T026A]** [F1] Create JWT storage utility
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\lib\jwt-storage.ts`
   - **Functions:**
     - `getJwtToken(): string | null` - Read JWT from localStorage
@@ -360,7 +360,7 @@ For each feature:
   - **NOT in-memory:** Must use localStorage for persistence
   - **Acceptance:** JWT persists across page refreshes ✅
 
-- [ ] **[T026B]** [F1] Integrate JWT retrieval in LoginForm
+- [✅] **[T026B]** [F1] Integrate JWT retrieval in LoginForm
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\LoginForm.tsx`
   - **After Better Auth signIn() success:**
     1. Call `authClient.token()` to retrieve JWT
@@ -371,7 +371,7 @@ For each feature:
     - ✅ JWT stored in localStorage
     - ✅ Login fails if JWT retrieval fails
 
-- [ ] **[T026C]** [F1] Integrate JWT retrieval in RegisterForm
+- [✅] **[T026C]** [F1] Integrate JWT retrieval in RegisterForm
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\RegisterForm.tsx`
   - **After Better Auth signUp() success:**
     1. Call `authClient.token()` to retrieve JWT
@@ -382,7 +382,7 @@ For each feature:
     - ✅ JWT stored in localStorage
     - ✅ Registration fails if JWT retrieval fails
 
-- [ ] **[T026D]** [F1] Update LogoutButton to clear JWT
+- [✅] **[T026D]** [F1] Update LogoutButton to clear JWT
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\auth\LogoutButton.tsx`
   - **On logout:**
     1. Call `authClient.signOut()` (clears session cookie)
@@ -423,7 +423,7 @@ For each feature:
   - **Acceptance:** Middleware protects routes correctly ✅
   - **Completed:** Middleware checks Better Auth session cookie, protects all routes except auth pages and API
 
-- [ ] **[T030A]** [F1] Create JWT refresh hook for page load
+- [✅] **[T030A]** [F1] Create JWT refresh hook for page load
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\hooks\useAuthInit.ts`
   - **Purpose:** Refresh JWT on page load if session exists but JWT missing
   - **Logic:**
@@ -479,7 +479,7 @@ For each feature:
   - **Acceptance:** E2E tests pass ✅
   - **Completed:** 7 comprehensive E2E tests covering full auth flow, Playwright configured
 
-- [ ] **[T032A]** [F1] E2E test: JWT persistence after page refresh
+- [✅] **[T032A]** [F1] E2E test: JWT persistence after page refresh
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\e2e\auth.spec.ts`
   - **Test Flow:**
     1. Register new user → Login succeeds

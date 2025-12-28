@@ -5,14 +5,13 @@
  * It includes the Sidebar and Header components.
  */
 
-import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
-
+import { Sidebar } from "@/components/layout/Sidebar";
 export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>): JSX.Element {
+}>){
   return (
     <div className="flex h-screen">
       <Sidebar />

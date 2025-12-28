@@ -1,14 +1,19 @@
 /**
- * Centralized API client for backend communication.
+ * Centralized API client for backend communication with JWT authentication.
  *
  * All backend API calls MUST go through this client.
  * DO NOT use direct fetch() calls in components.
+ *
+ * This client automatically includes JWT tokens in the Authorization header
+ * for authentication with the FastAPI backend.
  */
+
+import { getJwtToken, clearJwtToken } from "./jwt-storage";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 /**
- * Generic fetch wrapper with authentication and error handling.
+ * Generic fetch wrapper with JWT authentication and error handling.
  *
  * @param endpoint - API endpoint (e.g., "/api/v1/tasks")
  * @param options - Fetch options
@@ -17,23 +22,36 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
  */
 async function fetchWithAuth(endpoint: string, options?: RequestInit) {
   try {
+    // Get JWT token from storage
+    const token = getJwtToken();
+
+    // Build headers with JWT token
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    };
+
+    // Add Authorization header if token is available
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
-      credentials: "include", // Include JWT cookie
-      headers: {
-        "Content-Type": "application/json",
-        ...options?.headers,
-      },
+      headers,
     });
 
     if (!response.ok) {
       // Handle specific error codes
       if (response.status === 401) {
+        // Clear expired or invalid JWT token
+        clearJwtToken();
+
         // Redirect to login on unauthorized
         if (typeof window !== "undefined") {
           window.location.href = "/login";
         }
-        throw new Error("Unauthorized");
+        throw new Error("Authentication failed. Please log in again.");
       }
 
       if (response.status === 404) {

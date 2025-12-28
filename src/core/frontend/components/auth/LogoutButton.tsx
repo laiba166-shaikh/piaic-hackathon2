@@ -2,12 +2,13 @@
  * LogoutButton Component
  *
  * Button to sign out the current user and redirect to login page.
- * Uses Better Auth client to handle logout.
+ * Uses Better Auth client to handle logout and clears JWT token.
  */
 
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { clearJwtToken } from "@/lib/jwt-storage";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -23,7 +24,7 @@ export default function LogoutButton() {
   /**
    * Handle logout action
    *
-   * Signs out the user and redirects to login page.
+   * Signs out the user, clears JWT token, and redirects to login page.
    *
    * @returns Promise<void>
    */
@@ -31,14 +32,19 @@ export default function LogoutButton() {
     setIsLoading(true);
 
     try {
+      // Sign out with Better Auth (clears session cookie)
       await authClient.signOut();
+
+      // Clear JWT token from memory
+      clearJwtToken();
 
       // Redirect to login page after successful logout
       router.push("/login");
     } catch (error) {
-      // If logout fails, still redirect to login
+      // If logout fails, still clear token and redirect to login
       // (Better Auth clears cookies on client side)
       console.error("Logout error:", error);
+      clearJwtToken();
       router.push("/login");
     } finally {
       setIsLoading(false);

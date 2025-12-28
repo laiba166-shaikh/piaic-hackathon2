@@ -1,14 +1,15 @@
 /**
- * Better Auth Configuration
+ * Better Auth Configuration with JWT Plugin
  *
  * This file configures Better Auth for user authentication with:
  * - PostgreSQL database (Neon) for user data storage
  * - Email/password authentication
- * - JWT tokens with shared secret (backend validates these tokens)
- * - HTTP-only cookies for secure session storage
+ * - JWT tokens for external API authentication (FastAPI)
+ * - HTTP-only cookies for web session storage
  */
 
 import { betterAuth } from 'better-auth';
+import { jwt } from 'better-auth/plugins';
 import { Pool } from 'pg';
 
 // Validate required environment variables
@@ -158,6 +159,18 @@ export const auth = betterAuth({
    * Allow requests from backend API
    */
   trustedOrigins: [process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'],
+
+  /**
+   * JWT Plugin
+   * Generates JWT tokens for external API authentication
+   * - Tokens are signed with BETTER_AUTH_SECRET (same as JWT_SECRET in FastAPI)
+   * - Tokens contain 'sub' claim with user_id
+   * - Tokens use HS256 algorithm
+   * - Issuer and audience default to baseURL
+   */
+  plugins: [
+    jwt(),
+  ],
 });
 
 /**

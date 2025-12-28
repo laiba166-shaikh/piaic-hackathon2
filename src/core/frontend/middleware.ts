@@ -8,8 +8,9 @@
  * This middleware runs on all routes except static files and API routes.
  */
 
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { getSessionCookie } from 'better-auth/cookies';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * Middleware function to handle authentication
@@ -20,25 +21,28 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
 
+  // Skip middleware for API routes (they handle their own auth)
+  if (pathname.startsWith('/api/auth')) {
+    return NextResponse.next();
+  }
+
   // Check if user has auth token cookie (Better Auth session)
-  const authToken = request.cookies.get("better-auth.session_token");
-  const isAuthenticated = !!authToken;
+  // const authToken = request.cookies.get('better-auth.session_token');
+  const session = getSessionCookie(request);
+  const isAuthenticated = !!session;
 
   // Public routes (accessible without authentication)
-  const publicRoutes = ["/login", "/register"];
+  const publicRoutes = ['/login', '/register'];
   const isPublicRoute = publicRoutes.includes(pathname);
-
-  // Protected routes (require authentication)
-  const isProtectedRoute = !isPublicRoute && pathname !== "/api/auth";
 
   /**
    * Case 1: User is NOT authenticated and trying to access protected route
    * Action: Redirect to /login
    */
-  if (!isAuthenticated && isProtectedRoute) {
-    const loginUrl = new URL("/login", request.url);
+  if (!isAuthenticated && !isPublicRoute) {
+    const loginUrl = new URL('/login', request.url);
     // Add redirect query param to return to original page after login
-    loginUrl.searchParams.set("redirect", pathname);
+    loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -47,7 +51,7 @@ export function middleware(request: NextRequest): NextResponse {
    * Action: Redirect to home page (/)
    */
   if (isAuthenticated && isPublicRoute) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   /**
@@ -72,6 +76,6 @@ export const config = {
      * - favicon.ico (favicon)
      * - public folder files
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

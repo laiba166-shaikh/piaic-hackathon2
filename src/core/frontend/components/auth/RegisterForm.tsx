@@ -1,7 +1,7 @@
 /**
  * RegisterForm Component
  *
- * User registration form with email/password authentication.
+ * User registration form with email/password authentication and JWT token retrieval.
  * Includes password strength validation and confirmation matching.
  *
  * Features:
@@ -9,6 +9,7 @@
  * - Password strength indicator
  * - Password confirmation matching
  * - Auto-login after successful registration
+ * - JWT token retrieval for FastAPI authentication
  * - Loading states and error handling
  */
 
@@ -17,6 +18,7 @@
 import PasswordToggle from "@/components/auth/PasswordToggle";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { authClient } from "@/lib/auth-client";
+import { setJwtToken } from "@/lib/jwt-storage";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
@@ -94,8 +96,8 @@ export default function RegisterForm() {
 
     // Call Better Auth sign up
     setIsLoading(true);
-    console.log("Registering user:", { email, name });
     try {
+      // Step 1: Register with Better Auth
       const result = await authClient.signUp.email({
         email: email.trim(),
         password: password.trim(),
@@ -111,11 +113,23 @@ export default function RegisterForm() {
         return;
       }
 
-      // Success: Wait a moment for session cookie to be set, then redirect
-      // This prevents middleware from redirecting to /login before session is ready
-      setTimeout(() => {
-        router.push("/");
-      }, 100);
+      // Step 2: Retrieve JWT token for FastAPI authentication
+      // Better Auth autoSignIn is enabled, so user is already logged in
+      const tokenResult = await authClient.token();
+
+      // Check for errors retrieving JWT token
+      if (tokenResult.error || !tokenResult.data) {
+        setError("Registration succeeded but failed to retrieve access token. Please log in.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Step 3: Store JWT token in memory for API calls
+      setJwtToken(tokenResult.data.token);
+
+      // Step 4: Success - redirect to home page
+      // Note: Middleware will see the new session cookie and allow access
+      router.push("/");
     } catch (err) {
       // Handle network errors or unexpected errors
       setError("Unable to connect. Please try again.");

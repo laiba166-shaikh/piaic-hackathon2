@@ -2,13 +2,14 @@
  * LoginForm Component (GREEN Phase - TDD)
  *
  * This component implements the login form to satisfy all test cases from T024.
- * It provides email/password authentication with Better Auth.
+ * It provides email/password authentication with Better Auth and JWT token retrieval.
  *
  * Features:
  * - Client-side validation (email and password required)
  * - Password visibility toggle
  * - Loading states during API calls
  * - Error handling with user-friendly messages
+ * - JWT token retrieval for FastAPI authentication
  * - Redirect to home page on successful login
  */
 
@@ -17,6 +18,7 @@
 import PasswordToggle from "@/components/auth/PasswordToggle";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { authClient } from "@/lib/auth-client";
+import { setJwtToken } from "@/lib/jwt-storage";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
@@ -67,6 +69,7 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
+      // Step 1: Sign in with Better Auth
       const result = await authClient.signIn.email({
         email: email.trim(),
         password: password.trim(),
@@ -79,7 +82,22 @@ export default function LoginForm() {
         return;
       }
 
-      // Success: redirect to home page
+      // Step 2: Retrieve JWT token for FastAPI authentication
+      const tokenResult = await authClient.token();
+
+      // Check for errors retrieving JWT token
+      if (tokenResult.error || !tokenResult.data) {
+        setError("Authentication succeeded but failed to retrieve access token. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Step 3: Store JWT token in memory for API calls
+      setJwtToken(tokenResult.data.token);
+
+      // Step 4: Success - redirect to home page
+      // Note: Middleware will see the new session cookie and allow access
+      setIsLoading(false);
       router.push("/");
     } catch (err) {
       // Handle network errors or unexpected errors

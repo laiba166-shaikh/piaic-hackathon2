@@ -4,7 +4,7 @@ from collections.abc import Generator
 
 from sqlmodel import Session, create_engine
 
-from config import settings
+from src.core.backend.config import settings
 
 # Create database engine
 engine = create_engine(

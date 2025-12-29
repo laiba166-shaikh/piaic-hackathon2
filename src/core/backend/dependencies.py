@@ -5,8 +5,10 @@ import logging
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import ExpiredSignatureError, JWTError, jwt
+from sqlmodel import Session
 
-from config import settings
+from src.core.backend.config import settings
+from src.core.backend.db import get_session
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -63,3 +65,18 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials"
         )
+
+
+def get_db() -> Session:
+    """
+    Database session dependency.
+
+    Usage:
+        @app.get("/tasks")
+        def get_tasks(session: Session = Depends(get_db)):
+            ...
+
+    Yields:
+        Session: SQLModel database session
+    """
+    return get_session()

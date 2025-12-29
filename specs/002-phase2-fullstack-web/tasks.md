@@ -502,7 +502,7 @@ For each feature:
 
 ### Database: Tasks Table
 
-- [ ] **[T033]** [F2] Create tasks table migration
+- [✅] **[T033]** [F2] Create tasks table migration
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\migrations\versions\001_create_tasks.py`
   - **Schema:**
     - id (SERIAL, PRIMARY KEY)
@@ -517,7 +517,7 @@ For each feature:
   - **Triggers:** Auto-update updated_at
   - **Acceptance:** `alembic upgrade head` creates table
 
-- [ ] **[T034]** [F2] Create Task SQLModel
+- [✅] **[T034]** [F2] Create Task SQLModel
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\models\task.py`
   - **Model:** `class Task(SQLModel, table=True)`
   - **Fields:** All fields from migration
@@ -528,7 +528,7 @@ For each feature:
 
 #### RED - Write Failing Tests
 
-- [ ] **[T035]** [F2] Write task CRUD tests (RED)
+- [✅] **[T035]** [F2] Write task CRUD tests (RED)
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\tests\test_tasks.py`
   - **Test Categories:**
     - **Create:** Valid creation, missing title, title too long, user isolation
@@ -542,7 +542,7 @@ For each feature:
 
 #### GREEN - Implement Task CRUD
 
-- [ ] **[T036]** [F2] Implement POST /api/v1/tasks (GREEN)
+- [✅] **[T036]** [F2] Implement POST /api/v1/tasks (GREEN)
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\api\v1\tasks.py`
   - **Route:** `@router.post("/api/v1/tasks")`
   - **Logic:**
@@ -552,21 +552,21 @@ For each feature:
     - Return 201 Created with task
   - **Acceptance:** Tests for task creation pass
 
-- [ ] **[T037]** [F2] Implement GET /api/v1/tasks (GREEN)
+- [✅] **[T037]** [F2] Implement GET /api/v1/tasks (GREEN)
   - **Route:** `@router.get("/api/v1/tasks")`
   - **Logic:**
     - Filter by user_id and deleted_at IS NULL
     - Return list of tasks
   - **Acceptance:** Tests for listing tasks pass
 
-- [ ] **[T038]** [F2] Implement GET /api/v1/tasks/{id} (GREEN)
+- [✅] **[T038]** [F2] Implement GET /api/v1/tasks/{id} (GREEN)
   - **Route:** `@router.get("/api/v1/tasks/{id}")`
   - **Logic:**
     - Filter by id, user_id, and deleted_at IS NULL
     - Return 404 if not found or not owned
   - **Acceptance:** Tests for getting single task pass
 
-- [ ] **[T039]** [F2] Implement PUT /api/v1/tasks/{id} (GREEN)
+- [✅] **[T039]** [F2] Implement PUT /api/v1/tasks/{id} (GREEN)
   - **Route:** `@router.put("/api/v1/tasks/{id}")`
   - **Logic:**
     - Update title and/or description
@@ -574,7 +574,7 @@ For each feature:
     - Return 404 if not found or not owned
   - **Acceptance:** Tests for updating task pass
 
-- [ ] **[T040]** [F2] Implement DELETE /api/v1/tasks/{id} (GREEN)
+- [✅] **[T040]** [F2] Implement DELETE /api/v1/tasks/{id} (GREEN)
   - **Route:** `@router.delete("/api/v1/tasks/{id}")`
   - **Logic:**
     - Set deleted_at to current timestamp (soft delete)
@@ -584,7 +584,7 @@ For each feature:
 
 #### REFACTOR
 
-- [ ] **[T041]** [F2] Refactor common query patterns
+- [✅] **[T041]** [F2] Refactor common query patterns
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\backend\api\v1\tasks.py`
   - **Actions:** Extract `get_user_task()` helper function
   - **Acceptance:** Code DRY, tests still pass

@@ -34,9 +34,6 @@ async function fetchWithAuth(endpoint: string, options?: RequestInit) {
     // Add Authorization header if token is available
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
-      console.log('[API] Making request to:', endpoint, 'with token');
-    } else {
-      console.warn('[API] No JWT token found for request to:', endpoint);
     }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {

@@ -36,58 +36,36 @@ import { useEffect, useState } from 'react';
  */
 export function useAuthInit() {
   const [isInitialized, setIsInitialized] = useState(false);
+
   async function initializeAuth() {
-    console.log('[useAuthInit] ===== Starting auth initialization =====');
     try {
       // Step 1: Check Better Auth session status
-      console.log('[useAuthInit] Step 1: Checking Better Auth session...');
       const session = await authClient.getSession();
-      console.log('[useAuthInit] Session status:', session.data ? 'EXISTS' : 'NOT FOUND');
-
       const jwt = getJwtToken();
-      console.log('[useAuthInit] JWT token in localStorage:', jwt ? 'EXISTS' : 'NOT FOUND');
 
       // Step 2: Session exists but no JWT → retrieve JWT
       if (session.data && !jwt) {
-        console.log('[useAuthInit] Step 2: Session exists but JWT missing - retrieving token');
         const tokenResult = await authClient.token();
 
         if (tokenResult.data && tokenResult.data.token) {
           setJwtToken(tokenResult.data.token);
-          console.log('[useAuthInit] JWT token retrieved and stored');
-          console.log(
-            '[useAuthInit] Token preview:',
-            tokenResult.data.token.substring(0, 50) + '...'
-          );
-        } else {
-          console.warn('[useAuthInit] Failed to retrieve JWT token despite active session');
-          console.warn('[useAuthInit] Token result:', tokenResult);
         }
       }
 
       // Step 3: No session but JWT exists → clear stale JWT
       if (!session.data && jwt) {
-        console.log('[useAuthInit] Step 3: No session but JWT exists - clearing stale token');
         clearJwtToken();
       }
 
-      // Step 4: Both exist or both don't exist → normal state
-      if (session.data && jwt) {
-        console.log('[useAuthInit] Step 4: Auth state SYNCHRONIZED (session + JWT both exist)');
-      } else if (!session.data && !jwt) {
-        console.log('[useAuthInit] Step 4: No auth (session + JWT both missing) - user needs to login');
-      }
-
       setIsInitialized(true);
-      console.log('[useAuthInit] ===== Auth initialization COMPLETE =====');
-    } catch (error) {
-      console.error('[useAuthInit] ===== Auth initialization FAILED =====');
-      console.error('[useAuthInit] Error:', error);
-      setIsInitialized(true); // Set initialized even on error to prevent blocking
+    } catch {
+      // Set initialized even on error to prevent blocking
+      setIsInitialized(true);
     }
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     initializeAuth();
   }, []); // Run once on mount
 

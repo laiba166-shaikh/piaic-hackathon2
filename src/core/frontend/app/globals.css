@@ -1,12 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --background: #F5F1E8;  /* Paper Cream */
-  --foreground: #2C3E50;  /* Ink Black */
+body {
+  background: #F5F1E8;
+  color: #2C3E50;
+  font-family: Inter, system-ui, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Inter, system-ui, sans-serif;
+@layer utilities {
+  /* Paper background colors */
+  .bg-paper-cream {
+    background-color: #F5F1E8;
+  }
+  .bg-paper-white {
+    background-color: #FEFEFE;
+  }
+
+  /* Ink text colors */
+  .text-ink-black {
+    color: #2C3E50;
+  }
+  .text-ink-dark {
+    color: #1A252F;
+  }
+  .text-ink-light {
+    color: #546E7A;
+  }
+
+  /* Vintage colors */
+  .bg-vintage-blue {
+    background-color: #4A7C99;
+  }
+  .bg-vintage-dark {
+    background-color: #3A5F7D;
+  }
+  .bg-vintage-light {
+    background-color: #6B9FB8;
+  }
+  .text-vintage-blue {
+    color: #4A7C99;
+  }
+
+  /* Sepia colors */
+  .bg-sepia-brown {
+    background-color: #8B7355;
+  }
+  .border-sepia-brown {
+    border-color: #8B7355;
+  }
+  .text-sepia-brown {
+    color: #8B7355;
+  }
+
+  /* Accent colors */
+  .bg-accent-gold {
+    background-color: #D4AF37;
+  }
+  .bg-accent-red {
+    background-color: #C85A54;
+  }
+  .bg-accent-green {
+    background-color: #5A8A6F;
+  }
 }

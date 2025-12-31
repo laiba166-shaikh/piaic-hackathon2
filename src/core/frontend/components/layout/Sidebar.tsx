@@ -20,7 +20,7 @@ export function Sidebar() {
             href="/"
             className={`block px-4 py-2 rounded-lg transition-colors ${
               isActive("/")
-                ? "bg-vintage-blue text-paper-white"
+                ? "bg-vintage-dark text-white font-medium"
                 : "text-ink-black hover:bg-sepia-brown/10"
             }`}
           >
@@ -31,7 +31,7 @@ export function Sidebar() {
             href="/tasks"
             className={`block px-4 py-2 rounded-lg transition-colors ${
               isActive("/tasks")
-                ? "bg-vintage-blue text-paper-white"
+                ? "bg-vintage-blue text-white font-medium"
                 : "text-ink-black hover:bg-sepia-brown/10"
             }`}
           >

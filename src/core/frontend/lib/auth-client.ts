@@ -40,6 +40,7 @@ export const authClient = createAuthClient({
   /**
    * JWT Client Plugin
    * Enables retrieving JWT tokens for external API authentication
+   * Uses EdDSA asymmetric algorithm (default)
    */
   plugins: [
     jwtClient(),

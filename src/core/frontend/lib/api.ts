@@ -34,6 +34,9 @@ async function fetchWithAuth(endpoint: string, options?: RequestInit) {
     // Add Authorization header if token is available
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
+      console.log('[API] Making request to:', endpoint, 'with token');
+    } else {
+      console.warn('[API] No JWT token found for request to:', endpoint);
     }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -47,11 +50,9 @@ async function fetchWithAuth(endpoint: string, options?: RequestInit) {
         // Clear expired or invalid JWT token
         clearJwtToken();
 
-        // Redirect to login on unauthorized
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
-        throw new Error("Authentication failed. Please log in again.");
+        // Don't automatically redirect - let the component handle it
+        // This prevents redirect loops during auth initialization
+        throw new Error("Authentication required. Please log in.");
       }
 
       if (response.status === 404) {

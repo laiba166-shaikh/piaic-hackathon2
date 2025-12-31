@@ -163,10 +163,10 @@ export const auth = betterAuth({
   /**
    * JWT Plugin
    * Generates JWT tokens for external API authentication
-   * - Tokens are signed with BETTER_AUTH_SECRET (same as JWT_SECRET in FastAPI)
+   * - Uses EdDSA (default) asymmetric algorithm with Ed25519 curve
    * - Tokens contain 'sub' claim with user_id
-   * - Tokens use HS256 algorithm
-   * - Issuer and audience default to baseURL
+   * - Public key available at /api/auth/jwks endpoint
+   * - Backend verifies tokens using public key from JWKS
    */
   plugins: [
     jwt(),

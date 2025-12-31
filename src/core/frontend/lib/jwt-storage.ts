@@ -78,6 +78,7 @@ export function clearJwtToken(): void {
   }
 
   try {
+    alert('clearing JWT');
     localStorage.removeItem(JWT_STORAGE_KEY);
   } catch (error) {
     console.error('Error clearing JWT token from localStorage:', error);

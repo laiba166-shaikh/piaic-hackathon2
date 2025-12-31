@@ -593,7 +593,7 @@ For each feature:
 
 #### RED - Write Failing Frontend Tests
 
-- [ ] **[T042]** [F2] Write task UI tests (RED)
+- [✅] **[T042]** [F2] Write task UI tests (RED)
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\components\tasks\TaskList.test.tsx`
   - **Test Cases:**
     - Task list renders tasks
@@ -607,54 +607,54 @@ For each feature:
 
 #### GREEN - Implement Task UI
 
-- [ ] **[T043]** [F2] Create tasks page (GREEN)
+- [✅] **[T043]** [F2] Create tasks page (GREEN)
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\tasks\page.tsx`
   - **Component:** Server Component fetching tasks
   - **Layout:** "Want todos" heading, Create Task button, TaskList
   - **Acceptance:** Page accessible at /tasks
 
-- [ ] **[T044]** [F2] Create TaskList component (GREEN)
+- [✅] **[T044]** [F2] Create TaskList component (GREEN)
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskList.tsx`
   - **Features:** Display task cards, handle loading/empty/error states
   - **Acceptance:** All tests in T042 pass
 
-- [ ] **[T045]** [F2] Create TaskCard component
+- [✅] **[T045]** [F2] Create TaskCard component
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskCard.tsx`
   - **Layout:** Title, description, metadata, Edit/Delete buttons
   - **Styling:** Paper-like card with journal aesthetic
   - **Acceptance:** Task card displays all fields correctly
 
-- [ ] **[T046]** [F2] Create Modal component
+- [✅] **[T046]** [F2] Create Modal component
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\ui\Modal.tsx`
   - **Features:** Backdrop, close button, keyboard navigation (Escape to close)
   - **Acceptance:** Modal opens and closes correctly
 
-- [ ] **[T047]** [F2] Create TaskForm component
+- [✅] **[T047]** [F2] Create TaskForm component
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\components\tasks\TaskForm.tsx`
   - **Fields:** Title (required, max 200 chars), Description (optional)
   - **Validation:** Client-side validation before submission
   - **Actions:** Call api.createTask(), close modal on success
   - **Acceptance:** Form validation works, task creates successfully
 
-- [ ] **[T048]** [F2] Create task detail page
+- [✅] **[T048]** [F2] Create task detail page
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\app\tasks\[id]\page.tsx`
   - **Component:** Server Component fetching single task
   - **Features:** Display full task details, Edit/Delete buttons
   - **Acceptance:** Task detail page accessible at /tasks/[id]
 
-- [ ] **[T049]** [F2] Implement task editing
+- [✅] **[T049]** [F2] Implement task editing
   - **Component:** TaskForm in edit mode
   - **Actions:** Pre-populate form, call api.updateTask(), refresh view
   - **Acceptance:** User can edit task successfully
 
-- [ ] **[T050]** [F2] Implement task deletion with confirmation
+- [✅] **[T050]** [F2] Implement task deletion with confirmation
   - **Component:** DeleteConfirmationModal
   - **Flow:** Show confirmation → User confirms → Call api.deleteTask() → Remove from UI
   - **Acceptance:** User can delete task with confirmation
 
 #### REFACTOR
 
-- [ ] **[T051]** [F2] Extract reusable UI components
+- [✅] **[T051]** [F2] Extract reusable UI components
   - **Paths:**
     - `src/core/frontend\components\ui\Button.tsx`
     - `src/core/frontend\components\ui\Input.tsx`
@@ -663,7 +663,7 @@ For each feature:
 
 ### Integration Tests
 
-- [ ] **[T052]** [F2] Write end-to-end task CRUD tests
+- [✅] **[T052]** [F2] Write end-to-end task CRUD tests
   - **Path:** `D:\piaic-hackathon\hackathon2\src\core\frontend\__tests__\e2e\tasks.spec.ts`
   - **Test Cases:**
     - Create task flow

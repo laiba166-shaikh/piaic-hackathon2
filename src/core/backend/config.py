@@ -9,10 +9,8 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
 
-    # Authentication
-    JWT_SECRET: str
-    JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRATION_HOURS: int = 24
+    # Authentication (EdDSA with JWKS verification)
+    FRONTEND_URL: str = "http://localhost:3000"  # Better Auth JWKS endpoint location
 
     # Application
     DEBUG: bool = False

@@ -27,7 +27,21 @@ Follow-up TODOs: None
 
 Spec-driven development is at the core of this project. Every feature, no matter how small, MUST have a markdown specification in the `/specs` folder. Claude Code will generate the code based on these specifications, and the code MUST meet the defined requirements before it is considered complete. Features are not to be manually coded but MUST evolve through iterative refinement of the specification until the generated code is correct.
 
-**Rationale:** Ensures requirements are documented, testable, and drive implementation rather than being retrofitted after coding. This approach enables AI-assisted development and maintains architectural clarity.
+**Mandatory Spec Reference Rule (NON-NEGOTIABLE):**
+
+1. **NO implementation without reading the spec first** - Before writing ANY code (including tests), the relevant specification file(s) MUST be read and understood
+2. **Explicit spec references required** - All implementation work MUST reference the spec file by path (e.g., `@specs/002-phase2-fullstack-web/features/01-user-authentication.md`)
+3. **Architecture documents are specifications** - Backend architecture (`00-backend-architecture.md`), frontend design flow (`08-frontend-design-flow.md`), API contracts, and database schemas are authoritative specifications that MUST be consulted
+4. **CLAUDE.md files guide implementation** - Frontend and backend CLAUDE.md files provide context-specific guidelines and MUST be referenced when working in those directories
+5. **Verification checkpoint** - Before submitting code, verify that the implementation matches ALL requirements in the referenced spec(s)
+
+**Enforcement:**
+- Pull requests MUST cite which spec file(s) were implemented
+- Code reviews MUST verify spec compliance
+- Automated tests MUST validate spec acceptance criteria
+- Non-compliance requires rework and spec re-review
+
+**Rationale:** Ensures requirements are documented, testable, and drive implementation rather than being retrofitted after coding. This approach enables AI-assisted development and maintains architectural clarity. Mandatory spec references prevent developers from "guessing" requirements, reduce rework, and ensure every line of code traces to documented intent.
 
 ### II. Clean Code and Proper Structure
 
@@ -132,20 +146,113 @@ The project will be considered successful if it meets the following criteria:
 
 ### Spec-Driven Implementation
 
-1. **Create a Spec for Each Feature:** Before implementing a feature, write a detailed specification that clearly outlines the expected behavior and acceptance criteria
-2. **Claude Code Implementation:** Use Claude Code to generate the code based on the specification
-3. **Testing:** Write automated tests to validate the generated code and ensure it meets the specification
-4. **Iteration:** Refine the specification and code until the generated solution meets all requirements
+**MANDATORY WORKFLOW - MUST be followed for ALL implementation work:**
 
-**Rationale:** Specifications as single source of truth prevent ambiguity, enable parallel work, and facilitate AI-assisted development. Iteration based on tests ensures convergence to correct implementation.
+**Step 1: Identify and Read Specifications**
+1. Locate the relevant spec file(s) in `/specs/[phase]/features/[feature-name].md`
+2. Read the complete specification including:
+   - Feature overview and user stories
+   - Acceptance criteria (ALL must be met)
+   - API contracts (if applicable)
+   - Data models and database schema
+   - UI/UX requirements
+   - Error handling and edge cases
+3. Read applicable architecture documents:
+   - Backend: `@specs/002-phase2-fullstack-web/00-backend-architecture.md`
+   - Frontend: `@specs/002-phase2-fullstack-web/08-frontend-design-flow.md`
+   - API: `@specs/002-phase2-fullstack-web/api/rest-endpoints.md`
+   - Database: `@specs/002-phase2-fullstack-web/database/schema.md`
+4. Read context-specific guidelines:
+   - Frontend work: `@frontend/CLAUDE.md`
+   - Backend work: `@backend/CLAUDE.md`
+
+**Step 2: Plan Implementation**
+1. Review the plan.md file for the feature (if it exists)
+2. Review the tasks.md file for specific implementation tasks
+3. Identify which acceptance criteria you will implement
+4. Note any dependencies on other specs or features
+
+**Step 3: Write Tests First (TDD)**
+1. Write failing tests based on spec acceptance criteria
+2. Reference the spec file in test comments
+3. Ensure tests cover ALL acceptance criteria
+
+**Step 4: Implement Code**
+1. Use Claude Code to generate implementation based on spec
+2. Reference spec file(s) in code comments where appropriate
+3. Follow patterns from architecture documents and CLAUDE.md files
+4. Verify implementation matches spec requirements
+
+**Step 5: Verify Spec Compliance**
+1. Run all tests and ensure they pass
+2. Review acceptance criteria - ALL must be satisfied
+3. Check error handling and edge cases from spec
+4. Verify performance requirements are met
+
+**Step 6: Document Spec References**
+1. In commit messages, cite spec file(s): `Implement user auth from @specs/.../01-user-authentication.md`
+2. In pull requests, list all spec files implemented
+3. In code reviews, verify spec compliance
+
+**CHECKPOINT:** If ANY step reveals ambiguity or missing information in the spec, STOP implementation and update the spec first. Never guess or assume requirements.
+
+**Rationale:** Specifications as single source of truth prevent ambiguity, enable parallel work, and facilitate AI-assisted development. Iteration based on tests ensures convergence to correct implementation. The mandatory workflow ensures specifications drive development, not the reverse.
 
 ### Code Review and Quality Gates
 
-- **Peer Review:** Every pull request will undergo peer review. Code MUST be clean, maintainable, and match the specifications
-- **Automated Testing:** Automated tests MUST be run on every pull request to ensure that the code works as expected
-- **Code Coverage:** Achieve at least 90% test coverage for every feature and maintain a low rate of code duplication
+**Every pull request MUST pass these gates:**
 
-**Rationale:** Peer review catches design issues automation cannot detect. High code coverage ensures comprehensive testing. Combined gates maintain quality bar and facilitate knowledge sharing.
+1. **Spec Compliance Review (MANDATORY):**
+   - PR description MUST list all spec file(s) implemented (with full paths)
+   - Code reviewer MUST verify each acceptance criterion from spec is met
+   - Code reviewer MUST verify architecture patterns from referenced docs are followed
+   - Code reviewer MUST verify CLAUDE.md guidelines are followed (if applicable)
+   - **GATE:** PR cannot be approved without spec file references and compliance verification
+
+2. **Code Quality Review:**
+   - Code MUST be clean, readable, and maintainable
+   - Code MUST follow patterns from architecture documents
+   - Code MUST not introduce security vulnerabilities
+   - Code MUST include appropriate error handling
+   - **GATE:** Code quality issues must be resolved before merge
+
+3. **Automated Testing:**
+   - All tests MUST pass on CI/CD pipeline
+   - No new failing tests are introduced
+   - Tests MUST validate spec acceptance criteria
+   - **GATE:** Failing tests block merge
+
+4. **Test Coverage:**
+   - Achieve at least 90% test coverage for new code
+   - Maintain low rate of code duplication
+   - **GATE:** Coverage below 90% requires justification or additional tests
+
+**Pull Request Template:**
+```markdown
+## Implemented Specifications
+- [ ] @specs/[phase]/features/[feature].md - [Feature Name]
+- [ ] @specs/[phase]/[architecture-doc].md (if applicable)
+- [ ] @frontend/CLAUDE.md or @backend/CLAUDE.md (if applicable)
+
+## Acceptance Criteria Checklist
+- [ ] Criterion 1 from spec (describe)
+- [ ] Criterion 2 from spec (describe)
+- [ ] All edge cases handled per spec
+- [ ] Error handling implemented per spec
+
+## Architecture Compliance
+- [ ] Follows patterns from architecture documents
+- [ ] Follows CLAUDE.md guidelines
+- [ ] Security requirements met
+- [ ] Performance requirements met
+
+## Testing
+- [ ] All tests pass
+- [ ] Test coverage ≥ 90%
+- [ ] Tests validate spec acceptance criteria
+```
+
+**Rationale:** Peer review catches design issues automation cannot detect. High code coverage ensures comprehensive testing. Combined gates maintain quality bar and facilitate knowledge sharing. Mandatory spec compliance verification ensures every PR traces to documented requirements, preventing scope drift and undocumented features.
 
 ## Technology Stack
 
@@ -169,4 +276,4 @@ The project will be considered successful if it meets the following criteria:
 
 **Rationale:** Governance ensures constitutional stability while allowing evolution. Code ownership creates accountability. Regular audits verify compliance and catch drift before it compounds.
 
-**Version**: 1.1.0 | **Ratified**: 2025-12-07 | **Last Amended**: 2025-12-09
+**Version**: 1.2.0 | **Ratified**: 2025-12-07 | **Last Amended**: 2025-12-26

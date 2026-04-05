@@ -12,8 +12,8 @@ import click
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from src.core.services import TaskService
-from src.core.storage.memory import MemoryStorage
+from src.cli.logics.services import TaskService
+from src.cli.logics.storage.memory import MemoryStorage
 from src.config import get_logger
 
 logger = get_logger(__name__)
@@ -90,7 +90,7 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
     """
     try:
         # Parse priority
-        from src.core.models import Priority, Recurrence
+        from src.cli.logics.models import Priority, Recurrence
 
         priority_enum = None
         if priority:
@@ -108,7 +108,7 @@ def add(title: str, description: str | None, priority: str | None, tags: str | N
         recurrence_enum = recurrence_map[recurrence.lower()]
 
         # Parse tags
-        from src.core.validators import parse_tags, parse_due_date
+        from src.cli.logics.validators import parse_tags, parse_due_date
 
         tags_list = parse_tags(tags) if tags else []
 
@@ -392,7 +392,7 @@ def update(
     """
     try:
         # Parse priority
-        from src.core.models import Priority, Recurrence
+        from src.cli.logics.models import Priority, Recurrence
 
         priority_enum = None
         if priority:
@@ -411,7 +411,7 @@ def update(
             recurrence_enum = recurrence_map[recurrence.lower()]
 
         # Parse tags
-        from src.core.validators import parse_tags, parse_due_date
+        from src.cli.logics.validators import parse_tags, parse_due_date
 
         tags_list = parse_tags(tags) if tags else None
 

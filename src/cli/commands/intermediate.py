@@ -9,7 +9,7 @@ import click
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from src.core.services import TaskService
+from src.cli.logics.services import TaskService
 from src.config import get_logger
 
 # Import shared storage instance from basic commands
@@ -166,7 +166,7 @@ def filter(priority: str | None, status: str | None, tag: str | None, overdue: b
     """
     try:
         # Parse priority
-        from src.core.models import Priority
+        from src.cli.logics.models import Priority
 
         priority_enum = None
         if priority:

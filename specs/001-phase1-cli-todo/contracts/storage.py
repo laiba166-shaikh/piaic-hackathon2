@@ -16,7 +16,7 @@ Branch: 001-phase1-cli-todo
 
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from src.core.models import Task
+from src.cli.logics.models import Task
 
 
 class ITaskStorage(ABC):

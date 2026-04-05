@@ -1,282 +1,253 @@
-# Phase 1 CLI Todo App (Enhanced)
+# TASKMATE
 
-A professional command-line todo application with Basic, Intermediate, and Advanced features. Built with Python 3.12+, featuring excellent table-based visualization, priorities, tags, search, filtering, recurring tasks, and due date management.
+A full-stack task management application built across 5 progressive phases — from a CLI tool to a cloud-deployed, AI-powered web app.
 
-## Features
+**Current phase: Phase 2 — Full-Stack Web Application**
 
-### Basic Level
-- ✅ Add, view, update, and delete tasks
-- ✅ Mark tasks complete/incomplete
-- ✅ Professional table-based visualization with unicode support
-- ✅ Interactive shell mode for persistent session
+---
 
-### Intermediate Level
-- ✅ Assign priorities (High/Medium/Low) with visual indicators
-- ✅ Tag tasks for organization
-- ✅ Search tasks by keyword
-- ✅ Filter by status, priority, and tags
-- ✅ Sort by due date, priority, created date, or title
+## What is TASKMATE?
 
-### Advanced Level
-- ✅ Recurring tasks (daily, weekly, monthly)
-- ✅ Due dates with time support
-- ✅ Overdue task highlighting
-- ✅ Reminder notifications
+TASKMATE lets users create, manage, and track tasks with a clean journal-themed interface. Each user's tasks are private and isolated. Authentication is handled via email/password with JWT tokens.
 
-## Quick Start
+The project is structured as a **monorepo with independently runnable phases** — the CLI from Phase 1 still works alongside the Phase 2 web app.
+
+---
+
+## Tech Stack (Phase 2)
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16+ (App Router), TypeScript, Tailwind CSS |
+| Auth | Better Auth (email/password + EdDSA JWT plugin) |
+| Backend | FastAPI, Python 3.11+ |
+| Database | PostgreSQL via [Neon](https://neon.tech) (serverless) |
+| ORM | SQLModel + Alembic migrations |
+| CLI (Phase 1) | Click, Rich |
+
+---
+
+## Project Structure
+
+```
+hackathon2/
+├── src/
+│   ├── cli/                    # Phase 1 — CLI application (Click + Rich)
+│   └── core/
+│       ├── backend/            # Phase 2 — FastAPI REST API
+│       └── frontend/           # Phase 2 — Next.js web app
+├── specs/                      # Spec-Driven Development artifacts
+├── history/                    # Prompt History Records + ADRs
+├── Procfile                    # Deployment start command (repo root)
+├── ARCHITECTURE.md             # Full multi-phase architecture
+└── ENV_SETUP.md                # Environment variables quick reference
+```
+
+---
+
+## Quick Start (Phase 2)
 
 ### Prerequisites
 
-- Python 3.12 or higher
-- UV package manager (recommended) or pip
+- Python 3.11+
+- Node.js 18+
+- A [Neon](https://neon.tech) PostgreSQL database
 
-### Installation
+---
+
+### 1. Backend
 
 ```bash
-# Clone repository
-git clone https://github.com/laiba166-shaikh/piaic-hackathon2.git
-cd piaic-hackathon2
+cd src/core/backend
 
-# Checkout feature branch
-git checkout 001-phase1-cli-todo
-
-# Install UV (if not already installed)
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Windows
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/Scripts/activate   # Windows (Git Bash)
+# source .venv/bin/activate     # macOS/Linux
 
 # Install dependencies
-uv pip install -e .
+pip install -r requirements.txt
 
-# Verify installation
-todo --help
+# Set up environment
+cp .env.example .env
+# Edit .env — fill in DATABASE_URL and FRONTEND_URL
 ```
 
-### Basic Usage
-
-#### Interactive Mode (Recommended)
-
-Interactive mode keeps tasks in memory during your session, making the in-memory storage practical to use:
+**.env (backend):**
+```bash
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+FRONTEND_URL=http://localhost:3000
+DEBUG=True
+```
 
 ```bash
-# Start interactive mode
-todo
+# Run database migrations
+alembic upgrade head
 
-# Then execute commands without the "todo" prefix:
-todo> add "Buy groceries"
-Task created successfully! ID: 1
-
-todo> add "Call dentist" -d "Schedule checkup"
-Task created successfully! ID: 2
-
-todo> list
-# Shows all tasks from this session
-
-todo> help
-# See all available commands
-
-todo> exit
-# Exit interactive mode
+# Start the API server (must run from inside src/core/backend/)
+uvicorn main:app --reload --port 8000
 ```
 
-#### One-Shot Commands
+API available at → http://localhost:8000  
+Swagger docs → http://localhost:8000/docs
 
-You can also run individual commands (each runs in a separate process):
+> See [`src/core/backend/README.md`](src/core/backend/README.md) for full backend setup.
+
+---
+
+### 2. Frontend
 
 ```bash
-# Add a task
-todo add "Buy groceries"
+cd src/core/frontend
 
-# Add task with details
-todo add "Complete proposal" -p high --tags "work,urgent" --due "2025-12-15 17:00"
+# Install dependencies
+npm install
 
-# View all tasks
-todo list
-
-# Mark task complete
-todo done 1
-
-# Search tasks
-todo search "meeting"
-
-# Filter tasks
-todo filter --status incomplete --priority high
-
-# Delete task
-todo delete 1
+# Set up environment
+cp .env.example .env.local
+# Edit .env.local — fill in all variables
 ```
 
-**Note**: With one-shot commands, each command runs in a separate process, so tasks don't persist between commands in Phase 1 (in-memory storage). Use interactive mode for a better experience.
-
-## Development
-
-### Setup Development Environment
+**.env.local (frontend):**
+```bash
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+BETTER_AUTH_SECRET=<run: openssl rand -base64 32>
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
 ```bash
-# Install development dependencies
-uv pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Run tests with coverage
-pytest --cov=src --cov-report=term-missing
-
-# Run type checking
-mypy src/
-
-# Format code
-black src/ tests/
-
-# Lint code
-ruff check src/ tests/
+# Start the dev server
+npm run dev
 ```
 
-### Project Structure
+App available at → http://localhost:3000
+
+> See [`src/core/frontend/README.md`](src/core/frontend/README.md) for full frontend setup.
+
+---
+
+### Environment Variables — Key Points
+
+| Variable | Where | Description |
+|---|---|---|
+| `DATABASE_URL` | Backend `.env` + Frontend `.env.local` | **Same Neon database** — backend stores tasks, frontend (Better Auth) stores users/sessions |
+| `BETTER_AUTH_SECRET` | Frontend `.env.local` only | Signs JWT tokens — generate with `openssl rand -base64 32` |
+| `FRONTEND_URL` | Backend `.env` | Backend fetches JWKS public keys from `FRONTEND_URL/api/auth/jwks` to verify tokens — no shared secret needed |
+| `NEXT_PUBLIC_API_URL` | Frontend `.env.local` | FastAPI backend URL, exposed to browser |
+
+> There is **no `JWT_SECRET` in the backend**. Token verification uses EdDSA asymmetric keys — the backend fetches the public key from the frontend's JWKS endpoint.
+
+> Full environment guide → [`ENV_SETUP.md`](ENV_SETUP.md)
+
+---
+
+## Authentication Flow
 
 ```
-src/
-├── core/               # Business logic
-│   ├── models.py       # Task, Priority, Recurrence
-│   ├── services.py     # TaskService
-│   ├── exceptions.py   # Custom exceptions
-│   ├── validators.py   # Input validation
-│   └── storage/        # Storage abstraction
-│       ├── base.py     # ITaskStorage interface
-│       └── memory.py   # MemoryStorage implementation
-├── cli/                # CLI interface
-│   ├── main.py         # CLI entry point
-│   ├── commands/       # Click commands
-│   └── rendering/      # Table rendering
-└── config.py           # Configuration
-
-tests/
-├── unit/               # Unit tests
-├── integration/        # Integration tests
-└── contract/           # Storage contract tests
+User → Frontend (Better Auth) → Issues EdDSA JWT → Stored in HTTP-only cookie
+                                                          ↓
+                                       Backend receives JWT in Authorization header
+                                                          ↓
+                              Backend fetches public key from /api/auth/jwks
+                                                          ↓
+                                        Token verified → user_id extracted
 ```
 
-## Architecture
+---
 
-This project demonstrates **clean architecture** principles with separation of concerns:
+## Deployment
 
-- **Core Layer**: Business logic independent of CLI
-- **Storage Layer**: Abstract interface with strategy pattern for Phase 2 database migration
-- **CLI Layer**: Click-based commands with Rich table rendering
+### Backend
 
-Built to evolve across 5 phases:
-- **Phase 1**: CLI with in-memory storage (this phase)
-- **Phase 2**: Web interface with PostgreSQL
-- **Phase 3**: AI chatbot integration
-- **Phase 4**: Kubernetes deployment
-- **Phase 5**: Cloud deployment
+The backend uses **flat local imports** that require `src/core/backend/` to be on Python's path.
 
-## Testing
+**Option A — Set root directory to `src/core/backend/`** (Railway, Render dashboard setting):
+```bash
+# Start command
+uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+**Option B — Deploy from repo root** (uses the committed `Procfile`):
+```
+web: PYTHONPATH=src/core/backend uvicorn src.core.backend.main:app --host 0.0.0.0 --port ${PORT:-8000}
+```
+
+Production environment variables for backend:
+```bash
+DATABASE_URL=postgresql://...
+FRONTEND_URL=https://your-frontend.com
+DEBUG=False
+```
+
+### Frontend
+
+Deploy to **Vercel** (recommended for Next.js):
+- Set root directory to `src/core/frontend`
+- Add all `.env.local` variables in the Vercel dashboard
+
+Or deploy to Railway/Render:
+- Set root directory to `src/core/frontend`
+- Build command: `npm run build`
+- Start command: `npm run start`
+
+Production environment variables for frontend:
+```bash
+DATABASE_URL=postgresql://...
+BETTER_AUTH_SECRET=<your-secret>
+BETTER_AUTH_URL=https://your-frontend.com
+NEXT_PUBLIC_API_URL=https://your-backend.com
+```
+
+---
+
+## Phase 1 — CLI (still works)
 
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage report
-pytest --cov=src --cov-report=html
-
-# Run specific test file
-pytest tests/unit/test_models.py
-
-# Run with verbose output
-pytest -v
+cd hackathon2
+pip install -e src/cli
+python -m src.cli.main           # interactive mode
+python -m src.cli.main --help    # one-shot commands
 ```
 
-**Coverage Target**: >90%
+The CLI runs completely independently — no backend or database required (uses in-memory storage).
 
-## Data Persistence
+---
 
-⚠️ **Important**: Phase 1 uses **in-memory storage**.
+## Running Everything Together (Phase 2)
 
-- **Interactive Mode**: Tasks persist during your session. When you exit, all tasks are lost.
-- **One-Shot Commands**: Each command runs in a separate process, so tasks don't persist between commands.
+Open 2 terminals:
 
-**Recommendation**: Use interactive mode (`todo` with no arguments) for the best Phase 1 experience.
+```bash
+# Terminal 1 — Backend
+cd src/core/backend
+source .venv/Scripts/activate
+uvicorn main:app --reload --port 8000
 
-Database persistence will be added in Phase 2.
+# Terminal 2 — Frontend
+cd src/core/frontend
+npm run dev
+```
 
-## Command Reference
+---
 
-### Task Management
+## Further Reading
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `add` | Create a new task | `todo add "Buy milk" -p high --tags "shopping"` |
-| `list` | View all tasks | `todo list` |
-| `done` | Mark task complete | `todo done 1` |
-| `undone` | Mark task incomplete | `todo undone 1` |
-| `update` | Modify task details | `todo update 1 --title "New title" -p low` |
-| `delete` | Remove a task | `todo delete 1` |
+| Document | Description |
+|---|---|
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Full multi-phase architecture, phase evolution strategy, storage abstraction, and all entry points |
+| [`src/core/backend/README.md`](src/core/backend/README.md) | Backend setup, API endpoints, JWT verification, deployment options, troubleshooting |
+| [`src/core/frontend/README.md`](src/core/frontend/README.md) | Frontend setup, Better Auth config, environment variables, deployment |
+| [`ENV_SETUP.md`](ENV_SETUP.md) | Quick environment variables reference for both services |
 
-### Search, Filter & Sort
+---
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `search` | Find tasks by keyword | `todo search "meeting"` |
-| `filter` | Filter by criteria | `todo filter --priority high --status incomplete` |
-| `sort` | Sort tasks | `todo sort --by priority --order desc` |
+## Phases Roadmap
 
-### Add Command Options
-
-| Option | Description | Example |
-|--------|-------------|---------|
-| `-d, --description` | Task description | `-d "Call about appointment"` |
-| `-p, --priority` | Priority level (high/medium/low) | `-p high` |
-| `--tags` | Comma-separated tags | `--tags "work,urgent"` |
-| `--due` | Due date (YYYY-MM-DD or YYYY-MM-DD HH:MM) | `--due "2025-12-31 14:00"` |
-| `-r, --recurrence` | Recurrence pattern (daily/weekly/monthly) | `-r weekly` |
-
-### Filter Command Options
-
-| Option | Description | Example |
-|--------|-------------|---------|
-| `-p, --priority` | Filter by priority | `--priority high` |
-| `-s, --status` | Filter by status (completed/incomplete/all) | `--status incomplete` |
-| `-t, --tag` | Filter by tag | `--tag work` |
-| `--overdue` | Show only overdue tasks | `--overdue` |
-
-### Sort Command Options
-
-| Option | Description | Example |
-|--------|-------------|---------|
-| `-b, --by` | Sort field (priority/title/created/due_date) | `--by priority` |
-| `-o, --order` | Sort order (asc/desc) | `--order asc` |
-
-## Visual Indicators
-
-### Priority Icons
-- **HIGH**: `[!]` (red) - Urgent tasks
-- **MEDIUM**: `[-]` (yellow) - Normal priority
-- **LOW**: `[v]` (blue) - Low priority
-
-### Status Icons
-- `[X]` - Completed task
-- `[ ]` - Incomplete task
-
-### Due Date Indicators
-- **OVERDUE** (red) - Past due date
-- **DUE TODAY** (yellow) - Due today
-- Normal date display - Future dates
-
-## License
-
-MIT
-
-## Documentation
-
-- [Feature Specification](specs/001-phase1-cli-todo/spec.md)
-- [Implementation Plan](specs/001-phase1-cli-todo/plan.md)
-- [Task Breakdown](specs/001-phase1-cli-todo/tasks.md)
-- [Quick Start Guide](specs/001-phase1-cli-todo/quickstart.md)
-- [Architecture Decisions](history/adr/)
-
-## Phase Evolution
-
-For multi-phase architecture strategy, see [ARCHITECTURE.md](ARCHITECTURE.md).
+| Phase | Status | Description |
+|---|---|---|
+| Phase 1 | ✅ Complete | CLI with in-memory storage (Click + Rich) |
+| Phase 2 | ✅ Complete | Full-stack web app (FastAPI + Next.js + PostgreSQL) |
+| Phase 3 | Planned | AI Chatbot with MCP server (OpenAI Agents SDK) |
+| Phase 4 | Planned | Local Kubernetes deployment (Docker + Helm + Minikube) |
+| Phase 5 | Planned | Cloud deployment (Kafka, Dapr, DigitalOcean/GKE) |

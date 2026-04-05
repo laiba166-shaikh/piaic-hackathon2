@@ -6,7 +6,7 @@ This module defines:
 - Status indicators for complete/incomplete tasks
 - Color mappings for different task states
 """
-from src.core.models import Priority
+from src.cli.logics.models import Priority
 
 # Priority indicators: (symbol, color)
 # Using text-based indicators instead of emojis for Windows compatibility

@@ -36,6 +36,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${inter.variable} ${patrickHand.variable} ${courierPrime.variable} antialiased bg-paper-cream`}
+        suppressHydrationWarning
       >
         {children}
       </body>

@@ -5,8 +5,8 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.core.backend.api.v1.tasks import router as tasks_router
-from src.core.backend.config import settings
+from api.v1.tasks import router as tasks_router
+from config import settings
 
 # Configure logging
 logging.basicConfig(

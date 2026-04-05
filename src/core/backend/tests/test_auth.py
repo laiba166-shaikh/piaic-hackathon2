@@ -4,7 +4,7 @@ import pytest
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 
-from src.core.backend.dependencies import get_current_user
+from dependencies import get_current_user
 from tests.fixtures.jwt_tokens import create_invalid_jwt, create_test_jwt
 
 

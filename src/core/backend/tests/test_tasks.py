@@ -19,9 +19,9 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from src.core.backend.dependencies import get_current_user, get_db
-from src.core.backend.main import app
-from src.core.backend.models import Task
+from dependencies import get_current_user, get_db
+from main import app
+from models import Task
 
 
 # Test database setup

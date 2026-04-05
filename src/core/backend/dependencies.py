@@ -11,8 +11,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from src.core.backend.config import settings
-from src.core.backend.db import get_session
+from config import settings
+from db import get_session
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -49,12 +49,27 @@ async def fetch_jwks() -> dict[str, Any]:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(jwks_url, timeout=5.0)
-            response.raise_for_status()
+            if not response.is_success:
+                logger.error(
+                    f"JWKS endpoint returned {response.status_code}: {response.text[:200]}"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Unable to verify authentication token"
+                )
             jwks_data = response.json()
             logger.info(f"Successfully fetched JWKS with {len(jwks_data.get('keys', []))} keys")
             return jwks_data
+    except HTTPException:
+        raise
+    except httpx.ConnectError:
+        logger.error(f"Cannot reach frontend at {jwks_url} — is the frontend running?")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to verify authentication token"
+        )
     except Exception as e:
-        logger.error(f"Failed to fetch JWKS from {jwks_url}: {str(e)}")
+        logger.error(f"Failed to fetch JWKS from {jwks_url}: {type(e).__name__}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unable to verify authentication token"

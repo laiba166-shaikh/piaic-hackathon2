@@ -16,8 +16,8 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from src.core.backend.dependencies import get_current_user, get_db
-from src.core.backend.models import Task, TaskCreate, TaskPublic, TaskUpdate
+from dependencies import get_current_user, get_db
+from models import Task, TaskCreate, TaskPublic, TaskUpdate
 
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
 

@@ -14,7 +14,7 @@ class TaskBase(SQLModel):
 
     title: str = Field(max_length=200, min_length=1)
     description: str | None = Field(default=None)
-    completed: bool = Field(default=False)
+    completed: bool = Field(default=False, index=True)
 
 
 class Task(TaskBase, table=True):

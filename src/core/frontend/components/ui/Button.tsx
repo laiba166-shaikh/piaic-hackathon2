@@ -1,9 +1,3 @@
-/**
- * Button Component
- *
- * Reusable button component with consistent styling and variants.
- */
-
 import { ButtonHTMLAttributes } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,13 +19,13 @@ export function Button({
 
   const variantStyles = {
     primary:
-      "bg-vintage text-white hover:bg-vintage/90 focus:ring-vintage",
+      "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-ring",
     secondary:
-      "border border-sepia text-ink hover:bg-paper-dark focus:ring-sepia",
+      "border border-border text-foreground hover:bg-muted focus:ring-ring",
     danger:
-      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+      "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive",
     ghost:
-      "text-vintage hover:bg-vintage/10 focus:ring-vintage",
+      "text-primary hover:bg-primary/10 focus:ring-ring",
   };
 
   const sizeStyles = {

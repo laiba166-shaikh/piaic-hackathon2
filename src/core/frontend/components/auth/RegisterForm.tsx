@@ -1,18 +1,3 @@
-/**
- * RegisterForm Component
- *
- * User registration form with email/password authentication and JWT token retrieval.
- * Includes password strength validation and confirmation matching.
- *
- * Features:
- * - Email validation
- * - Password strength indicator
- * - Password confirmation matching
- * - Auto-login after successful registration
- * - JWT token retrieval for FastAPI authentication
- * - Loading states and error handling
- */
-
 "use client";
 
 import PasswordToggle from "@/components/auth/PasswordToggle";
@@ -22,194 +7,129 @@ import { setJwtToken } from "@/lib/jwt-storage";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-/**
- * RegisterForm component for new user registration
- *
- * @returns JSX.Element
- */
 export default function RegisterForm() {
-  // Form state
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [name, setName] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false);
-
-  // UI state
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Router for navigation
   const router = useRouter();
 
-  /**
-   * Calculate password strength
-   *
-   * @param pwd - Password to evaluate
-   * @returns "weak" | "medium" | "strong"
-   */
-  function getPasswordStrength(pwd: string): "weak" | "medium" | "strong" {
-    if (pwd.length < 8) return "weak";
-    if (pwd.length < 12) return "medium";
-    return "strong";
-  }
-
-  const passwordStrength = getPasswordStrength(password);
-
-  /**
-   * Handle form submission
-   *
-   * @param e - Form event
-   * @returns Promise<void>
-   */
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setError(null);
 
-    // Client-side validation
+    if (!firstName.trim()) {
+      setError("First name is required");
+      return;
+    }
     if (!email.trim()) {
       setError("Email is required");
       return;
     }
-
-    if (!name.trim()) {
-      setError("Name is required");
-      return;
-    }
-
     if (!password.trim()) {
       setError("Password is required");
       return;
     }
-
     if (password.length < 8) {
       setError("Password must be at least 8 characters");
       return;
     }
-
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    // Call Better Auth sign up
     setIsLoading(true);
     try {
-      // Step 1: Register with Better Auth
+      const name = [firstName.trim(), lastName.trim()].filter(Boolean).join(" ");
       const result = await authClient.signUp.email({
         email: email.trim(),
         password: password.trim(),
-        name: name.trim(),
+        name,
       });
 
-      // Check for errors from Better Auth
       if (result.error) {
-        setError(
-          result.error.message || "Registration failed. Please try again."
-        );
+        setError(result.error.message || "Registration failed. Please try again.");
         setIsLoading(false);
         return;
       }
 
-      // Step 2: Retrieve JWT token for FastAPI authentication
-      // Better Auth autoSignIn is enabled, so user is already logged in
       const tokenResult = await authClient.token();
-
-      // Check for errors retrieving JWT token
       if (tokenResult.error || !tokenResult.data) {
         setError("Registration succeeded but failed to retrieve access token. Please log in.");
         setIsLoading(false);
         return;
       }
 
-      // Step 3: Store JWT token in memory for API calls
       setJwtToken(tokenResult.data.token);
-
-      // Step 4: Success - redirect to home page
-      // Note: Middleware will see the new session cookie and allow access
       router.push("/");
-    } catch (err) {
-      // Handle network errors or unexpected errors
+    } catch {
       setError("Unable to connect. Please try again.");
       setIsLoading(false);
     }
   }
 
-  /**
-   * Toggle password visibility
-   *
-   * @returns void
-   */
-  function togglePasswordVisibility(): void {
-    setShowPassword((prev) => !prev);
-  }
-
-  /**
-   * Toggle confirm password visibility
-   *
-   * @returns void
-   */
-  function toggleConfirmPasswordVisibility(): void {
-    setShowConfirmPassword((prev) => !prev);
-  }
+  const inputClass =
+    "w-full px-4 py-3 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors";
+  const labelClass = "block text-xs font-semibold uppercase tracking-wide text-foreground mb-1.5";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
-      {/* Error Message */}
+    <form onSubmit={handleSubmit} className="space-y-5">
       <ErrorMessage message={error} />
 
-      {/* Name Field */}
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-ink mb-1"
-        >
-          Name
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          required
-          value={name}
-          onChange={(e): void => setName(e.target.value)}
-          className="w-full px-3 py-2 border border-sepia rounded-md bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-vintage"
-          placeholder="Your name"
-          disabled={isLoading}
-        />
+      {/* First + Last Name */}
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <label htmlFor="firstName" className={labelClass}>First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Alexica"
+            disabled={isLoading}
+            className={inputClass}
+          />
+        </div>
+        <div className="flex-1">
+          <label htmlFor="lastName" className={labelClass}>Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Smith"
+            disabled={isLoading}
+            className={inputClass}
+          />
+        </div>
       </div>
 
-      {/* Email Field */}
+      {/* Email */}
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-ink mb-1"
-        >
-          Email
-        </label>
+        <label htmlFor="email" className={labelClass}>Email Address</label>
         <input
           id="email"
           name="email"
           type="email"
           required
           value={email}
-          onChange={(e): void => setEmail(e.target.value)}
-          className="w-full px-3 py-2 border border-sepia rounded-md bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-vintage"
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           disabled={isLoading}
+          className={inputClass}
         />
       </div>
 
-      {/* Password Field */}
+      {/* Password */}
       <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-ink mb-1"
-        >
-          Password
-        </label>
+        <label htmlFor="password" className={labelClass}>Password</label>
         <div className="relative">
           <input
             id="password"
@@ -217,49 +137,19 @@ export default function RegisterForm() {
             type={showPassword ? "text" : "password"}
             required
             value={password}
-            onChange={(e): void => setPassword(e.target.value)}
-            className="w-full px-3 py-2 pr-10 border border-sepia rounded-md bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-vintage"
-            placeholder="At least 8 characters"
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Create a strong password"
             disabled={isLoading}
             minLength={8}
+            className={`${inputClass} pr-10`}
           />
-          <PasswordToggle
-            isVisible={showPassword}
-            onToggle={togglePasswordVisibility}
-          />
+          <PasswordToggle isVisible={showPassword} onToggle={() => setShowPassword((p) => !p)} />
         </div>
-
-        {/* Password Strength Indicator */}
-        {password && (
-          <div className="mt-1">
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-1 bg-sepia/20 rounded-full overflow-hidden">
-                <div
-                  className={`h-full transition-all ${
-                    passwordStrength === "weak"
-                      ? "w-1/3 bg-red-500"
-                      : passwordStrength === "medium"
-                        ? "w-2/3 bg-yellow-500"
-                        : "w-full bg-green-500"
-                  }`}
-                />
-              </div>
-              <span className="text-xs text-ink/60 capitalize">
-                {passwordStrength}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Confirm Password Field */}
+      {/* Confirm Password */}
       <div>
-        <label
-          htmlFor="confirmPassword"
-          className="block text-sm font-medium text-ink mb-1"
-        >
-          Confirm Password
-        </label>
+        <label htmlFor="confirmPassword" className={labelClass}>Confirm Password</label>
         <div className="relative">
           <input
             id="confirmPassword"
@@ -267,25 +157,22 @@ export default function RegisterForm() {
             type={showConfirmPassword ? "text" : "password"}
             required
             value={confirmPassword}
-            onChange={(e): void => setConfirmPassword(e.target.value)}
-            className="w-full px-3 py-2 pr-10 border border-sepia rounded-md bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-vintage"
-            placeholder="Re-enter your password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Repeat your password"
             disabled={isLoading}
+            className={`${inputClass} pr-10`}
           />
-          <PasswordToggle
-            isVisible={showConfirmPassword}
-            onToggle={toggleConfirmPasswordVisibility}
-          />
+          <PasswordToggle isVisible={showConfirmPassword} onToggle={() => setShowConfirmPassword((p) => !p)} />
         </div>
       </div>
 
-      {/* Submit Button */}
+      {/* Submit */}
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-vintage text-paper py-2 px-4 rounded-md font-medium hover:bg-vintage/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-card border border-border text-foreground font-bold py-3 px-4 rounded-lg hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
       >
-        {isLoading ? "Creating account..." : "Create Account"}
+        {isLoading ? "Creating account..." : "Create my account"}
       </button>
     </form>
   );

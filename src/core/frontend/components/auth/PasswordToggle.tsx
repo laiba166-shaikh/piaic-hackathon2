@@ -30,7 +30,7 @@ export default function PasswordToggle({
     <button
       type="button"
       onClick={onToggle}
-      className={`absolute right-3 top-1/2 -translate-y-1/2 text-ink/60 hover:text-ink transition-colors ${className}`}
+      className={`absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors ${className}`}
       aria-label={isVisible ? "Hide password" : "Show password"}
     >
       {isVisible ? (

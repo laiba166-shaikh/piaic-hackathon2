@@ -92,3 +92,6 @@ yarn-error.log*
 
 # Distribution / packaging
 .Python
+
+# UI inspiration
+UI_inspiration/

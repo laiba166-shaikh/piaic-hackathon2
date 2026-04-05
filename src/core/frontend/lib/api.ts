@@ -110,7 +110,7 @@ export const api = {
    */
   updateTask: (
     id: number,
-    task: { title?: string; description?: string }
+    task: { title?: string; description?: string; completed?: boolean }
   ) =>
     fetchWithAuth(`/api/v1/tasks/${id}`, {
       method: "PUT",

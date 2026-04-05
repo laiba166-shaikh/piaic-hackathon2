@@ -1,64 +1,138 @@
 @import "tailwindcss";
 
-body {
-  background: #F5F1E8;
-  color: #2C3E50;
-  font-family: Inter, system-ui, sans-serif;
+/* Class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Map CSS custom properties → Tailwind color utilities */
+@theme inline {
+  --color-background:                  hsl(var(--background));
+  --color-foreground:                  hsl(var(--foreground));
+  --color-card:                        hsl(var(--card));
+  --color-card-foreground:             hsl(var(--card-foreground));
+  --color-popover:                     hsl(var(--popover));
+  --color-popover-foreground:          hsl(var(--popover-foreground));
+  --color-primary:                     hsl(var(--primary));
+  --color-primary-foreground:          hsl(var(--primary-foreground));
+  --color-secondary:                   hsl(var(--secondary));
+  --color-secondary-foreground:        hsl(var(--secondary-foreground));
+  --color-muted:                       hsl(var(--muted));
+  --color-muted-foreground:            hsl(var(--muted-foreground));
+  --color-accent:                      hsl(var(--accent));
+  --color-accent-foreground:           hsl(var(--accent-foreground));
+  --color-destructive:                 hsl(var(--destructive));
+  --color-destructive-foreground:      hsl(var(--destructive-foreground));
+  --color-border:                      hsl(var(--border));
+  --color-input:                       hsl(var(--input));
+  --color-ring:                        hsl(var(--ring));
+  --color-sidebar-background:          hsl(var(--sidebar-background));
+  --color-sidebar-foreground:          hsl(var(--sidebar-foreground));
+  --color-sidebar-primary:             hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground:  hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent:              hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground:   hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border:              hsl(var(--sidebar-border));
+  --color-sidebar-ring:                hsl(var(--sidebar-ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
-@layer utilities {
-  /* Paper background colors */
-  .bg-paper-cream {
-    background-color: #F5F1E8;
-  }
-  .bg-paper-white {
-    background-color: #FEFEFE;
-  }
-
-  /* Ink text colors */
-  .text-ink-black {
-    color: #2C3E50;
-  }
-  .text-ink-dark {
-    color: #1A252F;
-  }
-  .text-ink-light {
-    color: #546E7A;
-  }
-
-  /* Vintage colors */
-  .bg-vintage-blue {
-    background-color: #4A7C99;
-  }
-  .bg-vintage-dark {
-    background-color: #3A5F7D;
-  }
-  .bg-vintage-light {
-    background-color: #6B9FB8;
-  }
-  .text-vintage-blue {
-    color: #4A7C99;
-  }
-
-  /* Sepia colors */
-  .bg-sepia-brown {
-    background-color: #8B7355;
-  }
-  .border-sepia-brown {
-    border-color: #8B7355;
-  }
-  .text-sepia-brown {
-    color: #8B7355;
+/* Raw HSL values — light mode (:root) and dark mode (.dark) */
+@layer base {
+  :root {
+    --background: 210 33% 98%;
+    --foreground: 203 47% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 203 47% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 203 47% 12%;
+    --primary: 209 78% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 205 55% 93%;
+    --secondary-foreground: 205 92% 22%;
+    --muted: 205 30% 95%;
+    --muted-foreground: 205 30% 45%;
+    --accent: 188 88% 44%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 205 35% 87%;
+    --input: 205 35% 87%;
+    --ring: 188 88% 44%;
+    --radius: 0.5rem;
+    --sidebar-background: 205 92% 31%;
+    --sidebar-foreground: 205 60% 92%;
+    --sidebar-primary: 188 88% 44%;
+    --sidebar-primary-foreground: 203 47% 12%;
+    --sidebar-accent: 205 80% 25%;
+    --sidebar-accent-foreground: 205 60% 92%;
+    --sidebar-border: 205 70% 26%;
+    --sidebar-ring: 188 88% 44%;
   }
 
-  /* Accent colors */
-  .bg-accent-gold {
-    background-color: #D4AF37;
+  .dark {
+    --background: 203 47% 10%;
+    --foreground: 205 40% 92%;
+    --card: 203 47% 15%;
+    --card-foreground: 205 40% 92%;
+    --popover: 203 47% 13%;
+    --popover-foreground: 205 40% 92%;
+    --primary: 188 88% 44%;
+    --primary-foreground: 203 47% 10%;
+    --secondary: 203 47% 19%;
+    --secondary-foreground: 205 40% 88%;
+    --muted: 203 40% 21%;
+    --muted-foreground: 205 30% 60%;
+    --accent: 209 78% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 205 40% 24%;
+    --input: 203 47% 19%;
+    --ring: 188 88% 44%;
+    --sidebar-background: 203 55% 7%;
+    --sidebar-foreground: 205 40% 88%;
+    --sidebar-primary: 188 88% 44%;
+    --sidebar-primary-foreground: 203 47% 10%;
+    --sidebar-accent: 203 47% 16%;
+    --sidebar-accent-foreground: 205 40% 88%;
+    --sidebar-border: 205 40% 18%;
+    --sidebar-ring: 188 88% 44%;
   }
-  .bg-accent-red {
-    background-color: #C85A54;
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: Inter, system-ui, sans-serif;
   }
-  .bg-accent-green {
-    background-color: #5A8A6F;
+
+  /* Custom scrollbar for task list */
+  .task-list-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  .task-list-scroll::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .task-list-scroll::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 99px;
+  }
+
+  .task-list-scroll::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 99px;
+    transition: background-color 0.2s;
+  }
+
+  .task-list-scroll:hover::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.4);
+  }
+
+  .dark .task-list-scroll {
+    scrollbar-color: hsl(var(--border)) transparent;
   }
 }

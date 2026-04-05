@@ -1,110 +1,118 @@
-/**
- * TaskCard Component
- *
- * Displays a single task with a paper-like journal aesthetic.
- */
+"use client";
 
+import { useState } from "react";
 import { Task } from "@/types/task";
 
 interface TaskCardProps {
   task: Task;
+  onToggle?: (taskId: number) => Promise<void>;
   onEdit?: (task: Task) => void;
   onDelete?: (taskId: number) => void;
 }
 
-export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
-  const formattedDate = new Date(task.created_at).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
+export function TaskCard({ task, onToggle, onEdit, onDelete }: TaskCardProps) {
+  const [toggling, setToggling] = useState(false);
+
+  const formattedDate = new Date(task.created_at).toLocaleDateString("en-GB", {
     day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 
-  return (
-    <div
-      className={`bg-white rounded-lg border border-sepia p-6 shadow-sm hover:shadow-md transition-shadow ${
-        task.completed ? "opacity-75" : ""
-      }`}
-    >
-      <div className="flex justify-between items-start mb-3">
-        <h3
-          className={`text-xl font-serif font-medium text-ink ${
-            task.completed ? "line-through text-ink/60" : ""
-          }`}
-        >
-          {task.title}
-        </h3>
+  async function handleToggle() {
+    if (!onToggle || toggling) return;
+    setToggling(true);
+    try {
+      await onToggle(task.id);
+    } finally {
+      setToggling(false);
+    }
+  }
 
-        <div className="flex gap-2 ml-4">
+
+  return (
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
+      {/* Main row */}
+      <div className="flex items-center gap-4 p-4">
+        {/* Toggle circle */}
+        <button
+          onClick={handleToggle}
+          disabled={toggling || !onToggle}
+          aria-label={task.completed ? "Mark as incomplete" : "Mark as complete"}
+          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-all
+            ${task.completed
+              ? "bg-accent/20 border-accent"
+              : "border-border hover:border-accent"
+            }
+            ${toggling ? "opacity-50 cursor-wait" : onToggle ? "cursor-pointer" : "cursor-default"}
+          `}
+        >
+          {task.completed && (
+            <svg
+              className="w-4 h-4 text-accent"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+          {toggling && !task.completed && (
+            <div className="w-3 h-3 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+          )}
+        </button>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <p
+            className={`text-base ${
+              task.completed
+                ? "line-through text-muted-foreground"
+                : "text-foreground font-medium"
+            }`}
+          >
+            {task.title}
+          </p>
+          <p className="text-sm text-muted-foreground mt-0.5">{formattedDate}</p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 shrink-0">
           {onEdit && (
             <button
               onClick={() => onEdit(task)}
-              className="text-vintage hover:text-vintage/80 transition-colors"
-              aria-label="Edit"
+              aria-label="Edit task"
+              className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
           )}
-
           {onDelete && (
             <button
               onClick={() => onDelete(task.id)}
-              className="text-red-600 hover:text-red-700 transition-colors"
-              aria-label="Delete"
+              aria-label="Delete task"
+              className="p-2 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
             </button>
           )}
         </div>
       </div>
 
-      {task.description && (
-        <p className="text-ink/80 leading-relaxed mb-4">{task.description}</p>
+      {/* Completed tag — bottom strip, only visible when done */}
+      {task.completed && (
+        <div className="px-4 py-2 border-t border-border bg-accent/5 flex items-center gap-1.5">
+          <svg className="w-3.5 h-3.5 text-accent shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-xs font-medium text-accent">Completed</span>
+        </div>
       )}
-
-      <div className="flex justify-between items-center pt-3 border-t border-sepia/30">
-        <span className="text-sm text-ink/50 font-mono">{formattedDate}</span>
-
-        {task.completed && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <svg
-              className="w-3 h-3 mr-1"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Completed
-          </span>
-        )}
-      </div>
     </div>
   );
 }

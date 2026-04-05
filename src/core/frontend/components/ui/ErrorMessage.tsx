@@ -26,7 +26,7 @@ export default function ErrorMessage({
   return (
     <div
       role="alert"
-      className={`bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm ${className}`}
+      className={`bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm ${className}`}
     >
       {message}
     </div>

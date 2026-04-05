@@ -55,7 +55,7 @@ export default function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={isLoading}
-      className="px-4 py-2 text-sm font-medium text-ink hover:text-vintage transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       aria-label="Sign out"
     >
       {isLoading ? "Signing out..." : "Sign Out"}

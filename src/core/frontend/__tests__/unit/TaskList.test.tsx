@@ -4,10 +4,10 @@
  * These tests should FAIL initially since components are not implemented yet.
  */
 
-import { render, screen, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
 import { TaskList } from "@/components/tasks/TaskList";
 import { Task } from "@/types/task";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 const mockTasks: Task[] = [
   {

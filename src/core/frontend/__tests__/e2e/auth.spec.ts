@@ -10,7 +10,7 @@
  * These tests run against a live Next.js application with Better Auth.
  */
 
-import { test, expect, type Page } from "@playwright/test";
+import { expect, test, type Page } from '@playwright/test';
 
 /**
  * Test utilities
@@ -27,8 +27,8 @@ function generateTestEmail(): string {
   return `test-${timestamp}-${random}@example.com`;
 }
 
-const TEST_PASSWORD = "testpassword123";
-const TEST_NAME = "Test User";
+const TEST_PASSWORD = 'testpassword123';
+const TEST_NAME = 'Test User';
 
 /**
  * Clear all cookies and local storage before each test
@@ -43,25 +43,27 @@ async function clearAuth(page: Page): Promise<void> {
   // Navigate to the app first to ensure we have access to localStorage
   // Then clear it safely with error handling
   try {
-    await page.goto("/");
+    await page.goto('/');
     await page.evaluate(() => {
       try {
         localStorage.clear();
         sessionStorage.clear();
       } catch (e) {
         // Ignore errors if localStorage is not accessible
+        console.log(e);
       }
     });
   } catch (e) {
     // If navigation or evaluation fails, just continue
     // Clearing cookies is usually sufficient for auth tests
+    console.log('Error during clearAuth:', e);
   }
 }
 
 /**
  * Test Suite: Authentication Flow
  */
-test.describe("Authentication Flow", () => {
+test.describe('Authentication Flow', () => {
   /**
    * Test 1: Complete Registration Flow
    *
@@ -72,7 +74,7 @@ test.describe("Authentication Flow", () => {
    * - After registration, user is redirected to dashboard
    * - User session is established (auth cookie exists)
    */
-  test("should complete registration flow successfully", async ({ page }) => {
+  test('should complete registration flow successfully', async ({ page }) => {
     // Arrange: Clear any existing auth state
     await clearAuth(page);
 
@@ -80,13 +82,11 @@ test.describe("Authentication Flow", () => {
     const testEmail = generateTestEmail();
 
     // Act: Navigate to registration page
-    await page.goto("/register");
+    await page.goto('/register');
 
     // Assert: Registration page loads correctly
-    await expect(page).toHaveURL("/register");
-    await expect(
-      page.getByRole("heading", { name: /create account|register/i })
-    ).toBeVisible();
+    await expect(page).toHaveURL('/register');
+    await expect(page.getByRole('heading', { name: /create account|register/i })).toBeVisible();
 
     // Act: Fill in registration form
     await page.getByLabel(/name/i).fill(TEST_NAME);
@@ -95,22 +95,20 @@ test.describe("Authentication Flow", () => {
     await page.getByLabel(/confirm password/i).fill(TEST_PASSWORD);
 
     // Act: Submit the form
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Assert: User is redirected to dashboard after successful registration
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Assert: Dashboard content is visible (sidebar, header, or welcome message)
     // Adjust selector based on your dashboard layout
-    await expect(
-      page.locator("text=Task").or(page.locator("text=Dashboard"))
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Task').or(page.locator('text=Dashboard'))).toBeVisible({
+      timeout: 5000,
+    });
 
     // Assert: Auth cookie is set
     const cookies = await page.context().cookies();
-    const authCookie = cookies.find((cookie) =>
-      cookie.name.includes("better-auth.session_token")
-    );
+    const authCookie = cookies.find((cookie) => cookie.name.includes('better-auth.session_token'));
     expect(authCookie).toBeDefined();
     expect(authCookie?.value).toBeTruthy();
   });
@@ -123,13 +121,13 @@ test.describe("Authentication Flow", () => {
    * - Form shows error when password is too short
    * - Form shows error when passwords don't match
    */
-  test("should validate registration form fields", async ({ page }) => {
+  test('should validate registration form fields', async ({ page }) => {
     // Arrange
     await clearAuth(page);
-    await page.goto("/register");
+    await page.goto('/register');
 
     // Test Case 1: Submit with missing fields
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Assert: Validation errors appear (browser validation or custom)
     // This will trigger HTML5 validation since fields are required
@@ -138,24 +136,22 @@ test.describe("Authentication Flow", () => {
     // Test Case 2: Password too short
     await page.getByLabel(/name/i).fill(TEST_NAME);
     await page.getByLabel(/email/i).fill(generateTestEmail());
-    await page.getByLabel(/^password$/i).fill("short");
-    await page.getByLabel(/confirm password/i).fill("short");
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByLabel(/^password$/i).fill('short');
+    await page.getByLabel(/confirm password/i).fill('short');
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Assert: Error message about password length
-    await expect(
-      page.locator("text=/password must be at least 8 characters/i")
-    ).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('text=/password must be at least 8 characters/i')).toBeVisible({
+      timeout: 3000,
+    });
 
     // Test Case 3: Passwords don't match
     await page.getByLabel(/^password$/i).fill(TEST_PASSWORD);
-    await page.getByLabel(/confirm password/i).fill("different123");
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByLabel(/confirm password/i).fill('different123');
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Assert: Error message about password mismatch
-    await expect(
-      page.locator("text=/passwords do not match/i")
-    ).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('text=/passwords do not match/i')).toBeVisible({ timeout: 3000 });
   });
 
   /**
@@ -167,57 +163,53 @@ test.describe("Authentication Flow", () => {
    * - After login, user is redirected to dashboard
    * - User session is established
    */
-  test("should complete login flow successfully", async ({ page }) => {
+  test('should complete login flow successfully', async ({ page }) => {
     // Arrange: First register a user
     await clearAuth(page);
     const testEmail = generateTestEmail();
 
     // Register user
-    await page.goto("/register");
+    await page.goto('/register');
     await page.getByLabel(/name/i).fill(TEST_NAME);
     await page.getByLabel(/email/i).fill(testEmail);
     await page.getByLabel(/^password$/i).fill(TEST_PASSWORD);
     await page.getByLabel(/confirm password/i).fill(TEST_PASSWORD);
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Wait for registration to complete
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Act: Log out (click logout button)
-    const logoutButton = page.getByRole("button", { name: /log out|logout/i });
+    const logoutButton = page.getByRole('button', { name: /log out|logout/i });
     if (await logoutButton.isVisible()) {
       await logoutButton.click();
-      await expect(page).toHaveURL("/login", { timeout: 5000 });
+      await expect(page).toHaveURL('/login', { timeout: 5000 });
     } else {
       // Manually clear cookies if logout button not found
       await clearAuth(page);
-      await page.goto("/login");
+      await page.goto('/login');
     }
 
     // Act: Navigate to login page
-    await page.goto("/login");
-    await expect(page).toHaveURL("/login");
+    await page.goto('/login');
+    await expect(page).toHaveURL('/login');
 
     // Assert: Login page loads correctly
-    await expect(
-      page.getByRole("heading", { name: /log in|sign in|login/i })
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: /log in|sign in|login/i })).toBeVisible();
 
     // Act: Fill in login form
     await page.getByLabel(/email/i).fill(testEmail);
     await page.getByLabel(/^password$/i).fill(TEST_PASSWORD);
 
     // Act: Submit the form
-    await page.getByRole("button", { name: /log in|sign in|login/i }).click();
+    await page.getByRole('button', { name: /log in|sign in|login/i }).click();
 
     // Assert: User is redirected to dashboard after successful login
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Assert: Auth cookie is set
     const cookies = await page.context().cookies();
-    const authCookie = cookies.find((cookie) =>
-      cookie.name.includes("better-auth.session_token")
-    );
+    const authCookie = cookies.find((cookie) => cookie.name.includes('better-auth.session_token'));
     expect(authCookie).toBeDefined();
   });
 
@@ -228,25 +220,23 @@ test.describe("Authentication Flow", () => {
    * - Form shows error when credentials are invalid
    * - Form validates required fields
    */
-  test("should validate login form and handle errors", async ({ page }) => {
+  test('should validate login form and handle errors', async ({ page }) => {
     // Arrange
     await clearAuth(page);
-    await page.goto("/login");
+    await page.goto('/login');
 
     // Test Case 1: Submit with invalid credentials
-    await page.getByLabel(/email/i).fill("wrong@example.com");
-    await page.getByLabel(/^password$/i).fill("wrongpassword");
-    await page.getByRole("button", { name: /log in|sign in|login/i }).click();
+    await page.getByLabel(/email/i).fill('wrong@example.com');
+    await page.getByLabel(/^password$/i).fill('wrongpassword');
+    await page.getByRole('button', { name: /log in|sign in|login/i }).click();
 
     // Assert: Error message appears
-    await expect(
-      page.locator("text=/invalid|incorrect|failed/i")
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=/invalid|incorrect|failed/i')).toBeVisible({ timeout: 5000 });
 
     // Test Case 2: Submit with empty fields
     await page.getByLabel(/email/i).clear();
     await page.getByLabel(/^password$/i).clear();
-    await page.getByRole("button", { name: /log in|sign in|login/i }).click();
+    await page.getByRole('button', { name: /log in|sign in|login/i }).click();
 
     // Assert: Validation error or focus on email field
     await expect(page.getByLabel(/email/i)).toBeFocused();
@@ -260,10 +250,10 @@ test.describe("Authentication Flow", () => {
    * - Authenticated users can access /
    * - Login page redirects authenticated users to /
    */
-  test("should protect routes based on authentication", async ({ page }) => {
+  test('should protect routes based on authentication', async ({ page }) => {
     // Test Case 1: Unauthenticated user accessing protected route
     await clearAuth(page);
-    await page.goto("/");
+    await page.goto('/');
 
     // Assert: Redirected to login page
     await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
@@ -271,29 +261,27 @@ test.describe("Authentication Flow", () => {
     // Test Case 2: Authenticated user accessing login page
     // First, register and login
     const testEmail = generateTestEmail();
-    await page.goto("/register");
+    await page.goto('/register');
     await page.getByLabel(/name/i).fill(TEST_NAME);
     await page.getByLabel(/email/i).fill(testEmail);
     await page.getByLabel(/^password$/i).fill(TEST_PASSWORD);
     await page.getByLabel(/confirm password/i).fill(TEST_PASSWORD);
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Wait for redirect to dashboard
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Act: Try to access login page while authenticated
-    await page.goto("/login");
+    await page.goto('/login');
 
     // Assert: Redirected back to dashboard
-    await expect(page).toHaveURL("/", { timeout: 5000 });
+    await expect(page).toHaveURL('/', { timeout: 5000 });
 
     // Test Case 3: Authenticated user can access protected route
-    await page.goto("/");
-    await expect(page).toHaveURL("/");
+    await page.goto('/');
+    await expect(page).toHaveURL('/');
     // Dashboard content should be visible
-    await expect(
-      page.locator("text=Task").or(page.locator("text=Dashboard"))
-    ).toBeVisible();
+    await expect(page.locator('text=Task').or(page.locator('text=Dashboard'))).toBeVisible();
   });
 
   /**
@@ -305,46 +293,42 @@ test.describe("Authentication Flow", () => {
    * - Auth cookie is cleared
    * - User cannot access protected routes after logout
    */
-  test("should complete logout flow successfully", async ({ page }) => {
+  test('should complete logout flow successfully', async ({ page }) => {
     // Arrange: Register and login a user
     await clearAuth(page);
     const testEmail = generateTestEmail();
 
-    await page.goto("/register");
+    await page.goto('/register');
     await page.getByLabel(/name/i).fill(TEST_NAME);
     await page.getByLabel(/email/i).fill(testEmail);
     await page.getByLabel(/^password$/i).fill(TEST_PASSWORD);
     await page.getByLabel(/confirm password/i).fill(TEST_PASSWORD);
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Wait for successful login
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Assert: User is logged in (auth cookie exists)
     let cookies = await page.context().cookies();
-    let authCookie = cookies.find((cookie) =>
-      cookie.name.includes("better-auth.session_token")
-    );
+    let authCookie = cookies.find((cookie) => cookie.name.includes('better-auth.session_token'));
     expect(authCookie).toBeDefined();
 
     // Act: Click logout button
-    const logoutButton = page.getByRole("button", { name: /log out|logout/i });
+    const logoutButton = page.getByRole('button', { name: /log out|logout/i });
     await expect(logoutButton).toBeVisible();
     await logoutButton.click();
 
     // Assert: Redirected to login page
-    await expect(page).toHaveURL("/login", { timeout: 5000 });
+    await expect(page).toHaveURL('/login', { timeout: 5000 });
 
     // Assert: Auth cookie is cleared or expired
     cookies = await page.context().cookies();
-    authCookie = cookies.find((cookie) =>
-      cookie.name.includes("better-auth.session_token")
-    );
+    authCookie = cookies.find((cookie) => cookie.name.includes('better-auth.session_token'));
     // Cookie should be removed or have empty value
     expect(!authCookie || !authCookie.value).toBeTruthy();
 
     // Assert: Cannot access protected routes
-    await page.goto("/");
+    await page.goto('/');
     await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
   });
 
@@ -356,30 +340,30 @@ test.describe("Authentication Flow", () => {
    * - Clicking toggle shows password
    * - Clicking toggle again hides password
    */
-  test("should toggle password visibility on login form", async ({ page }) => {
+  test('should toggle password visibility on login form', async ({ page }) => {
     // Arrange
     await clearAuth(page);
-    await page.goto("/login");
+    await page.goto('/login');
 
     const passwordInput = page.getByLabel(/^password$/i);
-    const toggleButton = page.getByRole("button", {
+    const toggleButton = page.getByRole('button', {
       name: /show password|hide password|toggle/i,
     });
 
     // Assert: Password is hidden by default
-    await expect(passwordInput).toHaveAttribute("type", "password");
+    await expect(passwordInput).toHaveAttribute('type', 'password');
 
     // Act: Click toggle to show password
     await toggleButton.click();
 
     // Assert: Password is now visible
-    await expect(passwordInput).toHaveAttribute("type", "text");
+    await expect(passwordInput).toHaveAttribute('type', 'text');
 
     // Act: Click toggle to hide password again
     await toggleButton.click();
 
     // Assert: Password is hidden again
-    await expect(passwordInput).toHaveAttribute("type", "password");
+    await expect(passwordInput).toHaveAttribute('type', 'password');
   });
 
   /**
@@ -396,20 +380,20 @@ test.describe("Authentication Flow", () => {
    * - JWT must survive page refresh
    * - useAuthInit hook must refresh JWT on page load if missing
    */
-  test("should persist JWT token across page refresh", async ({ page }) => {
+  test('should persist JWT token across page refresh', async ({ page }) => {
     // Arrange: Register and login a user
     await clearAuth(page);
     const testEmail = generateTestEmail();
 
-    await page.goto("/register");
+    await page.goto('/register');
     await page.getByLabel(/name/i).fill(TEST_NAME);
     await page.getByLabel(/email/i).fill(testEmail);
     await page.getByLabel(/^password$/i).fill(TEST_PASSWORD);
     await page.getByLabel(/confirm password/i).fill(TEST_PASSWORD);
-    await page.getByRole("button", { name: /register|sign up/i }).click();
+    await page.getByRole('button', { name: /register|sign up/i }).click();
 
     // Wait for successful registration and redirect to dashboard
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Assert: JWT token exists in localStorage
     const jwtBefore = await page.evaluate(() => {
@@ -421,9 +405,7 @@ test.describe("Authentication Flow", () => {
 
     // Assert: Better Auth session cookie exists
     let cookies = await page.context().cookies();
-    let authCookie = cookies.find((cookie) =>
-      cookie.name.includes("better-auth.session_token")
-    );
+    let authCookie = cookies.find((cookie) => cookie.name.includes('better-auth.session_token'));
     expect(authCookie).toBeDefined();
     expect(authCookie?.value).toBeTruthy();
 
@@ -431,7 +413,7 @@ test.describe("Authentication Flow", () => {
     await page.reload();
 
     // Wait for page to load completely
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Assert: JWT token STILL exists in localStorage after refresh
     const jwtAfter = await page.evaluate(() => {
@@ -443,15 +425,13 @@ test.describe("Authentication Flow", () => {
     expect(jwtAfter).not.toBe('undefined');
 
     // Assert: User is still authenticated (can see dashboard content)
-    await expect(
-      page.locator("text=Task").or(page.locator("text=Dashboard"))
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Task').or(page.locator('text=Dashboard'))).toBeVisible({
+      timeout: 5000,
+    });
 
     // Assert: Session cookie still exists
     cookies = await page.context().cookies();
-    authCookie = cookies.find((cookie) =>
-      cookie.name.includes("better-auth.session_token")
-    );
+    authCookie = cookies.find((cookie) => cookie.name.includes('better-auth.session_token'));
     expect(authCookie).toBeDefined();
     expect(authCookie?.value).toBeTruthy();
 
@@ -473,7 +453,7 @@ test.describe("Authentication Flow", () => {
     await page.reload();
 
     // Wait for page to load and useAuthInit to run
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
     await page.waitForTimeout(1000); // Give useAuthInit time to run
 
     // Assert: JWT token is automatically restored by useAuthInit hook
@@ -485,8 +465,8 @@ test.describe("Authentication Flow", () => {
     expect(jwtRestored).not.toBe('undefined');
 
     // Assert: User can still access protected content
-    await expect(
-      page.locator("text=Task").or(page.locator("text=Dashboard"))
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Task').or(page.locator('text=Dashboard'))).toBeVisible({
+      timeout: 5000,
+    });
   });
 });

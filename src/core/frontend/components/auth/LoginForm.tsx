@@ -1,18 +1,3 @@
-/**
- * LoginForm Component (GREEN Phase - TDD)
- *
- * This component implements the login form to satisfy all test cases from T024.
- * It provides email/password authentication with Better Auth and JWT token retrieval.
- *
- * Features:
- * - Client-side validation (email and password required)
- * - Password visibility toggle
- * - Loading states during API calls
- * - Error handling with user-friendly messages
- * - JWT token retrieval for FastAPI authentication
- * - Redirect to home page on successful login
- */
-
 "use client";
 
 import PasswordToggle from "@/components/auth/PasswordToggle";
@@ -22,115 +7,65 @@ import { setJwtToken } from "@/lib/jwt-storage";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-/**
- * LoginForm component for user authentication
- */
 export default function LoginForm() {
-  // Form state
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  // UI state
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Router for navigation
   const router = useRouter();
 
-  /**
-   * Handle form submission
-   *
-   * Validates inputs, calls Better Auth sign in, and redirects on success.
-   *
-   * @param e - Form event
-   * @returns Promise<void>
-   */
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-
-    // Prevent browser's built-in validation from interfering
     e.stopPropagation();
-
     setError(null);
 
-    // Client-side validation (must happen even if HTML5 validation is bypassed)
     if (!email.trim()) {
       setError("Email is required");
       return;
     }
-
     if (!password.trim()) {
       setError("Password is required");
       return;
     }
 
-    // Call Better Auth sign in
     setIsLoading(true);
-
     try {
-      // Step 1: Sign in with Better Auth
       const result = await authClient.signIn.email({
         email: email.trim(),
         password: password.trim(),
       });
 
-      // Check for errors from Better Auth
       if (result.error) {
         setError(result.error.message || "Invalid email or password");
         setIsLoading(false);
         return;
       }
 
-      // Step 2: Retrieve JWT token for FastAPI authentication
       const tokenResult = await authClient.token();
-
-      // Check for errors retrieving JWT token
       if (tokenResult.error || !tokenResult.data) {
         setError("Authentication succeeded but failed to retrieve access token. Please try again.");
         setIsLoading(false);
         return;
       }
 
-      // Step 3: Store JWT token in memory for API calls
       setJwtToken(tokenResult.data.token);
-
-      // Step 4: Success - redirect to home page
-      // Note: Middleware will see the new session cookie and allow access
       setIsLoading(false);
       router.push("/");
-    } catch (err) {
-      // Handle network errors or unexpected errors
+    } catch {
       setError("Unable to connect. Please try again.");
       setIsLoading(false);
     }
   }
 
-  /**
-   * Toggle password visibility
-   *
-   * @returns void
-   */
-  function togglePasswordVisibility(): void {
-    setShowPassword((prev) => !prev);
-  }
-
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="space-y-4 w-full max-w-md"
-    >
-      {/* Error Message */}
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <ErrorMessage message={error} />
 
-      {/* Email Field */}
+      {/* Email */}
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-ink mb-1"
-        >
-          Email
+        <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wide text-foreground mb-1.5">
+          Email Address
         </label>
         <input
           id="email"
@@ -138,19 +73,16 @@ export default function LoginForm() {
           type="email"
           required
           value={email}
-          onChange={(e): void => setEmail(e.target.value)}
-          className="w-full px-3 py-2 border border-sepia rounded-md bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-vintage"
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           disabled={isLoading}
+          className="w-full px-4 py-3 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors"
         />
       </div>
 
-      {/* Password Field */}
+      {/* Password */}
       <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-ink mb-1"
-        >
+        <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wide text-foreground mb-1.5">
           Password
         </label>
         <div className="relative">
@@ -160,25 +92,25 @@ export default function LoginForm() {
             type={showPassword ? "text" : "password"}
             required
             value={password}
-            onChange={(e): void => setPassword(e.target.value)}
-            className="w-full px-3 py-2 pr-10 border border-sepia rounded-md bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-vintage"
-            placeholder="Enter your password"
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
             disabled={isLoading}
+            className="w-full px-4 py-3 pr-10 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors"
           />
-          <PasswordToggle
-            isVisible={showPassword}
-            onToggle={togglePasswordVisibility}
-          />
+          <PasswordToggle isVisible={showPassword} onToggle={() => setShowPassword((p) => !p)} />
+        </div>
+        <div className="text-right mt-1">
+          <span className="text-sm text-muted-foreground cursor-default">Forgot password?</span>
         </div>
       </div>
 
-      {/* Submit Button */}
+      {/* Submit */}
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-vintage text-paper py-2 px-4 rounded-md font-medium hover:bg-vintage/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-card border border-border text-foreground font-bold py-3 px-4 rounded-lg hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
       >
-        {isLoading ? "Signing in..." : "Log in"}
+        {isLoading ? "Signing in..." : "Sign in to Task Mate"}
       </button>
     </form>
   );

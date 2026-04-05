@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Patrick_Hand, Courier_Prime } from "next/font/google";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,23 +9,9 @@ const inter = Inter({
   display: "swap",
 });
 
-const patrickHand = Patrick_Hand({
-  variable: "--font-patrick-hand",
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const courierPrime = Courier_Prime({
-  variable: "--font-courier-prime",
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "Todo - Task Management",
-  description: "Simple and elegant task management application",
+  title: "Task Mate",
+  description: "Organise your thoughts and tasks",
 };
 
 export default function RootLayout({
@@ -33,12 +20,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>): JSX.Element {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${patrickHand.variable} ${courierPrime.variable} antialiased bg-paper-cream`}
-        suppressHydrationWarning
-      >
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} antialiased bg-background text-foreground`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(t===null&&d))document.documentElement.classList.add('dark');})()`,
+          }}
+        />
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

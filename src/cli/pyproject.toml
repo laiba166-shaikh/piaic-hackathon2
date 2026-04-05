@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [
-    {name = "PIAIC Hackathon Team"}
+    {name = "LAIBA SHAHID"}
 ]
 
 dependencies = [
@@ -30,7 +30,7 @@ dev = [
 todo = "src.cli.main:cli"
 
 [tool.setuptools]
-package-dir = {"" = "."}
+package-dir = {"" = "../.."}
 packages = ["src", "src.core", "src.core.storage", "src.cli", "src.cli.commands", "src.cli.rendering"]
 
 [build-system]

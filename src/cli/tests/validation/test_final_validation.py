@@ -15,9 +15,9 @@ from datetime import datetime, timedelta
 from click.testing import CliRunner
 from src.cli.main import cli
 from src.cli.commands.basic import _storage
-from src.core.models import Task, Priority, Recurrence
-from src.core.services import TaskService
-from src.core.storage.memory import MemoryStorage
+from src.cli.logics.models import Task, Priority, Recurrence
+from src.cli.logics.services import TaskService
+from src.cli.logics.storage.memory import MemoryStorage
 
 
 @pytest.fixture(autouse=True)

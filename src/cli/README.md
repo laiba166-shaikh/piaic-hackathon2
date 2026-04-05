@@ -138,33 +138,36 @@ ruff check src/ tests/
 
 ```
 src/
-├── core/               # Business logic
-│   ├── models.py       # Task, Priority, Recurrence
-│   ├── services.py     # TaskService
-│   ├── exceptions.py   # Custom exceptions
-│   ├── validators.py   # Input validation
-│   └── storage/        # Storage abstraction
-│       ├── base.py     # ITaskStorage interface
-│       └── memory.py   # MemoryStorage implementation
-├── cli/                # CLI interface
-│   ├── main.py         # CLI entry point
-│   ├── commands/       # Click commands
-│   └── rendering/      # Table rendering
-└── config.py           # Configuration
-
-tests/
-├── unit/               # Unit tests
-├── integration/        # Integration tests
-└── contract/           # Storage contract tests
+├── cli/                    # Phase 1 CLI application
+│   ├── main.py             # CLI entry point
+│   ├── commands/           # Click commands (basic, intermediate)
+│   ├── rendering/          # Table rendering (colors, table)
+│   ├── logics/             # Business logic (CLI-local)
+│   │   ├── models.py       # Task, Priority, Recurrence
+│   │   ├── services.py     # TaskService
+│   │   ├── exceptions.py   # Custom exceptions
+│   │   ├── validators.py   # Input validation
+│   │   ├── recurring.py    # Recurring task utilities
+│   │   └── storage/        # Storage abstraction
+│   │       ├── base.py     # ITaskStorage interface
+│   │       └── memory.py   # MemoryStorage implementation
+│   └── tests/              # All CLI tests
+│       ├── unit/
+│       ├── integration/
+│       └── contract/
+├── core/                   # Phase 2+ (web)
+│   ├── backend/            # FastAPI backend
+│   └── frontend/           # Next.js frontend
+└── config.py               # Shared configuration
 ```
 
 ## Architecture
 
 This project demonstrates **clean architecture** principles with separation of concerns:
 
-- **Core Layer**: Business logic independent of CLI
-- **Storage Layer**: Abstract interface with strategy pattern for Phase 2 database migration
-- **CLI Layer**: Click-based commands with Rich table rendering
+- **Logics Layer** (`cli/logics/`): Business logic, domain models, and storage — fully independent of the CLI interface
+- **Storage Layer**: Abstract interface (`ITaskStorage`) with strategy pattern, enabling Phase 2 database migration
+- **CLI Layer**: Click-based commands with Rich table rendering, depends only on the logics layer
 
 Built to evolve across 5 phases:
 - **Phase 1**: CLI with in-memory storage (this phase)

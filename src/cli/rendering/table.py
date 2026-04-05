@@ -6,7 +6,7 @@ using Rich library for enhanced CLI output.
 """
 from rich.table import Table
 from rich.text import Text
-from src.core.models import Task
+from src.cli.logics.models import Task
 from src.cli.rendering.colors import PRIORITY_INDICATORS, STATUS_INDICATORS, COLORS
 
 

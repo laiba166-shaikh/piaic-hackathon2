@@ -1,9 +1,9 @@
 """Unit tests for MemoryStorage implementation"""
 from datetime import datetime
 import pytest
-from src.core.models import Task, Priority
-from src.core.exceptions import TaskNotFoundError
-from src.core.storage.memory import MemoryStorage
+from src.cli.logics.models import Task, Priority
+from src.cli.logics.exceptions import TaskNotFoundError
+from src.cli.logics.storage.memory import MemoryStorage
 
 
 class TestMemoryStorage:

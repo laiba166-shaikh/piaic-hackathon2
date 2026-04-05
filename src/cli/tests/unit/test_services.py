@@ -2,9 +2,9 @@
 from datetime import datetime
 import pytest
 from unittest.mock import Mock, MagicMock
-from src.core.models import Task, Priority, Recurrence
-from src.core.storage.base import ITaskStorage
-from src.core.exceptions import ValidationError
+from src.cli.logics.models import Task, Priority, Recurrence
+from src.cli.logics.storage.base import ITaskStorage
+from src.cli.logics.exceptions import ValidationError
 
 
 class TestTaskServiceCreateTask:
@@ -13,7 +13,7 @@ class TestTaskServiceCreateTask:
     def test_create_task_with_title_only(self) -> None:
         """Test create_task with title only calls storage.create()"""
         # Import here to avoid circular dependency before implementation
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage
         mock_storage = Mock(spec=ITaskStorage)
@@ -40,7 +40,7 @@ class TestTaskServiceCreateTask:
 
     def test_create_task_with_title_and_description(self) -> None:
         """Test create_task with title and description"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage
         mock_storage = Mock(spec=ITaskStorage)
@@ -71,7 +71,7 @@ class TestTaskServiceCreateTask:
 
     def test_create_task_validates_empty_title(self) -> None:
         """Test create_task raises ValidationError for empty title (FR-007)"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         service = TaskService(mock_storage)
@@ -89,7 +89,7 @@ class TestTaskServiceCreateTask:
 
     def test_create_task_sets_default_values(self) -> None:
         """Test create_task sets correct default values"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         created_task = Task(title="Test", id=1, created_at=datetime.now(), updated_at=datetime.now())
@@ -107,7 +107,7 @@ class TestTaskServiceCreateTask:
 
     def test_create_task_returns_task_with_assigned_id(self) -> None:
         """Test create_task returns task with ID assigned by storage"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
 
@@ -127,7 +127,7 @@ class TestTaskServiceListAll:
 
     def test_list_all_returns_all_tasks(self) -> None:
         """Test list_all returns all tasks from storage"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -151,7 +151,7 @@ class TestTaskServiceListAll:
 
     def test_list_all_returns_empty_list_when_no_tasks(self) -> None:
         """Test list_all returns empty list when storage has no tasks"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with no tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -167,7 +167,7 @@ class TestTaskServiceListAll:
 
     def test_list_all_returns_tasks_sorted_by_created_at_descending(self) -> None:
         """Test list_all returns tasks sorted by created_at descending (newest first)"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
         import time
 
         # Mock storage with tasks in specific order
@@ -199,7 +199,7 @@ class TestTaskServiceMarkComplete:
 
     def test_mark_complete_updates_task_status(self) -> None:
         """Test mark_complete sets task.completed to True"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a task
         mock_storage = Mock(spec=ITaskStorage)
@@ -227,8 +227,8 @@ class TestTaskServiceMarkComplete:
 
     def test_mark_complete_raises_error_for_nonexistent_task(self) -> None:
         """Test mark_complete raises TaskNotFoundError for invalid ID"""
-        from src.core.services import TaskService
-        from src.core.exceptions import TaskNotFoundError
+        from src.cli.logics.services import TaskService
+        from src.cli.logics.exceptions import TaskNotFoundError
 
         # Mock storage that returns None (task not found)
         mock_storage = Mock(spec=ITaskStorage)
@@ -243,7 +243,7 @@ class TestTaskServiceMarkComplete:
 
     def test_mark_complete_is_idempotent(self) -> None:
         """Test marking already completed task as complete again works"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with already completed task
         mock_storage = Mock(spec=ITaskStorage)
@@ -264,7 +264,7 @@ class TestTaskServiceMarkIncomplete:
 
     def test_mark_incomplete_updates_task_status(self) -> None:
         """Test mark_incomplete sets task.completed to False"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a completed task
         mock_storage = Mock(spec=ITaskStorage)
@@ -292,8 +292,8 @@ class TestTaskServiceMarkIncomplete:
 
     def test_mark_incomplete_raises_error_for_nonexistent_task(self) -> None:
         """Test mark_incomplete raises TaskNotFoundError for invalid ID"""
-        from src.core.services import TaskService
-        from src.core.exceptions import TaskNotFoundError
+        from src.cli.logics.services import TaskService
+        from src.cli.logics.exceptions import TaskNotFoundError
 
         # Mock storage that returns None (task not found)
         mock_storage = Mock(spec=ITaskStorage)
@@ -312,7 +312,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_updates_title(self) -> None:
         """Test update_task updates task title"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a task
         mock_storage = Mock(spec=ITaskStorage)
@@ -340,7 +340,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_updates_description(self) -> None:
         """Test update_task updates task description"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a task
         mock_storage = Mock(spec=ITaskStorage)
@@ -361,7 +361,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_updates_both_title_and_description(self) -> None:
         """Test update_task can update both title and description"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a task
         mock_storage = Mock(spec=ITaskStorage)
@@ -380,8 +380,8 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_raises_error_for_nonexistent_task(self) -> None:
         """Test update_task raises TaskNotFoundError for invalid ID"""
-        from src.core.services import TaskService
-        from src.core.exceptions import TaskNotFoundError
+        from src.cli.logics.services import TaskService
+        from src.cli.logics.exceptions import TaskNotFoundError
 
         # Mock storage that returns None
         mock_storage = Mock(spec=ITaskStorage)
@@ -396,7 +396,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_raises_error_for_empty_title(self) -> None:
         """Test update_task raises ValueError for empty title"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a task
         mock_storage = Mock(spec=ITaskStorage)
@@ -412,7 +412,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_with_no_changes_provided(self) -> None:
         """Test update_task raises ValueError when no updates provided"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a task
         mock_storage = Mock(spec=ITaskStorage)
@@ -428,7 +428,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_recurrence_for_incomplete_task(self) -> None:
         """Test update_task can update recurrence for incomplete task"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with an incomplete task
         mock_storage = Mock(spec=ITaskStorage)
@@ -459,7 +459,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_recurrence_blocked_for_completed_task(self) -> None:
         """Test update_task raises ValueError when updating recurrence for completed task"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a completed task
         mock_storage = Mock(spec=ITaskStorage)
@@ -482,7 +482,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_recurrence_from_daily_to_weekly(self) -> None:
         """Test update_task can change recurrence from daily to weekly"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a daily recurring task
         mock_storage = Mock(spec=ITaskStorage)
@@ -506,7 +506,7 @@ class TestTaskServiceUpdateTask:
 
     def test_update_task_recurrence_to_none(self) -> None:
         """Test update_task can remove recurrence (set to NONE)"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with a recurring task
         mock_storage = Mock(spec=ITaskStorage)
@@ -534,7 +534,7 @@ class TestTaskServiceDeleteTask:
 
     def test_delete_task_removes_task(self) -> None:
         """Test delete_task removes task from storage"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage
         mock_storage = Mock(spec=ITaskStorage)
@@ -553,7 +553,7 @@ class TestTaskServiceDeleteTask:
 
     def test_delete_task_returns_false_for_nonexistent_task(self) -> None:
         """Test delete_task returns False if task doesn't exist"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage that returns False (task not found)
         mock_storage = Mock(spec=ITaskStorage)

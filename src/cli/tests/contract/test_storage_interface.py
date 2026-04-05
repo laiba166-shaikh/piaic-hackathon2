@@ -6,10 +6,10 @@ complies with the ITaskStorage interface contract.
 """
 from datetime import datetime, timedelta
 import pytest
-from src.core.models import Task, Priority, Recurrence
-from src.core.exceptions import TaskNotFoundError
-from src.core.storage.base import ITaskStorage
-from src.core.storage.memory import MemoryStorage
+from src.cli.logics.models import Task, Priority, Recurrence
+from src.cli.logics.exceptions import TaskNotFoundError
+from src.cli.logics.storage.base import ITaskStorage
+from src.cli.logics.storage.memory import MemoryStorage
 
 
 @pytest.fixture

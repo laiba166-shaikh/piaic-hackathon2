@@ -1,7 +1,7 @@
 """Unit tests for core models (Task, Priority, Recurrence)"""
 from datetime import datetime, timedelta
 import pytest
-from src.core.models import Task, Priority, Recurrence
+from src.cli.logics.models import Task, Priority, Recurrence
 
 
 class TestPriorityEnum:

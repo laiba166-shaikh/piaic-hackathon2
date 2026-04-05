@@ -12,9 +12,9 @@ Tests for:
 """
 import pytest
 from datetime import datetime, timedelta
-from src.core.models import Task, Priority, Recurrence
-from src.core.exceptions import TaskNotFoundError, ValidationError, InvalidIDError
-from src.core.validators import parse_tags, parse_due_date
+from src.cli.logics.models import Task, Priority, Recurrence
+from src.cli.logics.exceptions import TaskNotFoundError, ValidationError, InvalidIDError
+from src.cli.logics.validators import parse_tags, parse_due_date
 
 
 class TestVeryLongTitles:

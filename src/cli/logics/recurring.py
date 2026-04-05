@@ -5,7 +5,7 @@ This module provides functions for calculating next occurrences of recurring tas
 """
 from datetime import datetime
 from calendar import monthrange
-from src.core.models import Recurrence
+from src.cli.logics.models import Recurrence
 from src.config import get_logger
 
 logger = get_logger(__name__)

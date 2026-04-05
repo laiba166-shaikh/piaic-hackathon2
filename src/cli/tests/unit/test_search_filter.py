@@ -2,8 +2,8 @@
 import pytest
 from datetime import datetime, timedelta
 from unittest.mock import Mock
-from src.core.models import Task, Priority
-from src.core.storage.base import ITaskStorage
+from src.cli.logics.models import Task, Priority
+from src.cli.logics.storage.base import ITaskStorage
 
 
 class TestSearchTasks:
@@ -11,7 +11,7 @@ class TestSearchTasks:
 
     def test_search_tasks_matches_title_case_insensitive(self) -> None:
         """Test search_tasks matches keyword in title (case-insensitive)"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -34,7 +34,7 @@ class TestSearchTasks:
 
     def test_search_tasks_matches_description_case_insensitive(self) -> None:
         """Test search_tasks matches keyword in description (case-insensitive)"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -71,7 +71,7 @@ class TestSearchTasks:
 
     def test_search_tasks_matches_title_or_description(self) -> None:
         """Test search_tasks matches keyword in either title or description"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -100,7 +100,7 @@ class TestSearchTasks:
 
     def test_search_tasks_returns_empty_list_when_no_matches(self) -> None:
         """Test search_tasks returns empty list when no tasks match"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -120,7 +120,7 @@ class TestSearchTasks:
 
     def test_search_tasks_raises_error_for_empty_query(self) -> None:
         """Test search_tasks raises ValueError for empty query"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         service = TaskService(mock_storage)
@@ -135,7 +135,7 @@ class TestSearchTasks:
 
     def test_search_tasks_substring_matching(self) -> None:
         """Test search_tasks does substring matching"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -162,7 +162,7 @@ class TestFilterTasks:
 
     def test_filter_tasks_by_priority(self) -> None:
         """Test filter_tasks filters by priority"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks of different priorities
         mock_storage = Mock(spec=ITaskStorage)
@@ -186,7 +186,7 @@ class TestFilterTasks:
 
     def test_filter_tasks_by_status_completed(self) -> None:
         """Test filter_tasks filters by completed status"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with completed and incomplete tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -209,7 +209,7 @@ class TestFilterTasks:
 
     def test_filter_tasks_by_status_incomplete(self) -> None:
         """Test filter_tasks filters by incomplete status"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with completed and incomplete tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -232,7 +232,7 @@ class TestFilterTasks:
 
     def test_filter_tasks_by_tag(self) -> None:
         """Test filter_tasks filters by tag"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks with various tags
         mock_storage = Mock(spec=ITaskStorage)
@@ -256,7 +256,7 @@ class TestFilterTasks:
 
     def test_filter_tasks_combined_criteria(self) -> None:
         """Test filter_tasks with multiple criteria (priority + status)"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with various tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -299,7 +299,7 @@ class TestFilterTasks:
 
     def test_filter_tasks_returns_empty_list_when_no_matches(self) -> None:
         """Test filter_tasks returns empty list when no matches found"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         # Mock storage with tasks
         mock_storage = Mock(spec=ITaskStorage)
@@ -319,7 +319,7 @@ class TestFilterTasks:
 
     def test_filter_tasks_raises_error_when_no_criteria(self) -> None:
         """Test filter_tasks raises ValueError when no filter criteria provided"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         service = TaskService(mock_storage)
@@ -334,7 +334,7 @@ class TestSortTasks:
 
     def test_sort_tasks_by_priority_descending(self) -> None:
         """Test sort_tasks sorts by priority high -> medium -> low"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         tasks = [
@@ -356,7 +356,7 @@ class TestSortTasks:
 
     def test_sort_tasks_by_priority_ascending(self) -> None:
         """Test sort_tasks sorts by priority low -> medium -> high when ascending"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         tasks = [
@@ -378,7 +378,7 @@ class TestSortTasks:
 
     def test_sort_tasks_by_title_alphabetically(self) -> None:
         """Test sort_tasks sorts by title A-Z"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         tasks = [
@@ -400,7 +400,7 @@ class TestSortTasks:
 
     def test_sort_tasks_by_created_date(self) -> None:
         """Test sort_tasks sorts by created_at newest first"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         now = datetime.now()
@@ -423,7 +423,7 @@ class TestSortTasks:
 
     def test_sort_tasks_by_created_date_ascending(self) -> None:
         """Test sort_tasks sorts by created_at oldest first when ascending"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         now = datetime.now()
@@ -446,7 +446,7 @@ class TestSortTasks:
 
     def test_sort_tasks_returns_empty_list_when_no_tasks(self) -> None:
         """Test sort_tasks returns empty list when no tasks exist"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         mock_storage.list_all.return_value = []
@@ -459,7 +459,7 @@ class TestSortTasks:
 
     def test_sort_tasks_raises_error_for_invalid_field(self) -> None:
         """Test sort_tasks raises ValueError for invalid sort field"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         service = TaskService(mock_storage)
@@ -473,7 +473,7 @@ class TestFilterOverdueTasks:
 
     def test_filter_tasks_by_overdue_true(self) -> None:
         """Test filter_tasks can filter to only overdue tasks"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         now = datetime.now()
@@ -524,7 +524,7 @@ class TestFilterOverdueTasks:
 
     def test_filter_tasks_by_overdue_false(self) -> None:
         """Test filter_tasks can filter to only non-overdue tasks"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         now = datetime.now()
@@ -569,7 +569,7 @@ class TestFilterOverdueTasks:
 
     def test_filter_tasks_overdue_combined_with_priority(self) -> None:
         """Test filter_tasks combines overdue with priority filter"""
-        from src.core.services import TaskService
+        from src.cli.logics.services import TaskService
 
         mock_storage = Mock(spec=ITaskStorage)
         now = datetime.now()

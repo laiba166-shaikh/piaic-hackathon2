@@ -31,7 +31,7 @@ todo = "src.cli.main:cli"
 
 [tool.setuptools]
 package-dir = {"" = "../.."}
-packages = ["src", "src.core", "src.core.storage", "src.cli", "src.cli.commands", "src.cli.rendering"]
+packages = ["src", "src.cli", "src.cli.logics", "src.cli.logics.storage", "src.cli.commands", "src.cli.rendering"]
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel"]

@@ -20,7 +20,7 @@ interface ErrorMessageProps {
 export default function ErrorMessage({
   message,
   className = "",
-}: ErrorMessageProps): JSX.Element | null {
+}: ErrorMessageProps): React.JSX.Element | null {
   if (!message) return null;
 
   return (

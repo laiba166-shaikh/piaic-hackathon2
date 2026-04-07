@@ -5,6 +5,8 @@
  * Used in forms during API calls and page loading states.
  */
 
+import React from "react";
+
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -20,7 +22,7 @@ interface LoadingSpinnerProps {
 export default function LoadingSpinner({
   size = "md",
   className = "",
-}: LoadingSpinnerProps): JSX.Element {
+}: LoadingSpinnerProps): React.JSX.Element {
   const sizeClasses = {
     sm: "w-4 h-4 border-2",
     md: "w-6 h-6 border-2",

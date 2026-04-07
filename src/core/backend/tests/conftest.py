@@ -29,7 +29,7 @@ def mock_jwks():
     called at all — this patch is a no-op for them.
     """
     with patch(
-        "src.core.backend.dependencies.fetch_jwks",
+        "dependencies.fetch_jwks",
         new_callable=AsyncMock,
         return_value=get_test_jwks(),
     ):

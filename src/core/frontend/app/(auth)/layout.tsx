@@ -2,6 +2,6 @@ export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>): JSX.Element {
+}>): React.JSX.Element {
   return <>{children}</>;
 }

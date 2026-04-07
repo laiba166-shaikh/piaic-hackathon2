@@ -190,6 +190,13 @@ async def get_current_user(
         # Get the EdDSA public key for this token
         public_key = get_signing_key(token, jwks_data)
 
+        # Log unverified claims to help debug issuer/audience mismatches
+        unverified = jwt.decode(token, options={"verify_signature": False})
+        logger.info(f"""Token claims — iss: {unverified.get('iss')},
+                    aud: {unverified.get('aud')},
+                    expected: {settings.FRONTEND_URL}"""
+                )
+
         # Verify and decode the token using PyJWT with EdDSA
         payload = jwt.decode(
             token,

@@ -9,7 +9,6 @@
 
 import { authClient } from "@/lib/auth-client";
 import { clearJwtToken } from "@/lib/jwt-storage";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 /**
@@ -19,7 +18,6 @@ import { useState } from "react";
  */
 export default function LogoutButton() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const router = useRouter();
 
   /**
    * Handle logout action
@@ -32,22 +30,13 @@ export default function LogoutButton() {
     setIsLoading(true);
 
     try {
-      // Sign out with Better Auth (clears session cookie)
       await authClient.signOut();
-
-      // Clear JWT token from memory
-      clearJwtToken();
-
-      // Redirect to login page after successful logout
-      router.push("/login");
     } catch (error) {
-      // If logout fails, still clear token and redirect to login
-      // (Better Auth clears cookies on client side)
       console.error("Logout error:", error);
-      clearJwtToken();
-      router.push("/login");
     } finally {
+      clearJwtToken();
       setIsLoading(false);
+      window.location.href = "/login";
     }
   }
 

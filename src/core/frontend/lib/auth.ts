@@ -178,4 +178,4 @@ export const auth = betterAuth({
  * Use these in Server Components, Server Actions, and API Routes
  */
 export type AuthSession = typeof auth.api.getSession;
-export type AuthUser = Awaited<ReturnType<AuthSession>>['user'];
+export type AuthUser = NonNullable<Awaited<ReturnType<AuthSession>>>['user'];

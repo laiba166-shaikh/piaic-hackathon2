@@ -26,9 +26,9 @@ async function fetchWithAuth(endpoint: string, options?: RequestInit) {
     const token = getJwtToken();
 
     // Build headers with JWT token
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...options?.headers,
+      ...(options?.headers as Record<string, string>),
     };
 
     // Add Authorization header if token is available
